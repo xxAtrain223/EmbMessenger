@@ -46,12 +46,9 @@ namespace emb
             }
 
             template<typename T>
-            T Calculate(const T table[], const T& crc, const uint8_t& data)
+            T Calculate(const T table[], const T crc, const uint8_t data)
             {
-                /* XOR-in next input byte */
                 uint8_t pos = (uint8_t)((crc ^ ((uint32_t)data << nBits<T>())) >> nBits<T>());
-
-                /* get current CRC value = remainder */
                 return ((sizeof(T) > 1) ? (crc << 8) : 0) ^ table[pos];
             }
 
@@ -67,21 +64,48 @@ namespace emb
         }
 
         #ifdef CRC8
-        inline uint8_t Calculate8(const uint8_t& crc, const uint8_t& data)
+        /**
+         * @brief Calculates the next CRC value.
+         *
+         * @param crc Current CRC value
+         *
+         * @param data Byte to append to the crc value
+         *
+         * @returns New CRC value
+         */
+        inline uint8_t Calculate8(const uint8_t crc, const uint8_t data)
         {
             return detail::Calculate(detail::CrcTable8.data, crc, data);
         }
         #endif
 
         #ifdef CRC16
-        inline uint16_t Calculate16(const uint16_t& crc, const uint8_t& data)
+        /**
+        * @brief Calculates the next CRC value.
+        *
+        * @param crc Current CRC value
+        *
+        * @param data Byte to append to the crc value
+        *
+        * @returns New CRC value
+        */
+        inline uint16_t Calculate16(const uint16_t crc, const uint8_t data)
         {
             return detail::Calculate(detail::CrcTable16.data, crc, data);
         }
         #endif
 
         #ifdef CRC32
-        inline uint32_t Calculate32(const uint32_t& crc, const uint8_t& data)
+        /**
+        * @brief Calculates the next CRC value.
+        *
+        * @param crc Current CRC value
+        *
+        * @param data Byte to append to the crc value
+        *
+        * @returns New CRC value
+        */
+        inline uint32_t Calculate32(const uint32_t crc, const uint8_t data)
         {
             return detail::Calculate(detail::CrcTable32.data, crc, data);
         }

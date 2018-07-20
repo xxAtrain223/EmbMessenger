@@ -1,2 +1,2 @@
 # EmbeddedMessenger
-Communication library for embedded devices.
+Command based communication library for embedded devices.

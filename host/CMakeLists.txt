@@ -12,7 +12,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14 CXX_STANDARD_RE
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
 if(ENABLE_TESTING)
-	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -fprofile-arcs -ftest-coverage -DTESTING)
+	target_compile_options(${PROJECT_NAME} PUBLIC -g -O0 --coverage -DTESTING)
 
 	file(GLOB_RECURSE ${PROJECT_NAME}_TEST_SOURCES "test/*.[ch]pp")
 	add_executable(${PROJECT_NAME}Test ${${PROJECT_NAME}_TEST_SOURCES})
