@@ -1,0 +1,30 @@
+dist: trusty
+
+sudo: false
+
+language: cpp
+
+compiler: gcc
+
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-4.9
+            - gcc-4.9
+            - cmake
+            - lcov
+            - cppcheck
+
+install:
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+
+before_script:
+    - ./travis/before_script.sh
+
+script:
+    - ./travis/script.sh
+
+after_script:
+    - ./travis/after_script.sh
