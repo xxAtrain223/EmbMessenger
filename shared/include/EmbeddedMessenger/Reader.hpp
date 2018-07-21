@@ -60,6 +60,7 @@ namespace emb
                 var_uint_t<T> in; // uint the size of T
                 T out;
             } u;
+            u.in = 0;
 
             for (uint8_t i = sizeof(T) - 1; i >= 0; --i)
             {
