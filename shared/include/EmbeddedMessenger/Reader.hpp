@@ -18,6 +18,7 @@ namespace emb
     class Reader
     {
     protected:
+        IBuffer* m_buffer;
         uint8_t m_crc;
 
         /**
@@ -67,7 +68,7 @@ namespace emb
             {
                 uint8_t byte = 0;
                 readByte(byte);
-                u.in |= byte << (i * 8); // Probably wrong, needs testing
+                u.in |= static_cast<var_uint_t<T>>(byte) << (i * 8);
             }
 
             value = u.out;
@@ -96,7 +97,7 @@ namespace emb
          *
          * @returns The type of the next parameter in the buffer
          */
-        DataType getType() const;
+        bool getType(DataType& type) const;
 
         /**
          * @brief Checks if the next parameter in the buffer is a bool.

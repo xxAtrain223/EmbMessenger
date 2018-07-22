@@ -19,13 +19,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC0))
-                .WillOnce(Return(0xC2));
+                .WillOnce(Return(DataType::kNull))
+                .WillOnce(Return(DataType::kBoolFalse));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kNull);
-            EXPECT_NE(reader.getType(), DataType::kNull);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kNull);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kNull);
         }
 
         TEST(reader_types, get_type_bool_false)
@@ -35,13 +39,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC2))
-                .WillOnce(Return(0xC3));
+                .WillOnce(Return(DataType::kBoolFalse))
+                .WillOnce(Return(DataType::kBoolTrue));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kBoolFalse);
-            EXPECT_NE(reader.getType(), DataType::kBoolFalse);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kBoolFalse);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kBoolFalse);
         }
 
         TEST(reader_types, get_type_bool_true)
@@ -51,13 +59,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC3))
-                .WillOnce(Return(0xC2));
+                .WillOnce(Return(DataType::kBoolTrue))
+                .WillOnce(Return(DataType::kBoolFalse));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kBoolTrue);
-            EXPECT_NE(reader.getType(), DataType::kBoolTrue);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kBoolTrue);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kBoolTrue);
         }
 
         TEST(reader_types, get_type_uint_8)
@@ -67,13 +79,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCC))
-                .WillOnce(Return(0xCD));
+                .WillOnce(Return(DataType::kUint8))
+                .WillOnce(Return(DataType::kUint16));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kUint8);
-            EXPECT_NE(reader.getType(), DataType::kUint8);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kUint8);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kUint8);
         }
 
         TEST(reader_types, get_type_uint_16)
@@ -83,13 +99,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCD))
-                .WillOnce(Return(0xCE));
+                .WillOnce(Return(DataType::kUint16))
+                .WillOnce(Return(DataType::kUint32));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kUint16);
-            EXPECT_NE(reader.getType(), DataType::kUint16);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kUint16);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kUint16);
         }
 
         TEST(reader_types, get_type_uint_32)
@@ -99,13 +119,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCE))
-                .WillOnce(Return(0xCF));
+                .WillOnce(Return(DataType::kUint32))
+                .WillOnce(Return(DataType::kUint64));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kUint32);
-            EXPECT_NE(reader.getType(), DataType::kUint32);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kUint32);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kUint32);
         }
 
         TEST(reader_types, get_type_uint_64)
@@ -115,13 +139,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCF))
-                .WillOnce(Return(0xCE));
+                .WillOnce(Return(DataType::kUint64))
+                .WillOnce(Return(DataType::kUint32));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kUint64);
-            EXPECT_NE(reader.getType(), DataType::kUint64);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kUint64);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kUint64);
         }
 
         TEST(reader_types, get_type_int_8)
@@ -131,13 +159,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD0))
-                .WillOnce(Return(0xD1));
+                .WillOnce(Return(DataType::kInt8))
+                .WillOnce(Return(DataType::kInt16));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kInt8);
-            EXPECT_NE(reader.getType(), DataType::kInt8);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kInt8);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kInt8);
         }
 
         TEST(reader_types, get_type_int_16)
@@ -147,13 +179,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD1))
-                .WillOnce(Return(0xD2));
+                .WillOnce(Return(DataType::kInt16))
+                .WillOnce(Return(DataType::kInt32));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kInt16);
-            EXPECT_NE(reader.getType(), DataType::kInt16);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kInt16);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kInt16);
         }
 
         TEST(reader_types, get_type_int_32)
@@ -163,13 +199,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD2))
-                .WillOnce(Return(0xD3));
+                .WillOnce(Return(DataType::kInt32))
+                .WillOnce(Return(DataType::kInt64));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kInt32);
-            EXPECT_NE(reader.getType(), DataType::kInt32);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kInt32);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kInt32);
         }
 
         TEST(reader_types, get_type_int_64)
@@ -179,13 +219,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD3))
-                .WillOnce(Return(0xD2));
+                .WillOnce(Return(DataType::kInt64))
+                .WillOnce(Return(DataType::kInt32));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kInt64);
-            EXPECT_NE(reader.getType(), DataType::kInt64);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kInt64);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kInt64);
         }
 
         TEST(reader_types, get_type_posfixint)
@@ -200,10 +244,16 @@ namespace emb
                 .WillOnce(Return(0x7F));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kPosFixInt);
-            EXPECT_EQ(reader.getType(), DataType::kPosFixInt);
-            EXPECT_EQ(reader.getType(), DataType::kPosFixInt);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kPosFixInt);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kPosFixInt);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kPosFixInt);
         }
 
         TEST(reader_types, get_type_negfixint)
@@ -218,10 +268,16 @@ namespace emb
                 .WillOnce(Return(0xFF));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kNegFixInt);
-            EXPECT_EQ(reader.getType(), DataType::kNegFixInt);
-            EXPECT_EQ(reader.getType(), DataType::kNegFixInt);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kNegFixInt);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kNegFixInt);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kNegFixInt);
         }
 
         TEST(reader_types, get_type_float)
@@ -231,13 +287,17 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCA))
-                .WillOnce(Return(0xCB));
+                .WillOnce(Return(DataType::kFloat))
+                .WillOnce(Return(DataType::kUint8));
 
             Reader reader(&buffer);
+            DataType type;
 
-            EXPECT_EQ(reader.getType(), DataType::kFloat);
-            EXPECT_NE(reader.getType(), DataType::kFloat);
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_EQ(type, DataType::kFloat);
+
+            EXPECT_TRUE(reader.getType(type));
+            EXPECT_NE(type, DataType::kFloat);
         }
 
         TEST(reader_types, next_null)
@@ -247,8 +307,8 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC0))
-                .WillOnce(Return(0xC1));
+                .WillOnce(Return(DataType::kNull))
+                .WillOnce(Return(DataType::kCrc));
 
             Reader reader(&buffer);
 
@@ -263,10 +323,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC2))
-                .WillOnce(Return(0xC3))
-                .WillOnce(Return(0xC0))
-                .WillOnce(Return(0xC1));
+                .WillOnce(Return(DataType::kBoolFalse))
+                .WillOnce(Return(DataType::kBoolTrue))
+                .WillOnce(Return(DataType::kNull))
+                .WillOnce(Return(DataType::kCrc));
 
             Reader reader(&buffer);
 
@@ -301,12 +361,12 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCC))  // uint8
-                .WillOnce(Return(0xCD))  // uint16
-                .WillOnce(Return(0xCE))  // uint32
-                .WillOnce(Return(0xCF))  // uint64
-                .WillOnce(Return(0x41))  // PosFixInt
-                .WillOnce(Return(0xFF)); // NegFixInt
+                .WillOnce(Return(DataType::kUint8))
+                .WillOnce(Return(DataType::kUint16))
+                .WillOnce(Return(DataType::kUint32))
+                .WillOnce(Return(DataType::kUint64))
+                .WillOnce(Return(DataType::kPosFixInt))
+                .WillOnce(Return(DataType::kNegFixInt));
 
             Reader reader(&buffer);
 
@@ -325,12 +385,12 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD0))  // int8
-                .WillOnce(Return(0xD1))  // int16
-                .WillOnce(Return(0xD2))  // int32
-                .WillOnce(Return(0xD3))  // int64
-                .WillOnce(Return(0x41))  // PosFixInt
-                .WillOnce(Return(0xFF)); // NegFixInt
+                .WillOnce(Return(DataType::kInt8))
+                .WillOnce(Return(DataType::kInt16))
+                .WillOnce(Return(DataType::kInt32))
+                .WillOnce(Return(DataType::kInt64))
+                .WillOnce(Return(DataType::kPosFixInt))
+                .WillOnce(Return(DataType::kNegFixInt));
 
             Reader reader(&buffer);
 
@@ -349,8 +409,8 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCA))
-                .WillOnce(Return(0xCB));
+                .WillOnce(Return(DataType::kFloat))
+                .WillOnce(Return(DataType::kNull));
 
             Reader reader(&buffer);
 
@@ -365,9 +425,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC0));
+                .WillOnce(Return(DataType::kNull));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xC0));
+                .WillOnce(Return(DataType::kNull));
 
             Reader reader(&buffer);
 
@@ -381,9 +441,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC2));
+                .WillOnce(Return(DataType::kBoolFalse));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xC2));
+                .WillOnce(Return(DataType::kBoolFalse));
 
             Reader reader(&buffer);
 
@@ -399,9 +459,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xC3));
+                .WillOnce(Return(DataType::kBoolTrue));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xC3));
+                .WillOnce(Return(DataType::kBoolTrue));
 
             Reader reader(&buffer);
 
@@ -417,9 +477,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCC));
+                .WillOnce(Return(DataType::kUint8));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCC))
+                .WillOnce(Return(DataType::kUint8))
                 .WillOnce(Return(0xF1));
             EXPECT_CALL(buffer, size())
                 .WillOnce(Return(1));
@@ -438,9 +498,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCD));
+                .WillOnce(Return(DataType::kUint16));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCD))
+                .WillOnce(Return(DataType::kUint16))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23));
             EXPECT_CALL(buffer, size())
@@ -460,9 +520,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCE));
+                .WillOnce(Return(DataType::kUint32));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCE))
+                .WillOnce(Return(DataType::kUint32))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
@@ -484,9 +544,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCF));
+                .WillOnce(Return(DataType::kUint64));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCF))
+                .WillOnce(Return(DataType::kUint64))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
@@ -512,9 +572,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD0));
+                .WillOnce(Return(DataType::kInt8));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD0))
+                .WillOnce(Return(DataType::kInt8))
                 .WillOnce(Return(0xDF));
             EXPECT_CALL(buffer, size())
                 .WillOnce(Return(1));
@@ -533,9 +593,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD1));
+                .WillOnce(Return(DataType::kInt16));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD1))
+                .WillOnce(Return(DataType::kInt16))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23));
             EXPECT_CALL(buffer, size())
@@ -555,9 +615,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD2));
+                .WillOnce(Return(DataType::kInt32));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD2))
+                .WillOnce(Return(DataType::kInt32))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
@@ -579,9 +639,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD3));
+                .WillOnce(Return(DataType::kInt64));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD3))
+                .WillOnce(Return(DataType::kInt64))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
@@ -661,9 +721,9 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCA));
+                .WillOnce(Return(DataType::kFloat));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCA))
+                .WillOnce(Return(DataType::kFloat))
                 .WillOnce(Return(0x40))
                 .WillOnce(Return(0x49))
                 .WillOnce(Return(0x0F))
@@ -685,10 +745,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCC))
-                .WillOnce(Return(0xCC));
+                .WillOnce(Return(DataType::kUint8))
+                .WillOnce(Return(DataType::kUint8));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCC))
+                .WillOnce(Return(DataType::kUint8))
                 .WillOnce(Return(0xF1));
             EXPECT_CALL(buffer, size())
                 .WillOnce(Return(1));
@@ -707,10 +767,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCD))
-                .WillOnce(Return(0xCD));
+                .WillOnce(Return(DataType::kUint16))
+                .WillOnce(Return(DataType::kUint16));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCD))
+                .WillOnce(Return(DataType::kUint16))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23));
             EXPECT_CALL(buffer, size())
@@ -730,10 +790,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xCE))
-                .WillOnce(Return(0xCE));
+                .WillOnce(Return(DataType::kUint32))
+                .WillOnce(Return(DataType::kUint32));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xCE))
+                .WillOnce(Return(DataType::kUint32))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
@@ -774,10 +834,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD1))
-                .WillOnce(Return(0xD1));
+                .WillOnce(Return(DataType::kInt16))
+                .WillOnce(Return(DataType::kInt16));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD1))
+                .WillOnce(Return(DataType::kInt16))
                 .WillOnce(Return(0x71))
                 .WillOnce(Return(0x23));
             EXPECT_CALL(buffer, size())
@@ -797,10 +857,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD2))
-                .WillOnce(Return(0xD2));
+                .WillOnce(Return(DataType::kInt32))
+                .WillOnce(Return(DataType::kInt32));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD2))
+                .WillOnce(Return(DataType::kInt32))
                 .WillOnce(Return(0x71))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
@@ -822,10 +882,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD0))
-                .WillOnce(Return(0xD0));
+                .WillOnce(Return(DataType::kInt8))
+                .WillOnce(Return(DataType::kInt8));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD0))
+                .WillOnce(Return(DataType::kInt8))
                 .WillOnce(Return(0x81));
             EXPECT_CALL(buffer, size())
                 .WillOnce(Return(1));
@@ -844,10 +904,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD1))
-                .WillOnce(Return(0xD1));
+                .WillOnce(Return(DataType::kInt16))
+                .WillOnce(Return(DataType::kInt16));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD1))
+                .WillOnce(Return(DataType::kInt16))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23));
             EXPECT_CALL(buffer, size())
@@ -867,10 +927,10 @@ namespace emb
             EXPECT_CALL(buffer, empty())
                 .WillRepeatedly(Return(false));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(0xD2))
-                .WillOnce(Return(0xD2));
+                .WillOnce(Return(DataType::kInt32))
+                .WillOnce(Return(DataType::kInt32));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(0xD2))
+                .WillOnce(Return(DataType::kInt32))
                 .WillOnce(Return(0xF1))
                 .WillOnce(Return(0x23))
                 .WillOnce(Return(0x45))
