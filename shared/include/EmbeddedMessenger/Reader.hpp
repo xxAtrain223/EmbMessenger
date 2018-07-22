@@ -10,6 +10,7 @@ namespace emb
 {
     class IBuffer;
     enum DataType : uint8_t;
+    enum DataError : uint8_t;
 
     /**
      * @brief Message reader, used to deserialize messages.
@@ -62,7 +63,7 @@ namespace emb
             } u;
             u.in = 0;
 
-            for (uint8_t i = sizeof(T) - 1; i >= 0; --i)
+            for (int8_t i = sizeof(T) - 1; i >= 0; --i)
             {
                 uint8_t byte = 0;
                 readByte(byte);
@@ -285,7 +286,7 @@ namespace emb
          *
          * @returns True if the next parameter is an error and was read successfully
          */
-        bool readError(uint8_t& value);
+        bool readError(DataError& value);
 
         /**
         * @brief Reads the CRC and checks if it's valid.

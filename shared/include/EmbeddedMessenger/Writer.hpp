@@ -8,6 +8,7 @@
 namespace emb
 {
     class IBuffer;
+    enum DataError : uint8_t;
 
     /**
      * @brief Message writer, used to serialize messages.
@@ -40,9 +41,9 @@ namespace emb
             } u;
             u.in = value;
 
-            for (uint8_t i = sizeof(T) - 1; i >= 0; --i)
+            for (int8_t i = sizeof(T) - 1; i >= 0; --i)
             {
-                writeByte(u.out >> (i * 8));
+                writeByte(u.out >> (i * 8) & 0xFF);
             }
         }
 
@@ -134,7 +135,7 @@ namespace emb
          *
          * @param value Error to write to the buffer
          */
-        void writeError(const uint8_t value);
+        void writeError(const DataError value);
 
         /**
          * @brief Writes the CRC to the buffer.

@@ -12,7 +12,7 @@ namespace emb
         class MockBuffer : public IBuffer
         {
         public:
-            MOCK_METHOD1(writeByte, void(const uint8_t& byte));
+            MOCK_METHOD1(writeByte, void(const uint8_t byte));
             MOCK_CONST_METHOD0(peek, uint8_t());
             MOCK_METHOD0(readByte, uint8_t());
             MOCK_CONST_METHOD0(empty, bool());

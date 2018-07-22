@@ -2,12 +2,12 @@
 
 namespace emb
 {
-    bool Reader::peekByte(uint8_t & value) const
+    bool Reader::peekByte(uint8_t& value) const
     {
         return false;
     }
 
-    bool Reader::readByte(uint8_t & value)
+    bool Reader::readByte(uint8_t& value)
     {
         return false;
     }
@@ -17,7 +17,7 @@ namespace emb
         return false;
     }
 
-    Reader::Reader(IBuffer * buffer)
+    Reader::Reader(IBuffer* buffer)
     {
     }
 
@@ -71,52 +71,52 @@ namespace emb
         return false;
     }
 
-    bool Reader::read(bool & value)
+    bool Reader::read(bool& value)
     {
         return false;
     }
 
-    bool Reader::read(uint8_t & value)
+    bool Reader::read(uint8_t& value)
     {
         return false;
     }
 
-    bool Reader::read(uint16_t & value)
+    bool Reader::read(uint16_t& value)
     {
         return false;
     }
 
-    bool Reader::read(uint32_t & value)
+    bool Reader::read(uint32_t& value)
     {
         return false;
     }
 
-    bool Reader::read(uint64_t & value)
+    bool Reader::read(uint64_t& value)
     {
         return false;
     }
 
-    bool Reader::read(int8_t & value)
+    bool Reader::read(int8_t& value)
     {
         return false;
     }
 
-    bool Reader::read(int16_t & value)
+    bool Reader::read(int16_t& value)
     {
         return false;
     }
 
-    bool Reader::read(int32_t & value)
+    bool Reader::read(int32_t& value)
     {
         return false;
     }
 
-    bool Reader::read(int64_t & value)
+    bool Reader::read(int64_t& value)
     {
         return false;
     }
 
-    bool Reader::read(float & value)
+    bool Reader::read(float& value)
     {
         return false;
     }
@@ -126,7 +126,7 @@ namespace emb
         return false;
     }
 
-    bool Reader::readError(uint8_t & value)
+    bool Reader::readError(DataError& value)
     {
         return false;
     }

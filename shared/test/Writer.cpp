@@ -104,7 +104,7 @@ namespace emb
 
             Writer writer(&buffer);
 
-            int8_t data = 0xDF;
+            int8_t data = (int8_t)0xDF;
             writer.write(data);
         }
 
@@ -118,7 +118,7 @@ namespace emb
 
             Writer writer(&buffer);
 
-            int16_t data = 0xF123;
+            int16_t data = (int16_t)0xF123;
             writer.write(data);
         }
 
@@ -202,7 +202,7 @@ namespace emb
             MockBuffer buffer;
 
             EXPECT_CALL(buffer, writeByte(DataType::kCrc));
-            EXPECT_CALL(buffer, writeByte(0x00));
+            EXPECT_CALL(buffer, writeByte(0x28));
 
             Writer writer(&buffer);
 
@@ -249,7 +249,7 @@ namespace emb
             Writer writer(&buffer);
 
             uint16_t data = 0x00F1;
-            writer.write(0x00F1);
+            writer.write(data);
         }
 
         TEST(writer_minimize, uint8_to_posfixint)
@@ -349,7 +349,7 @@ namespace emb
 
             Writer writer(&buffer);
 
-            int16_t data = 0xFF81;
+            int16_t data = (int16_t)0xFF81;
             writer.write(data);
         }
 
@@ -373,7 +373,7 @@ namespace emb
 
             Writer writer(&buffer);
 
-            int8_t data = 0xF0;
+            int8_t data = (int8_t)0xF0;
             writer.write(data);
         }
 
@@ -408,7 +408,7 @@ namespace emb
 
             Writer writer(&buffer);
 
-            int16_t data1 = 0xF123;
+            int16_t data1 = (int16_t)0xF123;
             float data2 = 3.14159f;
             writer.write(data1);
             writer.write(data2);

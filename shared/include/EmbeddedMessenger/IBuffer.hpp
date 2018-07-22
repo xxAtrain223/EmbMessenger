@@ -17,7 +17,7 @@ namespace emb
          *
          * @param byte Value to be written
          */
-        virtual void writeByte(const uint8_t& byte) = 0;
+        virtual void writeByte(const uint8_t byte) = 0;
 
         /**
          * @brief Gets the byte from the front of the buffer, without removing it.
