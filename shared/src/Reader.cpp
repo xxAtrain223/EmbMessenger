@@ -99,12 +99,6 @@ namespace emb
         case DataType::kInt64:
             type = DataType::kInt64;
             break;
-        case DataType::kPosFixInt:
-            type = DataType::kPosFixInt;
-            break;
-        case DataType::kNegFixInt:
-            type = DataType::kNegFixInt;
-            break;
         case DataType::kCrc:
             type = DataType::kCrc;
             break;
@@ -576,6 +570,8 @@ namespace emb
 
         removeByte(); // Remove Type Byte
         removeByte(); // Consume the CRC byte, Updates internal CRC
+
+        return m_crc == 0x00;
     }
 
     void Reader::resetCrc()

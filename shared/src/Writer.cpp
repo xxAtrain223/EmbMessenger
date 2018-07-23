@@ -117,7 +117,7 @@ namespace emb
 
         if (value == value8)
         {
-            // Value fits into uint8_t
+            // Value fits into int8_t
             write(value8);
         }
         else
@@ -133,7 +133,7 @@ namespace emb
 
         if (value == value16)
         {
-            // Value fits into uint16_t
+            // Value fits into int16_t
             write(value16);
         }
         else
@@ -149,7 +149,7 @@ namespace emb
 
         if (value == value32)
         {
-            // Value fits into uint32_t
+            // Value fits into int32_t
             write(value32);
         }
         else

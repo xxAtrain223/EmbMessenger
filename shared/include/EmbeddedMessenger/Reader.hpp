@@ -8,7 +8,6 @@
 
 namespace emb
 {
-    class IBuffer;
     enum DataType : uint8_t;
     enum DataError : uint8_t;
 
@@ -95,7 +94,9 @@ namespace emb
          * @brief Gets the type of the next parameter in the buffer.
          * This will not remove the byte from the buffer.
          *
-         * @returns The type of the next parameter in the buffer
+         * @param[out] type The type of the next parameter in the buffer
+         *
+         * @returns True if the type was read successfully
          */
         bool getType(DataType& type) const;
 
