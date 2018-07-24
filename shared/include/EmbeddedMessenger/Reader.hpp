@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "EmbeddedMessenger/Crc.hpp"
 #include "EmbeddedMessenger/IBuffer.hpp"
 #include "EmbeddedMessenger/Templates.hpp"
 
