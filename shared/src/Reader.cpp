@@ -183,33 +183,7 @@ namespace emb
 
         return false;
     }
-
-    bool Reader::nextInt() const
-    {
-        DataType type;
-        if (!getType(type))
-        {
-            return false;
-        }
-
-        switch (type)
-        {
-        case DataType::kUint8:
-        case DataType::kUint16:
-        case DataType::kUint32:
-        case DataType::kUint64:
-        case DataType::kInt8:
-        case DataType::kInt16:
-        case DataType::kInt32:
-        case DataType::kInt64:
-        case DataType::kPosFixInt:
-        case DataType::kNegFixInt:
-            return true;
-        }
-
-        return false;
-    }
-
+    
     bool Reader::nextFloat() const
     {
         DataType type;
@@ -288,16 +262,12 @@ namespace emb
         {
         case DataType::kPosFixInt:
             readByte(value);
-            break;
+            return true;
         case DataType::kUint8:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(uint16_t& value)
@@ -312,22 +282,12 @@ namespace emb
         {
         case DataType::kPosFixInt:
         case DataType::kUint8:
-            uint8_t data;
-            if (!read(data))
-            {
-                return false;
-            }
-            value = data;
-            break;
+            return readAndConvert<uint8_t>(value);
         case DataType::kUint16:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(uint32_t& value)
@@ -343,22 +303,12 @@ namespace emb
         case DataType::kPosFixInt:
         case DataType::kUint8:
         case DataType::kUint16:
-            uint16_t data;
-            if (!read(data))
-            {
-                return false;
-            }
-            value = data;
-            break;
+            return readAndConvert<uint16_t>(value);
         case DataType::kUint32:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(uint64_t& value)
@@ -375,22 +325,12 @@ namespace emb
         case DataType::kUint8:
         case DataType::kUint16:
         case DataType::kUint32:
-            uint32_t data;
-            if (!read(data))
-            {
-                return false;
-            }
-            value = data;
-            break;
+            return readAndConvert<uint32_t>(value);
         case DataType::kUint64:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(int8_t& value)
@@ -407,20 +347,16 @@ namespace emb
         case DataType::kPosFixInt:
             readByte(data);
             value = data;
-            break;
+            return true;
         case DataType::kNegFixInt:
             readByte(data);
             value = data;
-            break;
+            return true;
         case DataType::kInt8:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(int16_t& value)
@@ -436,22 +372,12 @@ namespace emb
         case DataType::kPosFixInt:
         case DataType::kNegFixInt:
         case DataType::kInt8:
-            int8_t data;
-            if (!read(data))
-            {
-                return false;
-            }
-            value = data;
-            break;
+            return readAndConvert<int8_t>(value);
         case DataType::kInt16:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(int32_t& value)
@@ -468,22 +394,12 @@ namespace emb
         case DataType::kNegFixInt:
         case DataType::kInt8:
         case DataType::kInt16:
-            int16_t data;
-            if (!read(data))
-            {
-                return false;
-            }
-            value = data;
-            break;
+            return readAndConvert<int16_t>(value);
         case DataType::kInt32:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(int64_t& value)
@@ -501,22 +417,12 @@ namespace emb
         case DataType::kInt8:
         case DataType::kInt16:
         case DataType::kInt32:
-            int32_t data;
-            if (!read(data))
-            {
-                return false;
-            }
-            value = data;
-            break;
+            return readAndConvert<int32_t>(value);
         case DataType::kInt64:
-            removeByte(); // Remove Type Byte
-            readData(value);
-            break;
+            return removeTypeAndRead(value);
         default:
             return false;
         }
-
-        return true;
     }
 
     bool Reader::read(float& value)
@@ -527,11 +433,10 @@ namespace emb
             return false;
         }
 
-        if (type == DataType::kFloat)
+        if (type == DataType::kFloat && m_buffer->size() >= sizeof(value) + 1)
         {
             removeByte(); // Remove Type Byte
-            readData(value);
-            return true;
+            return readData(value);
         }
 
         return false;
@@ -556,9 +461,13 @@ namespace emb
             return false;
         }
 
-        removeByte();
-        readData(value);
-        return true;
+        if (m_buffer->size() >= sizeof(value) + 1)
+        {
+            removeByte();
+            return readData(value);
+        }
+
+        return false;
     }
 
     bool Reader::readCrc()
@@ -568,10 +477,15 @@ namespace emb
             return false;
         }
 
-        removeByte(); // Remove Type Byte
-        removeByte(); // Consume the CRC byte, Updates internal CRC
+        if (m_buffer->size() >= 2)
+        {
+            removeByte(); // Remove Type Byte
+            removeByte(); // Consume the CRC byte, Updates internal CRC
 
-        return m_crc == 0x00;
+            return m_crc == 0x00;
+        }
+
+        return false;
     }
 
     void Reader::resetCrc()

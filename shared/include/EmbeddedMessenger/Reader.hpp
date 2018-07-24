@@ -65,8 +65,8 @@ namespace emb
 
             for (int8_t i = sizeof(T) - 1; i >= 0; --i)
             {
-                uint8_t byte = 0;
-                readByte(byte);
+                uint8_t byte = m_buffer->readByte();
+                m_crc = crc::Calculate8(m_crc, byte);
                 u.in |= static_cast<var_uint_t<T>>(byte) << (i * 8);
             }
 
@@ -131,14 +131,6 @@ namespace emb
          * @returns True if the next parameter in the buffer is an unsigned int
          */
         bool nextUnsignedInt() const;
-
-        /**
-         * @brief Checks if the next parameter in the buffer is an int.
-         * This will not remove the byte from the buffer.
-         *
-         * @returns True if the next parameter in the buffer is an int
-         */
-        bool nextInt() const;
 
         /**
          * @brief Checks if the next parameter in the buffer is a float.
@@ -303,6 +295,29 @@ namespace emb
          * Useful when bytes are removed from buffer outside of this Reader.
          */
         void resetCrc();
+
+    protected:
+        // Helper functions
+
+        template <typename ReadType, typename ConvertType>
+        inline bool readAndConvert(ConvertType& ct)
+        {
+            ReadType rt = 0;
+            bool rv = read(rt);
+            ct = rt;
+            return rv;
+        }
+
+        template <typename T>
+        inline bool removeTypeAndRead(T& t)
+        {
+            if (m_buffer->size() >= sizeof(T) + 1)
+            {
+                removeByte(); // Remove Type Byte
+                return readData(t);
+            }
+            return false;
+        }
     };
 }
 
