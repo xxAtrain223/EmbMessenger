@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "EmbeddedMessenger/Reader.hpp"
-#include "EmbeddedMessenger/DataType.hpp"
-#include "EmbeddedMessenger/DataError.hpp"
+#include "EmbMessenger/Reader.hpp"
+#include "EmbMessenger/DataType.hpp"
+#include "EmbMessenger/DataError.hpp"
 #include "MockBuffer.hpp"
 
 using namespace testing;

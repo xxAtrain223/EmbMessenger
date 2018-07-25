@@ -1,5 +1,5 @@
-#ifndef EMBEDDEDMESSENGER_CRC_HPP
-#define EMBEDDEDMESSENGER_CRC_HPP
+#ifndef EMBMESSENGER_CRC_HPP
+#define EMBMESSENGER_CRC_HPP
 
 #include <cstdint>
 #include <cstddef>
@@ -113,4 +113,4 @@ namespace emb
     }
 }
 
-#endif // EMBEDDEDMESSENGER_CRC_HPP
+#endif // EMBMESSENGER_CRC_HPP

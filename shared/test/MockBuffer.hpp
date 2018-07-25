@@ -1,9 +1,9 @@
-#ifndef EMBEDDEDMESSENGER_TEST_MOCKBUFFER_HPP
-#define EMBEDDEDMESSENGER_TEST_MOCKBUFFER_HPP
+#ifndef EMBMESSENGER_TEST_MOCKBUFFER_HPP
+#define EMBMESSENGER_TEST_MOCKBUFFER_HPP
 
 #include <gmock/gmock.h>
 
-#include "EmbeddedMessenger/IBuffer.hpp"
+#include "EmbMessenger/IBuffer.hpp"
 
 namespace emb
 {
@@ -23,4 +23,4 @@ namespace emb
     }
 }
 
-#endif // EMBEDDEDMESSENGER_TEST_MOCKBUFFER_HPP
+#endif // EMBMESSENGER_TEST_MOCKBUFFER_HPP

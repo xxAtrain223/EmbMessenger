@@ -1,5 +1,5 @@
-#ifndef EMBEDDEDMESSENGER_IBUFFER_HPP
-#define EMBEDDEDMESSENGER_IBUFFER_HPP
+#ifndef EMBMESSENGER_IBUFFER_HPP
+#define EMBMESSENGER_IBUFFER_HPP
 
 #include <stdint.h>
 #include <stddef.h>
@@ -61,4 +61,4 @@ namespace emb
         virtual void update() = 0;
     };
 }
-#endif // EMBEDDEDMESSENGER_IBUFFER_HPP
+#endif // EMBMESSENGER_IBUFFER_HPP

@@ -1,9 +1,9 @@
-#ifndef EMBEDDEDMESSENGER_WRITER_HPP
-#define EMBEDDEDMESSENGER_WRITER_HPP
+#ifndef EMBMESSENGER_WRITER_HPP
+#define EMBMESSENGER_WRITER_HPP
 
 #include <cstdint>
 
-#include "EmbeddedMessenger/Templates.hpp"
+#include "EmbMessenger/Templates.hpp"
 
 namespace emb
 {
@@ -145,4 +145,4 @@ namespace emb
     };
 }
 
-#endif // EMBEDDEDMESSENGER_WRITER_HPP
+#endif // EMBMESSENGER_WRITER_HPP

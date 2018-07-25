@@ -1,8 +1,8 @@
-#include "EmbeddedMessenger/Reader.hpp"
+#include "EmbMessenger/Reader.hpp"
 
-#include "EmbeddedMessenger/Crc.hpp"
-#include "EmbeddedMessenger/DataType.hpp"
-#include "EmbeddedMessenger/IBuffer.hpp"
+#include "EmbMessenger/Crc.hpp"
+#include "EmbMessenger/DataType.hpp"
+#include "EmbMessenger/IBuffer.hpp"
 
 namespace emb
 {

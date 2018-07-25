@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(EmbeddedMessengerShared LANGUAGES CXX)
+project(EmbMessengerShared LANGUAGES CXX)
 
 file(GLOB_RECURSE ${PROJECT_NAME}_HEADERS "include/*.hpp")
 file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "src/*.cpp")

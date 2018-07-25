@@ -1,11 +1,11 @@
-#ifndef EMBEDDEDMESSENGER_READER_HPP
-#define EMBEDDEDMESSENGER_READER_HPP
+#ifndef EMBMESSENGER_READER_HPP
+#define EMBMESSENGER_READER_HPP
 
 #include <cstdint>
 
-#include "EmbeddedMessenger/Crc.hpp"
-#include "EmbeddedMessenger/IBuffer.hpp"
-#include "EmbeddedMessenger/Templates.hpp"
+#include "EmbMessenger/Crc.hpp"
+#include "EmbMessenger/IBuffer.hpp"
+#include "EmbMessenger/Templates.hpp"
 
 namespace emb
 {
@@ -322,4 +322,4 @@ namespace emb
     };
 }
 
-#endif // EMBEDDEDMESSENGER_READER_HPP
+#endif // EMBMESSENGER_READER_HPP

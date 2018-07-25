@@ -5,10 +5,10 @@ pushd build
 make -j2
 
 cd shared
-./EmbeddedMessengerSharedTest
+./EmbMessengerSharedTest
 
 cd ../host
-./EmbeddedMessengerTest
+./EmbMessengerTest
 
 popd
 
