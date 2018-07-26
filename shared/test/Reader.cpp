@@ -1006,7 +1006,7 @@ namespace emb
 
             Reader reader(&buffer);
 
-            DataError value = DataError::kExtraParameters;
+            uint8_t value = DataError::kExtraParameters;
             EXPECT_TRUE(reader.readError(value));  // 1 Pass
             EXPECT_EQ(value, DataError::kParameter0ReadError);
             EXPECT_FALSE(reader.readError(value)); // 2 Fail - Type

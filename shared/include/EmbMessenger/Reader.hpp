@@ -281,7 +281,7 @@ namespace emb
          *
          * @returns True if the next parameter is an error and was read successfully
          */
-        bool readError(DataError& value);
+        bool readError(uint8_t& value);
 
         /**
         * @brief Reads the CRC and checks if it's valid.

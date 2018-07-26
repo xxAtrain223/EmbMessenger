@@ -454,7 +454,7 @@ namespace emb
         return true;
     }
 
-    bool Reader::readError(DataError& value)
+    bool Reader::readError(uint8_t& value)
     {
         if (!nextError())
         {
