@@ -15,8 +15,6 @@ namespace emb
     class EmbMessenger
     {
     protected:
-        friend class Command;
-
         IBuffer* m_buffer;
         Writer m_writer;
         Reader m_reader;
@@ -26,30 +24,7 @@ namespace emb
         std::map<uint16_t, std::shared_ptr<Command>> m_commands;
 
         void write();
-
-        template <typename T, typename... Ts>
-        void write(const T arg, Ts... args)
-        {
-            writer.write(arg);
-            write(args...);
-        }
-
         void read();
-
-        template <typename T, typename... Ts>
-        void read(T& arg, Ts... args)
-        {
-            while (reader.nextError())
-            {
-                uint8_t error = 0;
-                reader.readError(error);
-                // TODO: Throw exception
-                printf("Error: 0x%02X\n", error);
-            }
-
-            reader.read(arg);
-            read(args...);
-        }
 
     public:
         EmbMessenger(IBuffer* buffer);
@@ -68,9 +43,31 @@ namespace emb
 
             write(m_message_id++, m_command_ids.at(typeid(CommandType)));
             command->send(this);
-            writer.writeCrc();
+            m_writer.writeCrc();
 
             return command;
+        }
+
+        template <typename T, typename... Ts>
+        void write(const T arg, Ts... args)
+        {
+            m_writer.write(arg);
+            write(args...);
+        }
+
+        template <typename T, typename... Ts>
+        void read(T& arg, Ts... args)
+        {
+            while (m_reader.nextError())
+            {
+                uint8_t error = 0;
+                m_reader.readError(error);
+                // TODO: Throw exception
+                printf("Error: 0x%02X\n", error);
+            }
+
+            m_reader.read(arg);
+            read(args...);
         }
     };
 }

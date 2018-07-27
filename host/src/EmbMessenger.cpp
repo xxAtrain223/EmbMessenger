@@ -7,7 +7,7 @@ namespace emb
         m_writer(buffer),
         m_reader(buffer)
     {
-        m_message_id = 0;
+        m_message_id = 1;
     }
 
     void EmbMessenger::write()
