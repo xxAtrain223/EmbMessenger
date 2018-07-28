@@ -4,9 +4,11 @@
 #include "EmbMessenger/EmbMessenger.hpp"
 #include "EmbMessenger/DataType.hpp"
 #include "MockBuffer.hpp"
+
 #include "Ping.hpp"
 #include "SetLed.hpp"
 #include "ToggleLed.hpp"
+#include "Add.hpp"
 
 using namespace testing;
 
@@ -22,6 +24,7 @@ namespace emb
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
 
             EXPECT_CALL(buffer, writeByte(0x01));
             EXPECT_CALL(buffer, writeByte(0x00));
@@ -67,6 +70,7 @@ namespace emb
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
 
             EXPECT_CALL(buffer, writeByte(0x01)).Times(2);
             EXPECT_CALL(buffer, writeByte(DataType::kBoolTrue));
@@ -148,6 +152,7 @@ namespace emb
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
 
             EXPECT_CALL(buffer, writeByte(0x01));
             EXPECT_CALL(buffer, writeByte(0x02));
@@ -224,6 +229,64 @@ namespace emb
                 .WillOnce(Return(0x02)) // read(uint8_t) -> getType -> peekByte
                 .WillOnce(Return(DataType::kBoolFalse)) // command->receive -> read -> readErrors -> nextError -> getType -> peekByte
                 .WillOnce(Return(DataType::kBoolFalse)) // command->receive -> read -> read(bool) -> nextBool -> getType -> peekByte
+                .WillOnce(Return(DataType::kCrc)) // readErrors -> nextError -> getType -> peekByte
+                .WillOnce(Return(DataType::kCrc)) // nextCrc -> getType -> peekByte
+                .WillOnce(Return(DataType::kCrc)); // readCrc -> nextCrc -> getType -> peekByte
+
+            messenger.update();
+        }
+
+        TEST(messenger, add)
+        {
+            MockBuffer buffer;
+
+            EmbMessenger messenger(&buffer);
+            messenger.registerCommand<Ping>(0);
+            messenger.registerCommand<SetLed>(1);
+            messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
+
+            EXPECT_CALL(buffer, writeByte(0x01));
+            EXPECT_CALL(buffer, writeByte(0x03));
+            EXPECT_CALL(buffer, writeByte(0x07));
+            EXPECT_CALL(buffer, writeByte(0x02));
+            EXPECT_CALL(buffer, writeByte(DataType::kCrc));
+            EXPECT_CALL(buffer, writeByte(0xEA));
+
+            auto addCommand = std::make_shared<Add>(7, 2);
+            messenger.send(addCommand);
+
+            EXPECT_CALL(buffer, update());
+            EXPECT_CALL(buffer, messagesAvailable())
+                .WillOnce(Return(1));
+            EXPECT_CALL(buffer, readByte())
+                .WillOnce(Return(0x01)) // read(uint8_t) -> getType -> readByte
+                .WillOnce(Return(0x09)) // receive -> read(int32_t) -> readByte
+                .WillOnce(Return(DataType::kCrc)) // readCrc -> removeByte -> readByte
+                .WillOnce(Return(0xB1)); // readCrc -> removeByte -> readByte
+            EXPECT_CALL(buffer, size())
+                .WillOnce(Return(2)); // readCrc
+            EXPECT_CALL(buffer, empty())
+                .WillOnce(Return(false)) // read(uint16_t) -> getType -> peekByte
+                .WillOnce(Return(false)) // read(uint8_t) -> getType -> peekByte
+                .WillOnce(Return(false)) // read(uint8_t) -> getType -> readByte
+                .WillOnce(Return(false)) // command->receive -> read -> readErrors -> nextError -> getType -> peekByte
+                .WillOnce(Return(false)) // command->receive -> read -> read(int32_t) -> nextSignedInt -> getType -> peekByte
+                .WillOnce(Return(false)) // command->receive -> read -> read(int16_t) -> nextSignedInt -> getType -> peekByte
+                .WillOnce(Return(false)) // command->receive -> read -> read(int8_t) -> nextSignedInt -> getType -> peekByte
+                .WillOnce(Return(false)) // command->receive -> read -> read(int8_t) -> readByte
+                .WillOnce(Return(false)) // readErrors -> nextError -> getType -> peekByte
+                .WillOnce(Return(false)) // nextCrc -> getType -> peekByte
+                .WillOnce(Return(false)) // readCrc -> nextCrc -> getType -> peekByte
+                .WillOnce(Return(false)) // readCrc -> removeByte -> readByte
+                .WillOnce(Return(false)); // readCrc -> removeByte -> readByte
+            EXPECT_CALL(buffer, peek())
+                .WillOnce(Return(0x01)) // read(uint16_t) -> getType -> peekByte
+                .WillOnce(Return(0x01)) // read(uint8_t) -> getType -> peekByte
+                .WillOnce(Return(0x09)) // command->receive -> read -> readErrors -> nextError -> getType -> peekByte
+                .WillOnce(Return(0x09)) // command->receive -> read -> read(int32_t) -> nextSignedInt -> getType -> peekByte
+                .WillOnce(Return(0x09)) // command->receive -> read -> read(int16_t) -> nextSignedInt -> getType -> peekByte
+                .WillOnce(Return(0x09)) // command->receive -> read -> read(int8_t) -> nextSignedInt -> getType -> peekByte
                 .WillOnce(Return(DataType::kCrc)) // readErrors -> nextError -> getType -> peekByte
                 .WillOnce(Return(DataType::kCrc)) // nextCrc -> getType -> peekByte
                 .WillOnce(Return(DataType::kCrc)); // readCrc -> nextCrc -> getType -> peekByte
