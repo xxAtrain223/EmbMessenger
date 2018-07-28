@@ -17,7 +17,7 @@ namespace emb
             MOCK_METHOD0(readByte, uint8_t());
             MOCK_CONST_METHOD0(empty, bool());
             MOCK_CONST_METHOD0(size, size_t());
-            MOCK_CONST_METHOD0(messageAvailable, bool());
+            MOCK_CONST_METHOD0(messagesAvailable, uint8_t());
             MOCK_METHOD0(update, void());
         };
     }

@@ -26,8 +26,13 @@ namespace emb
         void write();
         void read();
 
+        void readErrors();
+        void consumeMessage();
+
     public:
         EmbMessenger(IBuffer* buffer);
+
+        void update();
 
         template <typename T>
         void registerCommand(const uint8_t id)
@@ -58,15 +63,11 @@ namespace emb
         template <typename T, typename... Ts>
         void read(T& arg, Ts... args)
         {
-            while (m_reader.nextError())
+            readErrors();
+            if (!m_reader.read(arg))
             {
-                uint8_t error = 0;
-                m_reader.readError(error);
                 // TODO: Throw exception
-                printf("Error: 0x%02X\n", error);
             }
-
-            m_reader.read(arg);
             read(args...);
         }
     };

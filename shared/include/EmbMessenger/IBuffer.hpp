@@ -49,11 +49,11 @@ namespace emb
         virtual size_t size() const = 0;
 
         /**
-         * @brief Checks if the buffer has a message available.
+         * @brief Gets the number of available messages
          *
-         * @returns True if the buffer has a message available
+         * @returns Number of available messages
          */
-        virtual bool messageAvailable() const = 0;
+        virtual uint8_t messagesAvailable() const = 0; // TODO: Change to better name
 
         /**
          * @brief Updates the internal buffer.
