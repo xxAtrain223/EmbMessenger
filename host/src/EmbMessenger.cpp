@@ -64,6 +64,8 @@ namespace emb
         {
             command->m_callback(command);
         }
+
+        m_commands.erase(message_id);
     }
 
     void EmbMessenger::write()
