@@ -29,8 +29,8 @@ namespace emb
             auto pingCommand = std::make_shared<Ping>();
             messenger.send(pingCommand);
 
-            ASSERT_TRUE(buffer.checkHostBuffer(std::vector<uint8_t> { 0x01, 0x00 }));
-            buffer.addDeviceMessage(std::vector<uint8_t> { 0x01 });
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
+            buffer.addDeviceMessage({ 0x01 });
 
             messenger.update();
 
@@ -50,8 +50,8 @@ namespace emb
             auto setLedCommand = std::make_shared<SetLed>(true);
             messenger.send(setLedCommand);
 
-            ASSERT_TRUE(buffer.checkHostBuffer(std::vector<uint8_t> { 0x01, 0x01, DataType::kBoolTrue }));
-            buffer.addDeviceMessage(std::vector<uint8_t> { 0x01 });
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x01, DataType::kBoolTrue }));
+            buffer.addDeviceMessage({ 0x01 });
 
             messenger.update();
 
@@ -71,8 +71,8 @@ namespace emb
             auto toggleLedCommand = std::make_shared<ToggleLed>();
             messenger.send(toggleLedCommand);
 
-            ASSERT_TRUE(buffer.checkHostBuffer(std::vector<uint8_t> { 0x01, 0x02 }));
-            buffer.addDeviceMessage(std::vector<uint8_t> { 0x01, DataType::kBoolTrue });
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x02 }));
+            buffer.addDeviceMessage({ 0x01, DataType::kBoolTrue });
 
             messenger.update();
 
@@ -92,8 +92,8 @@ namespace emb
             auto addCommand = std::make_shared<Add>(7, 2);
             messenger.send(addCommand);
 
-            ASSERT_TRUE(buffer.checkHostBuffer(std::vector<uint8_t> { 0x01, 0x03, 0x07, 0x02 }));
-            buffer.addDeviceMessage(std::vector<uint8_t> { 0x01, 0x09 });
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x03, 0x07, 0x02 }));
+            buffer.addDeviceMessage({ 0x01, 0x09 });
 
             messenger.update();
 
