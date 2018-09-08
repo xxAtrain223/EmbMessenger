@@ -119,7 +119,9 @@ namespace emb
         template <typename CommandType>
         std::shared_ptr<UnregisterPeriodicCommand> unregisterPeriodicCommand()
         {
-            return send<UnregisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)));
+            std::shared_ptr<UnregisterPeriodicCommand> unregisterCommand = std::make_shared<UnregisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)));
+            send(unregisterCommand);
+            // TODO: Wait for unregisterCommand to receive acknoledgement
         }
     };
 }

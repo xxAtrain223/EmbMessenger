@@ -125,6 +125,5 @@ namespace emb
         std::shared_ptr<ResetCommand> resetCommand = std::make_shared<ResetCommand>();
         send(resetCommand);
         // TODO: Wait for resetCommand to receive acknoledgement
-        //       or return it for the program decide
     }
 }
