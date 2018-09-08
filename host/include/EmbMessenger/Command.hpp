@@ -16,6 +16,7 @@ namespace emb
     protected:
         uint16_t m_message_id;
         std::function<void(std::shared_ptr<Command>)> m_callback = nullptr;
+        bool m_is_periodic = false;
 
     public:
         virtual void send(EmbMessenger* messenger);

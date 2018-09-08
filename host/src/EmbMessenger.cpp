@@ -8,6 +8,10 @@ namespace emb
         m_reader(buffer)
     {
         m_message_id = 1;
+
+        registerCommand<ResetCommand>(255);
+        registerCommand<RegisterPeriodicCommand>(254);
+        registerCommand<UnregisterPeriodicCommand>(253);
     }
 
     void EmbMessenger::update()
@@ -88,10 +92,39 @@ namespace emb
             printf("Error: 0x%02X\n", error);
         }
     }
+
     void EmbMessenger::consumeMessage()
     {
         for (uint8_t n = m_buffer->messagesAvailable();
              n > 0 && n == m_buffer->messagesAvailable();
              m_buffer->readByte());
+    }
+
+    EmbMessenger::RegisterPeriodicCommand::RegisterPeriodicCommand(uint8_t commandId, uint32_t period)
+        : m_command_id(commandId), m_period(period)
+    {
+    }
+
+    void EmbMessenger::RegisterPeriodicCommand::send(EmbMessenger* messenger)
+    {
+        messenger->write(m_command_id, m_period);
+    }
+
+    EmbMessenger::UnregisterPeriodicCommand::UnregisterPeriodicCommand(uint8_t commandId)
+        : m_command_id(commandId)
+    {
+    }
+
+    void EmbMessenger::UnregisterPeriodicCommand::send(EmbMessenger* messenger)
+    {
+        messenger->write(m_message_id);
+    }
+
+    void EmbMessenger::resetDevice()
+    {
+        std::shared_ptr<ResetCommand> resetCommand = std::make_shared<ResetCommand>();
+        send(resetCommand);
+        // TODO: Wait for resetCommand to receive acknoledgement
+        //       or return it for the program decide
     }
 }

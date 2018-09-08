@@ -70,6 +70,57 @@ namespace emb
             }
             read(args...);
         }
+
+    protected:
+        class ResetCommand : public Command {};
+
+        class RegisterPeriodicCommand : public Command
+        {
+            uint8_t m_command_id;
+            uint32_t m_period;
+
+        public:
+            RegisterPeriodicCommand(uint8_t commandId, uint32_t period);
+
+            virtual void send(EmbMessenger* messenger);
+        };
+
+        class UnregisterPeriodicCommand : public Command
+        {
+            uint8_t m_command_id;
+
+        public:
+            UnregisterPeriodicCommand(uint8_t commandId);
+
+            virtual void send(EmbMessenger* messenger);
+        };
+
+    public:
+        void resetDevice();
+
+        template <typename CommandType, typename CallbackType>
+        std::shared_ptr<CommandType> registerPeriodicCommand(uint32_t period, CallbackType callback)
+        {
+            std::shared_ptr<CommandType> periodic_command = std::make_shared<CommandType>();
+            periodic_command->m_is_periodic = true;
+            periodic_command->template setCallback<CommandType>(callback); // Template dumbness/magic https://stackoverflow.com/a/2105906/4776344
+            periodic_command->m_message_id = m_message_id;
+
+            std::shared_ptr<RegisterPeriodicCommand> registerCommand = std::make_shared<RegisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)), period);
+            registerCommand->SetCallback<RegisterPeriodicCommand>([&](auto&& registerCommand) {
+                m_callbacks[periodic_command->getMessageId()] = periodic_command;
+            });
+            send(registerCommand);
+            // TODO: Wait for registerCommand to receive acknoledgement
+
+            return periodic_command;
+        }
+
+        template <typename CommandType>
+        std::shared_ptr<UnregisterPeriodicCommand> unregisterPeriodicCommand()
+        {
+            return send<UnregisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)));
+        }
     };
 }
 
