@@ -77,6 +77,7 @@ namespace emb
             messenger.update();
 
             ASSERT_TRUE(buffer.buffersEmpty());
+            ASSERT_EQ(toggleLedCommand->ledState, true);
         }
 
         TEST(messenger, add)
@@ -98,6 +99,7 @@ namespace emb
             messenger.update();
 
             ASSERT_TRUE(buffer.buffersEmpty());
+            ASSERT_EQ(addCommand->Result, 9);
         }
     }
 }

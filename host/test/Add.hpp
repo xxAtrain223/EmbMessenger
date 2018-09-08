@@ -11,9 +11,11 @@ namespace emb
         class Add : public Command
         {
         protected:
-            int A, B, Result;
+            int A, B;
 
         public:
+            int Result;
+
             Add(int a, int b)
             {
                 A = a;

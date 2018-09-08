@@ -8,7 +8,7 @@ cd shared
 ./EmbMessengerSharedTest
 
 cd ../host
-./EmbMessengerTest
+./EmbMessengerHostTest
 
 popd
 
