@@ -90,9 +90,12 @@ namespace emb
             uint8_t m_command_id;
 
         public:
+            uint16_t m_periodic_message_id;
+
             UnregisterPeriodicCommand(uint8_t commandId);
 
             virtual void send(EmbMessenger* messenger);
+            virtual void receive(EmbMessenger* messenger);
         };
 
     public:
@@ -107,8 +110,9 @@ namespace emb
             periodic_command->m_message_id = m_message_id;
 
             std::shared_ptr<RegisterPeriodicCommand> registerCommand = std::make_shared<RegisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)), period);
-            registerCommand->SetCallback<RegisterPeriodicCommand>([&](auto&& registerCommand) {
-                m_callbacks[periodic_command->getMessageId()] = periodic_command;
+            registerCommand->setCallback<RegisterPeriodicCommand>([=](auto&& registerCallbackCommand) {
+                m_commands[periodic_command->getMessageId()] = periodic_command;
+                //m_commands.emplace(periodic_command->getMessageId(), periodic_command);
             });
             send(registerCommand);
             // TODO: Wait for registerCommand to receive acknoledgement
@@ -117,9 +121,12 @@ namespace emb
         }
 
         template <typename CommandType>
-        std::shared_ptr<UnregisterPeriodicCommand> unregisterPeriodicCommand()
+        void unregisterPeriodicCommand()
         {
             std::shared_ptr<UnregisterPeriodicCommand> unregisterCommand = std::make_shared<UnregisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)));
+            unregisterCommand->setCallback<UnregisterPeriodicCommand>([=](auto&& unregisterCommand) {
+                m_commands.erase(unregisterCommand->m_periodic_message_id);
+            });
             send(unregisterCommand);
             // TODO: Wait for unregisterCommand to receive acknoledgement
         }

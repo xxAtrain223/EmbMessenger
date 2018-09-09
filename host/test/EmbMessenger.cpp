@@ -101,5 +101,87 @@ namespace emb
             ASSERT_TRUE(buffer.buffersEmpty());
             ASSERT_EQ(addCommand->Result, 9);
         }
+
+        TEST(messenger, reset)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger messenger(&buffer);
+            messenger.registerCommand<Ping>(0);
+            messenger.registerCommand<SetLed>(1);
+            messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
+
+            messenger.resetDevice();
+
+            ASSERT_TRUE(buffer.checkHostBuffer({0x01, DataType::kUint8, 0xFF}));
+            buffer.addDeviceMessage({0x01});
+
+            messenger.update();
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger, register_periodic_command)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger messenger(&buffer);
+            messenger.registerCommand<Ping>(0);
+            messenger.registerCommand<SetLed>(1);
+            messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
+
+            bool ledState = false;
+            messenger.registerPeriodicCommand<ToggleLed>(1000, [&](std::shared_ptr<ToggleLed>&& toggleLed) {
+                ledState = toggleLed->ledState;
+            });
+
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, DataType::kUint8, 0xFE, 0x02, DataType::kUint16, 0x03, 0xE8 }));
+
+            buffer.addDeviceMessage({ 0x01 });
+            buffer.addDeviceMessage({ 0x01, DataType::kBoolTrue });
+            messenger.update();
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+            ASSERT_EQ(ledState, true);
+
+            buffer.addDeviceMessage({ 0x01, DataType::kBoolFalse });
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+            ASSERT_EQ(ledState, false);
+        }
+
+        TEST(messenger, unregister_periodic_command)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger messenger(&buffer);
+            messenger.registerCommand<Ping>(0);
+            messenger.registerCommand<SetLed>(1);
+            messenger.registerCommand<ToggleLed>(2);
+            messenger.registerCommand<Add>(3);
+
+            bool ledState = false;
+            messenger.registerPeriodicCommand<ToggleLed>(1000, [&](std::shared_ptr<ToggleLed>&& toggleLed) {
+                ledState = toggleLed->ledState;
+            });
+
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, DataType::kUint8, 0xFE, 0x02, DataType::kUint16, 0x03, 0xE8 }));
+
+            buffer.addDeviceMessage({ 0x01 });
+            buffer.addDeviceMessage({ 0x01, DataType::kBoolTrue });
+            messenger.update();
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+            ASSERT_EQ(ledState, true);
+
+            messenger.unregisterPeriodicCommand<ToggleLed>();
+
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x02, DataType::kUint8, 0xFD, 0x02 }));
+            buffer.addDeviceMessage({ 0x02, 0x01 });
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
     }
 }

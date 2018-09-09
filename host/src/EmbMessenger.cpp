@@ -69,7 +69,10 @@ namespace emb
             command->m_callback(command);
         }
 
-        m_commands.erase(message_id);
+        if (!m_commands.at(message_id)->m_is_periodic)
+        {
+            m_commands.erase(message_id);
+        }
     }
 
     void EmbMessenger::write()
@@ -118,6 +121,11 @@ namespace emb
     void EmbMessenger::UnregisterPeriodicCommand::send(EmbMessenger* messenger)
     {
         messenger->write(m_message_id);
+    }
+
+    void EmbMessenger::UnregisterPeriodicCommand::receive(EmbMessenger* messenger)
+    {
+        messenger->read(m_periodic_message_id);
     }
 
     void EmbMessenger::resetDevice()

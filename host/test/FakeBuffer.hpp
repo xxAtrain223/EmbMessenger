@@ -16,6 +16,7 @@ namespace emb
             std::vector<uint8_t> host;
             std::vector<uint8_t> device;
             int deviceMessages = 0;
+            bool readCrc = false;
 
         public:
             /**

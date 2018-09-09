@@ -68,7 +68,11 @@ namespace emb
 
             if (byte == DataType::kCrc)
             {
-                // In reality, the byte after kCrc is the end of the message
+                readCrc = true;
+            }
+            else if (readCrc == true)
+            {
+                readCrc = false;
                 --deviceMessages;
             }
 
