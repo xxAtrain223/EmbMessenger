@@ -1,5 +1,5 @@
 #ifndef EMBMESSENGER_DATAERROR_HPP
-#define EMBMESSENGER_DATATYPE_HPP
+#define EMBMESSENGER_DATAERROR_HPP
 
 #include <cstdint>
 
@@ -11,7 +11,7 @@ namespace emb
     enum DataError : uint8_t
     {
         kExtraParameters = 0x00,
-        kOutOFRecurringCommandSlots = 0x01,
+        kOutOFPeriodicCommandSlots = 0x01,
 
         kParameter0ReadError = 0x10,
         kParameter1ReadError = 0x11,
@@ -39,4 +39,4 @@ namespace emb
     };
 }
 
-#endif // EMBMESSENGER_DATATYPE_HPP
+#endif // EMBMESSENGER_DATAERROR_HPP

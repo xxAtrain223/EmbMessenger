@@ -28,9 +28,8 @@ namespace emb
         uint16_t message_id = 0;
         if (!m_reader.read(message_id))
         {
-            // TODO: Throw exception
-            printf("Error reading message Id, consuming message\n");
             consumeMessage();
+            throw MessageIdReadErrorHostException("Error reading message Id");
             return;
         }
 
@@ -46,6 +45,7 @@ namespace emb
             return;
         }
 
+        m_parameter_index = 0;
         command->receive(this);
 
         readErrors();
@@ -54,14 +54,13 @@ namespace emb
         {
             if (!m_reader.readCrc())
             {
-                // TODO: Throw exception
-                printf("Crc Invalid\n");
+                throw CrcInvalidHostException("Crc from the device was invalid");
             }
         }
         else
         {
-            printf("Extra Parameters, consuming rest of message\n");
             consumeMessage();
+            throw ExtraParametersHostException("Message has extra parameters from the device");
         }
 
         if (command->m_callback != nullptr)
@@ -91,8 +90,46 @@ namespace emb
         {
             uint8_t error = 0;
             m_reader.readError(error);
-            // TODO: Throw exception
-            printf("Error: 0x%02X\n", error);
+            
+            switch (error)
+            {
+            case DataError::kExtraParameters:
+                throw ExtraParametersDeviceException("The device received one or more extra parameters");
+            case DataError::kOutOFPeriodicCommandSlots:
+                throw OutOFPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots");
+            case DataError::kParameter0ReadError:
+            case DataError::kParameter1ReadError:
+            case DataError::kParameter2ReadError:
+            case DataError::kParameter3ReadError:
+            case DataError::kParameter4ReadError:
+            case DataError::kParameter5ReadError:
+            case DataError::kParameter6ReadError:
+            case DataError::kParameter7ReadError:
+                throw ParameterReadErrorDeviceException(error - DataError::kParameter0ReadError);
+            case DataError::kMessageIdReadError:
+                throw MessageIdReadErrorDeviceException("The device encountered an error reading the message id");
+            case DataError::kCommandIdReadError:
+                throw CommandIdReadErrorDeviceException("The device encountered an error reading the command id");
+            case DataError::kCrcReadError:
+                throw CrcReadErrorDeviceException("The device encountered an error reading the CRC");
+            case DataError::kParameter0Invalid:
+            case DataError::kParameter1Invalid:
+            case DataError::kParameter2Invalid:
+            case DataError::kParameter3Invalid:
+            case DataError::kParameter4Invalid:
+            case DataError::kParameter5Invalid:
+            case DataError::kParameter6Invalid:
+            case DataError::kParameter7Invalid:
+                throw ParameterInvalidDeviceException(error - DataError::kParameter0Invalid);
+            case DataError::kMessageIdInvalid:
+                throw MessageIdInvalidDeviceException("The device read an invalid message id");
+            case DataError::kCommandIdInvalid:
+                throw CommandIdInvalidDeviceException("The device read an invalid command id");
+            case DataError::kCrcInvalid:
+                throw CrcInvalidDeviceException("The device read an invalid CRC");
+            default:
+                throw DeviceException(error, "The device reported a user defined error.");
+            }
         }
     }
 

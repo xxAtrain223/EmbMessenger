@@ -5,6 +5,7 @@
 #include "EmbMessenger/IBuffer.hpp"
 #include "EmbMessenger/Reader.hpp"
 #include "EmbMessenger/Writer.hpp"
+#include "EmbMessenger/Exceptions.hpp"
 
 #include <map>
 #include <memory>
@@ -22,6 +23,8 @@ namespace emb
         uint16_t m_message_id;
         std::map<std::type_index, uint8_t> m_command_ids;
         std::map<uint16_t, std::shared_ptr<Command>> m_commands;
+
+        uint8_t m_parameter_index;
 
         void write();
         void read();
@@ -66,8 +69,9 @@ namespace emb
             readErrors();
             if (!m_reader.read(arg))
             {
-                // TODO: Throw exception
+                throw ParameterReadErrorHostException(m_parameter_index);
             }
+            ++m_parameter_index;
             read(args...);
         }
 
@@ -110,9 +114,8 @@ namespace emb
             periodic_command->m_message_id = m_message_id;
 
             std::shared_ptr<RegisterPeriodicCommand> registerCommand = std::make_shared<RegisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)), period);
-            registerCommand->setCallback<RegisterPeriodicCommand>([=](auto&& registerCallbackCommand) {
+            registerCommand->setCallback<RegisterPeriodicCommand>([=](auto&& registerCommand) {
                 m_commands[periodic_command->getMessageId()] = periodic_command;
-                //m_commands.emplace(periodic_command->getMessageId(), periodic_command);
             });
             send(registerCommand);
             // TODO: Wait for registerCommand to receive acknoledgement
