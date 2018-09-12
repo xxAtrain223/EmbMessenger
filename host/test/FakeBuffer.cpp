@@ -22,7 +22,7 @@ namespace emb
                 addByte(byte);
             }
             addByte(DataType::kCrc);
-            addByte(crc);
+            addByte(crc + !validCrc);
 
             ++deviceMessages;
         }
@@ -49,6 +49,11 @@ namespace emb
         bool FakeBuffer::buffersEmpty()
         {
             return host.empty() && device.empty();
+        }
+
+        void FakeBuffer::writeValidCrc(bool value)
+        {
+            validCrc = value;
         }
 
         void FakeBuffer::writeByte(const uint8_t byte)

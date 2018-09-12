@@ -11,7 +11,7 @@ namespace emb
     enum DataError : uint8_t
     {
         kExtraParameters = 0x00,
-        kOutOFPeriodicCommandSlots = 0x01,
+        kOutOfPeriodicCommandSlots = 0x01,
 
         kParameter0ReadError = 0x10,
         kParameter1ReadError = 0x11,

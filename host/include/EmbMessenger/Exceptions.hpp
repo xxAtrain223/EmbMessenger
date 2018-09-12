@@ -80,6 +80,7 @@ namespace emb
     };
     
     NEW_HOST_EX(MessageIdReadError);
+    NEW_HOST_EX(MessageIdInvalid);
     NEW_HOST_EX(CrcInvalid);
     NEW_HOST_EX(ExtraParameters);
 
@@ -114,7 +115,7 @@ namespace emb
     };
 
     NEW_DEVICE_EX(ExtraParameters);
-    NEW_DEVICE_EX(OutOFPeriodicCommandSlots);
+    NEW_DEVICE_EX(OutOfPeriodicCommandSlots);
     NEW_DEVICE_EX(MessageIdReadError);
     NEW_DEVICE_EX(CommandIdReadError);
     NEW_DEVICE_EX(CrcReadError);

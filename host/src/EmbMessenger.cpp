@@ -25,12 +25,21 @@ namespace emb
 
         m_reader.resetCrc();
 
+        try
+        {
+            readErrors();
+        }
+        catch (...)
+        {
+            consumeMessage();
+            throw;
+        }
+
         uint16_t message_id = 0;
         if (!m_reader.read(message_id))
         {
             consumeMessage();
             throw MessageIdReadErrorHostException("Error reading message Id");
-            return;
         }
 
         std::shared_ptr<Command> command = nullptr;
@@ -40,15 +49,30 @@ namespace emb
         }
         catch (std::out_of_range e)
         {
-            // No command to receive message, consume message
             consumeMessage();
-            return;
+            throw MessageIdInvalidHostException("No command to receive message from the device");
         }
 
         m_parameter_index = 0;
-        command->receive(this);
+        try
+        {
+            command->receive(this);
+        }
+        catch (...)
+        {
+            consumeMessage();
+            throw;
+        }
 
-        readErrors();
+        try
+        {
+            readErrors();
+        }
+        catch (...)
+        {
+            consumeMessage();
+            throw;
+        }
 
         if (m_reader.nextCrc())
         {
@@ -95,8 +119,8 @@ namespace emb
             {
             case DataError::kExtraParameters:
                 throw ExtraParametersDeviceException("The device received one or more extra parameters");
-            case DataError::kOutOFPeriodicCommandSlots:
-                throw OutOFPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots");
+            case DataError::kOutOfPeriodicCommandSlots:
+                throw OutOfPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots");
             case DataError::kParameter0ReadError:
             case DataError::kParameter1ReadError:
             case DataError::kParameter2ReadError:

@@ -17,6 +17,7 @@ namespace emb
             std::vector<uint8_t> device;
             int deviceMessages = 0;
             bool readCrc = false;
+            bool validCrc = true;
 
         public:
             /**
@@ -39,6 +40,8 @@ namespace emb
             bool checkHostBuffer(std::vector<uint8_t>&& message);
 
             bool buffersEmpty();
+
+            void writeValidCrc(const bool value);
 
             virtual void writeByte(const uint8_t byte) override;
             virtual uint8_t peek() const override;
