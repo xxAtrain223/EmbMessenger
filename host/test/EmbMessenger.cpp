@@ -9,6 +9,7 @@
 #include "SetLed.hpp"
 #include "ToggleLed.hpp"
 #include "Add.hpp"
+#include "UserError.hpp"
 
 using namespace testing;
 
@@ -500,25 +501,33 @@ namespace emb
             FakeBuffer buffer;
 
             EmbMessenger messenger(&buffer);
-            messenger.registerCommand<Ping>(0);
-            messenger.registerCommand<SetLed>(1);
-            messenger.registerCommand<ToggleLed>(2);
-            messenger.registerCommand<Add>(3);
+            messenger.registerCommand<UserError>(0);
 
-            auto setLedCommand = std::make_shared<Ping>();
-            messenger.send(setLedCommand);
+            auto userErrorCommand = std::make_shared<UserError>();
+            messenger.send(userErrorCommand);
 
             ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
             buffer.addDeviceMessage({ 0x01, DataType::kError, 0x42 });
 
-            try
-            {
-                messenger.update();
-            }
-            catch (DeviceException e)
-            {
-                ASSERT_EQ(e.getErrorCode(), 0x42);  
-            }
+            ASSERT_THROW(messenger.update(), UserErrorException);
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_exceptions_device, user_defined_error_unexpected)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger messenger(&buffer);
+            messenger.registerCommand<UserError>(0);
+
+            auto userErrorCommand = std::make_shared<UserError>();
+            messenger.send(userErrorCommand);
+
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
+            buffer.addDeviceMessage({ 0x01, DataType::kError, 0x43 });
+
+            ASSERT_THROW(messenger.update(), DeviceException);
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }

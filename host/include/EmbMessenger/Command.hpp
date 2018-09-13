@@ -21,6 +21,7 @@ namespace emb
     public:
         virtual void send(EmbMessenger* messenger);
         virtual void receive(EmbMessenger* messenger);
+        virtual void reportError(const uint8_t error);
 
         uint16_t getMessageId();
 

@@ -42,10 +42,9 @@ namespace emb
             throw MessageIdReadErrorHostException("Error reading message Id");
         }
 
-        std::shared_ptr<Command> command = nullptr;
         try
         {
-            command = m_commands.at(message_id);
+            m_current_command = m_commands.at(message_id);
         }
         catch (std::out_of_range e)
         {
@@ -56,7 +55,7 @@ namespace emb
         m_parameter_index = 0;
         try
         {
-            command->receive(this);
+            m_current_command->receive(this);
         }
         catch (...)
         {
@@ -87,10 +86,12 @@ namespace emb
             throw ExtraParametersHostException("Message has extra parameters from the device");
         }
 
-        if (command->m_callback != nullptr)
+        if (m_current_command->m_callback != nullptr)
         {
-            command->m_callback(command);
+            m_current_command->m_callback(m_current_command);
         }
+
+        m_current_command = nullptr;
 
         if (!m_commands.at(message_id)->m_is_periodic)
         {
@@ -152,6 +153,7 @@ namespace emb
             case DataError::kCrcInvalid:
                 throw CrcInvalidDeviceException("The device read an invalid CRC");
             default:
+                m_current_command->reportError(error);
                 throw DeviceException(error, "The device reported a user defined error.");
             }
         }

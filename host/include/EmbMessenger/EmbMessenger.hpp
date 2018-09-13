@@ -23,6 +23,7 @@ namespace emb
         uint16_t m_message_id;
         std::map<std::type_index, uint8_t> m_command_ids;
         std::map<uint16_t, std::shared_ptr<Command>> m_commands;
+        std::shared_ptr<Command> m_current_command;
 
         uint8_t m_parameter_index;
 

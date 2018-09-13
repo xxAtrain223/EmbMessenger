@@ -24,14 +24,16 @@
         {} \
     }
 
-#define NEW_DEVICE_EX(code) \
-    class code##DeviceException : public emb::DeviceException \
+#define NEW_DEVICE_EX(code, name) \
+    class name : public emb::DeviceException \
     { \
     public: \
-        code##DeviceException(const std::string& message = "") : \
-            emb::DeviceException(emb::k##code, #code ": " + message) \
+        name(const std::string& message = "") : \
+            emb::DeviceException(code, #name ": " + message) \
         {} \
     }
+
+#define NEW_CODE_EX(code) NEW_DEVICE_EX(emb::k##code, code##DeviceException)
 
 namespace emb
 {
@@ -114,14 +116,14 @@ namespace emb
         }
     };
 
-    NEW_DEVICE_EX(ExtraParameters);
-    NEW_DEVICE_EX(OutOfPeriodicCommandSlots);
-    NEW_DEVICE_EX(MessageIdReadError);
-    NEW_DEVICE_EX(CommandIdReadError);
-    NEW_DEVICE_EX(CrcReadError);
-    NEW_DEVICE_EX(MessageIdInvalid);
-    NEW_DEVICE_EX(CommandIdInvalid);
-    NEW_DEVICE_EX(CrcInvalid);
+    NEW_CODE_EX(ExtraParameters);
+    NEW_CODE_EX(OutOfPeriodicCommandSlots);
+    NEW_CODE_EX(MessageIdReadError);
+    NEW_CODE_EX(CommandIdReadError);
+    NEW_CODE_EX(CrcReadError);
+    NEW_CODE_EX(MessageIdInvalid);
+    NEW_CODE_EX(CommandIdInvalid);
+    NEW_CODE_EX(CrcInvalid);
 }
 
 #endif // EMBMESSENGER_EXCEPTIONS_HPP

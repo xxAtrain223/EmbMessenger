@@ -10,6 +10,10 @@ namespace emb
     {
     }
 
+    void Command::reportError(const uint8_t error)
+    {
+    }
+
     uint16_t Command::getMessageId()
     {
         return m_message_id;
