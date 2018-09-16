@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <typeindex>
 
 namespace emb
 {
@@ -14,16 +15,20 @@ namespace emb
         friend class EmbMessenger;
 
     protected:
+        std::type_index m_type_index;
         uint16_t m_message_id;
         std::function<void(std::shared_ptr<Command>)> m_callback = nullptr;
         bool m_is_periodic = false;
 
     public:
+        Command();
+
         virtual void send(EmbMessenger* messenger);
         virtual void receive(EmbMessenger* messenger);
-        virtual void reportError(const uint8_t error);
+        virtual void reportError(const uint8_t error, std::shared_ptr<Command> ptr);
 
-        uint16_t getMessageId();
+        std::type_index getTypeIndex() const;
+        uint16_t getMessageId() const;
 
         template <typename CommandType>
         void setCallback(std::function<void(std::shared_ptr<CommandType>)> callback)

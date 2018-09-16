@@ -9,6 +9,11 @@ namespace emb
     {
         class Ping : public Command
         {
+        public:
+            Ping()
+            {
+                m_type_index = typeid(Ping);
+            }
         };
     }
 }

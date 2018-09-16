@@ -10,8 +10,8 @@
     class name##Exception : public emb::BaseException \
     { \
     public: \
-        name##Exception(const std::string& message="") : \
-            emb::BaseException(#name ": " + message) \
+        name##Exception(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
+            emb::BaseException(#name ": " + message, command) \
         {} \
     }
 
@@ -19,8 +19,8 @@
     class name##HostException : public emb::HostException \
     { \
     public: \
-        name##HostException(const std::string& message="") : \
-            emb::HostException(#name ": " + message) \
+        name##HostException(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
+            emb::HostException(#name ": " + message, command) \
         {} \
     }
 
@@ -28,8 +28,8 @@
     class name : public emb::DeviceException \
     { \
     public: \
-        name(const std::string& message = "") : \
-            emb::DeviceException(code, #name ": " + message) \
+        name(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
+            emb::DeviceException(code, #name ": " + message, command) \
         {} \
     }
 
@@ -37,18 +37,27 @@
 
 namespace emb
 {
+    class Command;
+
     class BaseException : public std::runtime_error
     {
+        std::shared_ptr<Command> m_command;
+
     public:
-        BaseException(const std::string& message) :
-            std::runtime_error(message) { }
+        BaseException(const std::string& message, std::shared_ptr<Command> command = nullptr) :
+            std::runtime_error(message), m_command(command) { }
+
+        std::shared_ptr<Command> getCommand() const
+        {
+            return m_command;
+        }
     };
 
     class HostException : public BaseException
     {
     public:
-        HostException(const std::string& message) :
-            BaseException(message) { }
+        HostException(const std::string& message, std::shared_ptr<Command> command = nullptr) :
+            BaseException(message, command) { }
     };
 
     class DeviceException : public BaseException
@@ -57,8 +66,8 @@ namespace emb
         uint8_t m_error_code;
 
     public:
-        DeviceException(const uint8_t errorCode, const std::string& message) :
-            m_error_code(errorCode), BaseException(message) { }
+        DeviceException(const uint8_t errorCode, const std::string& message, std::shared_ptr<Command> command = nullptr) :
+            m_error_code(errorCode), BaseException(message, command) { }
 
         inline uint8_t getErrorCode() const
         {
@@ -72,8 +81,8 @@ namespace emb
         uint8_t m_parameter_index;
 
     public:
-        ParameterReadErrorHostException(const uint8_t parameterIndex) :
-            m_parameter_index(parameterIndex), HostException("Error reading parameter " + std::to_string(parameterIndex)) { }
+        ParameterReadErrorHostException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
+            m_parameter_index(parameterIndex), HostException("Error reading parameter " + std::to_string(parameterIndex), command) { }
 
         inline uint8_t getParameterIndex() const
         {
@@ -85,6 +94,7 @@ namespace emb
     NEW_HOST_EX(MessageIdInvalid);
     NEW_HOST_EX(CrcInvalid);
     NEW_HOST_EX(ExtraParameters);
+    NEW_HOST_EX(InvalidCommandTypeIndex);
 
     class ParameterReadErrorDeviceException : public DeviceException
     {
@@ -92,8 +102,8 @@ namespace emb
         uint8_t m_parameter_index;
 
     public:
-        ParameterReadErrorDeviceException(const uint8_t parameterIndex) :
-            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0ReadError + parameterIndex, "Error reading parameter " + std::to_string(parameterIndex)) { }
+        ParameterReadErrorDeviceException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
+            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0ReadError + parameterIndex, "Error reading parameter " + std::to_string(parameterIndex), command) { }
 
         inline uint8_t getParameterIndex() const
         {
@@ -107,8 +117,8 @@ namespace emb
         uint8_t m_parameter_index;
 
     public:
-        ParameterInvalidDeviceException(const uint8_t parameterIndex) :
-            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0Invalid + parameterIndex, "Parameter " + std::to_string(parameterIndex) + " is invalid") { }
+        ParameterInvalidDeviceException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
+            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0Invalid + parameterIndex, "Parameter " + std::to_string(parameterIndex) + " is invalid", command) { }
 
         inline uint8_t getParameterIndex() const
         {

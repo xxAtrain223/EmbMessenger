@@ -115,8 +115,8 @@ namespace emb
 
             messenger.resetDevice();
 
-            ASSERT_TRUE(buffer.checkHostBuffer({0x01, DataType::kUint8, 0xFF}));
-            buffer.addDeviceMessage({0x01});
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, DataType::kUint8, 0xFF }));
+            buffer.addDeviceMessage({ 0x01 });
 
             messenger.update();
 
@@ -529,6 +529,37 @@ namespace emb
 
             ASSERT_THROW(messenger.update(), DeviceException);
 
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_exceptions_device, resend_command)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger messenger(&buffer);
+            messenger.registerCommand<UserError>(0);
+
+            auto userErrorCommand = std::make_shared<UserError>();
+            messenger.send(userErrorCommand);
+
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
+            buffer.addDeviceMessage({ 0x01, DataType::kError, 0x42 });
+
+            try
+            {
+                messenger.update();
+            }
+            catch (UserErrorException e)
+            {
+                ASSERT_TRUE(buffer.buffersEmpty());
+                ASSERT_EQ(e.getCommand(), userErrorCommand);
+                messenger.send(e.getCommand());
+            }
+
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x02, 0x00 }));
+            buffer.addDeviceMessage({ 0x02 });
+
+            messenger.update();
             ASSERT_TRUE(buffer.buffersEmpty());
         }
     }

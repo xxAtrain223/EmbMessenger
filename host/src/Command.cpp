@@ -2,6 +2,11 @@
 
 namespace emb
 {
+    Command::Command() :
+        m_type_index(typeid(Command))
+    {
+    }
+
     void Command::send(EmbMessenger * messenger)
     {
     }
@@ -10,11 +15,16 @@ namespace emb
     {
     }
 
-    void Command::reportError(const uint8_t error)
+    void Command::reportError(const uint8_t error, std::shared_ptr<Command> ptr)
     {
     }
 
-    uint16_t Command::getMessageId()
+    std::type_index Command::getTypeIndex() const
+    {
+        return m_type_index;
+    }
+
+    uint16_t Command::getMessageId() const
     {
         return m_message_id;
     }

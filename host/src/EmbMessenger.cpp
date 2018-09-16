@@ -14,6 +14,23 @@ namespace emb
         registerCommand<UnregisterPeriodicCommand>(253);
     }
 
+    std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command)
+    {
+        if (command->getTypeIndex() == typeid(Command))
+        {
+            throw InvalidCommandTypeIndexHostException("Command has an invalid type index, override it in your command derived class.", command);
+        }
+
+        command->m_message_id = m_message_id;
+        m_commands.emplace(m_message_id, command);
+
+        write(m_message_id++, m_command_ids.at(command->getTypeIndex()));
+        command->send(this);
+        m_writer.writeCrc();
+
+        return command;
+    }
+
     void EmbMessenger::update()
     {
         m_buffer->update();
@@ -49,7 +66,8 @@ namespace emb
         catch (std::out_of_range e)
         {
             consumeMessage();
-            throw MessageIdInvalidHostException("No command to receive message from the device");
+            m_commands.erase(message_id);
+            throw MessageIdInvalidHostException("No command to receive message from the device", m_current_command);
         }
 
         m_parameter_index = 0;
@@ -60,6 +78,7 @@ namespace emb
         catch (...)
         {
             consumeMessage();
+            m_commands.erase(message_id);
             throw;
         }
 
@@ -70,6 +89,7 @@ namespace emb
         catch (...)
         {
             consumeMessage();
+            m_commands.erase(message_id);
             throw;
         }
 
@@ -77,13 +97,15 @@ namespace emb
         {
             if (!m_reader.readCrc())
             {
-                throw CrcInvalidHostException("Crc from the device was invalid");
+                m_commands.erase(message_id);
+                throw CrcInvalidHostException("Crc from the device was invalid", m_current_command);
             }
         }
         else
         {
             consumeMessage();
-            throw ExtraParametersHostException("Message has extra parameters from the device");
+            m_commands.erase(message_id);
+            throw ExtraParametersHostException("Message has extra parameters from the device", m_current_command);
         }
 
         if (m_current_command->m_callback != nullptr)
@@ -119,9 +141,9 @@ namespace emb
             switch (error)
             {
             case DataError::kExtraParameters:
-                throw ExtraParametersDeviceException("The device received one or more extra parameters");
+                throw ExtraParametersDeviceException("The device received one or more extra parameters", m_current_command);
             case DataError::kOutOfPeriodicCommandSlots:
-                throw OutOfPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots");
+                throw OutOfPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots", m_current_command);
             case DataError::kParameter0ReadError:
             case DataError::kParameter1ReadError:
             case DataError::kParameter2ReadError:
@@ -130,13 +152,13 @@ namespace emb
             case DataError::kParameter5ReadError:
             case DataError::kParameter6ReadError:
             case DataError::kParameter7ReadError:
-                throw ParameterReadErrorDeviceException(error - DataError::kParameter0ReadError);
+                throw ParameterReadErrorDeviceException(error - DataError::kParameter0ReadError, m_current_command);
             case DataError::kMessageIdReadError:
-                throw MessageIdReadErrorDeviceException("The device encountered an error reading the message id");
+                throw MessageIdReadErrorDeviceException("The device encountered an error reading the message id", m_current_command);
             case DataError::kCommandIdReadError:
-                throw CommandIdReadErrorDeviceException("The device encountered an error reading the command id");
+                throw CommandIdReadErrorDeviceException("The device encountered an error reading the command id", m_current_command);
             case DataError::kCrcReadError:
-                throw CrcReadErrorDeviceException("The device encountered an error reading the CRC");
+                throw CrcReadErrorDeviceException("The device encountered an error reading the CRC", m_current_command);
             case DataError::kParameter0Invalid:
             case DataError::kParameter1Invalid:
             case DataError::kParameter2Invalid:
@@ -145,16 +167,16 @@ namespace emb
             case DataError::kParameter5Invalid:
             case DataError::kParameter6Invalid:
             case DataError::kParameter7Invalid:
-                throw ParameterInvalidDeviceException(error - DataError::kParameter0Invalid);
+                throw ParameterInvalidDeviceException(error - DataError::kParameter0Invalid, m_current_command);
             case DataError::kMessageIdInvalid:
-                throw MessageIdInvalidDeviceException("The device read an invalid message id");
+                throw MessageIdInvalidDeviceException("The device read an invalid message id", m_current_command);
             case DataError::kCommandIdInvalid:
-                throw CommandIdInvalidDeviceException("The device read an invalid command id");
+                throw CommandIdInvalidDeviceException("The device read an invalid command id", m_current_command);
             case DataError::kCrcInvalid:
-                throw CrcInvalidDeviceException("The device read an invalid CRC");
+                throw CrcInvalidDeviceException("The device read an invalid CRC", m_current_command);
             default:
-                m_current_command->reportError(error);
-                throw DeviceException(error, "The device reported a user defined error.");
+                m_current_command->reportError(error, m_current_command);
+                throw DeviceException(error, "The device reported a user defined error.", m_current_command);
             }
         }
     }
@@ -166,9 +188,15 @@ namespace emb
              m_buffer->readByte());
     }
 
+    EmbMessenger::ResetCommand::ResetCommand()
+    {
+        m_type_index = typeid(ResetCommand);
+    }
+
     EmbMessenger::RegisterPeriodicCommand::RegisterPeriodicCommand(uint8_t commandId, uint32_t period)
         : m_command_id(commandId), m_period(period)
     {
+        m_type_index = typeid(RegisterPeriodicCommand);
     }
 
     void EmbMessenger::RegisterPeriodicCommand::send(EmbMessenger* messenger)
@@ -179,6 +207,7 @@ namespace emb
     EmbMessenger::UnregisterPeriodicCommand::UnregisterPeriodicCommand(uint8_t commandId)
         : m_command_id(commandId)
     {
+        m_type_index = typeid(UnregisterPeriodicCommand);
     }
 
     void EmbMessenger::UnregisterPeriodicCommand::send(EmbMessenger* messenger)

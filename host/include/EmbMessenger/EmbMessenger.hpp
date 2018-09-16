@@ -44,6 +44,8 @@ namespace emb
             m_command_ids.emplace(typeid(T), id);
         }
 
+        std::shared_ptr<Command> send(std::shared_ptr<Command> command);
+
         template <typename CommandType>
         std::shared_ptr<CommandType> send(std::shared_ptr<CommandType> command)
         {
@@ -70,14 +72,18 @@ namespace emb
             readErrors();
             if (!m_reader.read(arg))
             {
-                throw ParameterReadErrorHostException(m_parameter_index);
+                throw ParameterReadErrorHostException(m_parameter_index, m_current_command);
             }
             ++m_parameter_index;
             read(args...);
         }
 
     protected:
-        class ResetCommand : public Command {};
+        class ResetCommand : public Command
+        {
+        public:
+            ResetCommand();
+        };
 
         class RegisterPeriodicCommand : public Command
         {

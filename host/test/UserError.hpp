@@ -12,13 +12,19 @@ namespace emb
 
         class UserError : public Command
         {
-            void reportError(const uint8_t error)
+            void reportError(const uint8_t error, std::shared_ptr<Command> ptr)
             {
                 switch (error)
                 {
                 case 0x42:
-                    throw UserErrorException("Something happened on the device");
+                    throw UserErrorException("Something happened on the device", ptr);
                 }
+            }
+
+        public:
+            UserError()
+            {
+                m_type_index = typeid(UserError);
             }
         };
     }

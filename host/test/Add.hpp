@@ -18,6 +18,7 @@ namespace emb
 
             Add(int a, int b)
             {
+                m_type_index = typeid(Add);
                 A = a;
                 B = b;
             }

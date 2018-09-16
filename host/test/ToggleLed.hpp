@@ -12,6 +12,11 @@ namespace emb
         public:
             bool ledState;
 
+            ToggleLed()
+            {
+                m_type_index = typeid(ToggleLed);
+            }
+
             void receive(EmbMessenger* messenger)
             {
                 messenger->read(ledState);
