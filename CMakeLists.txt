@@ -8,3 +8,4 @@ option(ENABLE_TESTING "Enable Testing" ON)
 
 add_subdirectory(shared)
 add_subdirectory(host)
+add_subdirectory(device)

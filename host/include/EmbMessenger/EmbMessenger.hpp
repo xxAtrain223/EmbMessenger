@@ -24,7 +24,7 @@ namespace emb
         std::map<std::type_index, uint8_t> m_command_ids;
         std::map<uint16_t, std::shared_ptr<Command>> m_commands;
         std::shared_ptr<Command> m_current_command;
-
+        std::function<int(double)> fdsa;
         uint8_t m_parameter_index;
 
         void write();
@@ -67,7 +67,7 @@ namespace emb
         }
 
         template <typename T, typename... Ts>
-        void read(T& arg, Ts... args)
+        void read(T& arg, Ts&... args)
         {
             readErrors();
             if (!m_reader.read(arg))
