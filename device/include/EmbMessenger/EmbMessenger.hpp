@@ -38,6 +38,7 @@ namespace emb
         uint16_t m_message_id;
         bool m_is_periodic;
         bool m_in_command;
+        uint8_t m_num_messages;
 
         uint8_t m_parameter_index;
 
@@ -52,6 +53,13 @@ namespace emb
         void write()
         {
             (void)0; // Noop
+        }
+
+        void consumeMessage()
+        {
+            for (uint8_t n = m_buffer->messagesAvailable();
+                n > 0 && n == m_buffer->messagesAvailable() && n == m_num_messages;
+                m_buffer->readByte());
         }
 
     public:
@@ -103,9 +111,9 @@ namespace emb
         void update()
         {
             m_buffer->update();
-            uint8_t numMessages = m_buffer->messagesAvailable();
+            m_num_messages = m_buffer->messagesAvailable();
 
-            if (numMessages == 0)
+            if (m_num_messages == 0)
             {
                 return;
             }
@@ -117,12 +125,18 @@ namespace emb
             if (!m_reader.read(m_message_id))
             {
                 m_writer.writeError(DataError::kMessageIdReadError);
+                consumeMessage();
+                m_writer.writeCrc();
+                return;
             }
             m_writer.write(m_message_id);
 
             if (!m_reader.read(m_command_id))
             {
                 m_writer.writeError(DataError::kCommandIdReadError);
+                consumeMessage();
+                m_writer.writeCrc();
+                return;
             }
 
             switch (m_command_id)
@@ -131,24 +145,36 @@ namespace emb
                 if (m_commands[m_command_id] == nullptr)
                 {
                     m_writer.writeError(DataError::kCommandIdInvalid);
+                    consumeMessage();
                 }
                 else
                 {
-                    m_commands[m_command_id]();
+                    if (setjmp(m_jmp_buf) == 0)
+                    {
+                        m_commands[m_command_id]();
+                    }
+                    else
+                    {
+                        consumeMessage();
+                        m_writer.writeCrc();
+                        return;
+                    }
                 }
             }
 
-            if (m_buffer->messagesAvailable() == numMessages)
+            if (m_buffer->messagesAvailable() == m_num_messages)
             {
                 if (m_reader.nextCrc())
                 {
                     if (!m_reader.readCrc())
                     {
+                        consumeMessage();
                         m_writer.writeError(DataError::kCrcInvalid);
                     }
                 }
                 else
                 {
+                    consumeMessage();
                     m_writer.writeError(DataError::kExtraParameters);
                 }
             }
@@ -175,7 +201,7 @@ namespace emb
         }
 
         template <typename T, typename... Ts>
-        void read(T& value, std::function<bool(const T)>& validator, Ts&... args)
+        void read(T& value, std::function<bool(T)>& validator, Ts&... args)
         {
             if (!m_in_command)
             {

@@ -15,7 +15,7 @@ namespace emb
         protected:
             std::vector<uint8_t> host;
             std::vector<uint8_t> device;
-            int deviceMessages = 0;
+            int hostMessages = 0;
             bool readCrc = false;
             bool validCrc = true;
 

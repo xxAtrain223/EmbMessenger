@@ -10,8 +10,9 @@ namespace emb
      */
     enum DataError : uint8_t
     {
-        kExtraParameters = 0x00,
-        kOutOfPeriodicCommandSlots = 0x01,
+        // Cannot use 0x00 because of longjmp
+        kExtraParameters = 0x01,
+        kOutOfPeriodicCommandSlots = 0x02,
 
         kParameter0ReadError = 0x10,
         kParameter1ReadError = 0x11,

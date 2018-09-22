@@ -13,7 +13,7 @@ namespace emb
             uint8_t crc = 0;
 
             auto addByte = [&](uint8_t byte) {
-                device.emplace_back(byte);
+                host.emplace_back(byte);
                 crc = crc::Calculate8(crc, byte);
             };
 
@@ -24,7 +24,7 @@ namespace emb
             addByte(DataType::kCrc);
             addByte(crc + !validCrc);
 
-            ++deviceMessages;
+            ++hostMessages;
         }
 
         bool FakeBuffer::checkDeviceBuffer(std::vector<uint8_t>&& message)
@@ -39,9 +39,9 @@ namespace emb
             crc = crc::Calculate8(crc, DataType::kCrc);
             message.emplace_back(crc);
 
-            bool rv = host == message;
+            bool rv = device == message;
 
-            host.erase(std::begin(host), std::begin(host) + message.size());
+            device.erase(std::begin(device), std::begin(device) + ((device.size() < message.size()) ? device.size() : message.size()));
 
             return rv;
         }
@@ -58,18 +58,18 @@ namespace emb
 
         void FakeBuffer::writeByte(const uint8_t byte)
         {
-            host.emplace_back(byte);
+            device.emplace_back(byte);
         }
 
         uint8_t FakeBuffer::peek() const
         {
-            return device.front();
+            return host.front();
         }
 
         uint8_t FakeBuffer::readByte()
         {
-            uint8_t byte = device.front();
-            device.erase(std::begin(device));
+            uint8_t byte = host.front();
+            host.erase(std::begin(host));
 
             if (byte == DataType::kCrc)
             {
@@ -78,7 +78,7 @@ namespace emb
             else if (readCrc == true)
             {
                 readCrc = false;
-                --deviceMessages;
+                --hostMessages;
             }
 
             return byte;
@@ -86,17 +86,17 @@ namespace emb
 
         bool FakeBuffer::empty() const
         {
-            return device.empty();
+            return host.empty();
         }
 
         size_t FakeBuffer::size() const
         {
-            return device.size();
+            return host.size();
         }
 
         uint8_t FakeBuffer::messagesAvailable() const
         {
-            return deviceMessages;
+            return hostMessages;
         }
 
         void FakeBuffer::update()
