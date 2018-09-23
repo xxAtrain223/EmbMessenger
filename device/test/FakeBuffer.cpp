@@ -23,7 +23,11 @@ namespace emb
                 addByte(byte);
             }
             addByte(DataType::kCrc);
-            addByte(crc + !validCrc);
+
+            if (appendCrc)
+            {
+                addByte(crc + !validCrc);
+            }
 
             ++hostMessages;
         }
@@ -50,6 +54,11 @@ namespace emb
         bool FakeBuffer::buffersEmpty()
         {
             return host.empty() && device.empty();
+        }
+
+        void FakeBuffer::writeCrc(bool value)
+        {
+            appendCrc = value;
         }
 
         void FakeBuffer::writeValidCrc(bool value)

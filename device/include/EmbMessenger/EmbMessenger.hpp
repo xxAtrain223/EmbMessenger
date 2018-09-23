@@ -63,7 +63,7 @@ namespace emb
         void consumeMessage()
         {
             for (uint8_t n = m_buffer->messagesAvailable();
-                n > 0 && n == m_buffer->messagesAvailable() && n == m_num_messages;
+                n > 0 && n == m_buffer->messagesAvailable() && n == m_num_messages && !m_buffer->empty();
                 m_buffer->readByte());
         }
 
@@ -149,7 +149,7 @@ namespace emb
             switch (m_command_id)
             {
             default:
-                if (m_commands[m_command_id] == nullptr)
+                if (m_commands[m_command_id] == nullptr || m_command_id >= MaxCommands)
                 {
                     m_writer.writeError(DataError::kCommandIdInvalid);
                     consumeMessage();

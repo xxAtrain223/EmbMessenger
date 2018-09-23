@@ -232,5 +232,110 @@ namespace emb
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
+
+        TEST(messenger_errors, message_id_read_error)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger<1, 0> messenger(&buffer);
+
+            bool ledState = false;
+
+            std::function<void()> ping = [&] {};
+
+            messenger.attachCommand(0, ping);
+
+            buffer.addHostMessage({ });
+            buffer.addHostMessage({ DataType::kBoolFalse });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError }));
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError }));
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_errors, command_id_read_error)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger<1, 0> messenger(&buffer);
+
+            bool ledState = false;
+
+            std::function<void()> ping = [&] {};
+
+            messenger.attachCommand(0, ping);
+
+            buffer.addHostMessage({ 0x01 });
+            buffer.addHostMessage({ 0x02, DataType::kBoolFalse });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCommandIdReadError }));
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kCommandIdReadError }));
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_errors, command_id_invalid)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger<1, 0> messenger(&buffer);
+
+            bool ledState = false;
+
+            std::function<void()> ping = [&] {};
+
+            messenger.attachCommand(0, ping);
+
+            buffer.addHostMessage({ 0x01, 0x01 });
+            buffer.addHostMessage({ 0x02, 0x02 });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCommandIdInvalid }));
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kCommandIdInvalid }));
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_errors, crc_invalid)
+        {
+            FakeBuffer buffer;
+            buffer.writeValidCrc(false);
+
+            EmbMessenger<2, 0> messenger(&buffer);
+
+            bool ledState = false;
+
+            std::function<void()> ping = [&] {};
+
+            messenger.attachCommand(0, ping);
+
+            buffer.addHostMessage({ 0x01, 0x00 });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCrcInvalid }));
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_errors, extra_parameters)
+        {
+            FakeBuffer buffer;
+
+            EmbMessenger<1, 0> messenger(&buffer);
+
+            bool ledState = false;
+
+            std::function<void()> ping = [&] {};
+
+            messenger.attachCommand(0, ping);
+
+            buffer.addHostMessage({ 0x01, 0x00, DataType::kBoolFalse });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kExtraParameters }));
+
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
     }
 }

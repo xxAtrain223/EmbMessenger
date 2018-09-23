@@ -17,6 +17,7 @@ namespace emb
             std::vector<uint8_t> device;
             int hostMessages = 0;
             bool readCrc = false;
+            bool appendCrc = true;
             bool validCrc = true;
 
         public:
@@ -41,6 +42,7 @@ namespace emb
 
             bool buffersEmpty();
 
+            void writeCrc(const bool value);
             void writeValidCrc(const bool value);
 
             void printBuffers();
