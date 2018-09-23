@@ -43,6 +43,8 @@ namespace emb
 
             void writeValidCrc(const bool value);
 
+            void printBuffers();
+
             virtual void writeByte(const uint8_t byte) override;
             virtual uint8_t peek() const override;
             virtual uint8_t readByte() override;

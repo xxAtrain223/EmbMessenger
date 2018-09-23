@@ -3,6 +3,7 @@
 #include "EmbMessenger/Crc.hpp"
 
 #include <algorithm>
+#include <cstdio>
 
 namespace emb
 {
@@ -54,6 +55,23 @@ namespace emb
         void FakeBuffer::writeValidCrc(bool value)
         {
             validCrc = value;
+        }
+
+        void FakeBuffer::printBuffers()
+        {
+            printf("Device:");
+            for (uint8_t byte : device)
+            {
+                printf(" 0x%02X", byte);
+            }
+
+            printf("\nHost:");
+            for (uint8_t byte : host)
+            {
+                printf(" 0x%02X", byte);
+            }
+
+            printf("\n");
         }
 
         void FakeBuffer::writeByte(const uint8_t byte)

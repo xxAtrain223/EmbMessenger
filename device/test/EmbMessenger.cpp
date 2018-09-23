@@ -185,11 +185,11 @@ namespace emb
             messenger.attachCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x03, DataType::kBoolTrue });
-            buffer.addHostMessage({ 0x01, 0x03, 0x07 });
+            buffer.addHostMessage({ 0x02, 0x03, 0x07 });
             messenger.update();
             ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kParameter0ReadError }));
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kParameter1ReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kParameter1ReadError }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -210,10 +210,11 @@ namespace emb
                 ledState = !ledState;
                 messenger.write(ledState);
             };
-            std::function<bool(int)> validator = [](int val) { return val != 0; };
             std::function<void()> add = [&] {
                 int a = 0, b = 0;
-                messenger.read(a, validator, b, validator);
+                messenger.read_and_validate(
+                    a, [](int val) { return val != 0; }, 
+                    b, [](int val) { return val != 0; });
                 messenger.write(a + b);
             };
 

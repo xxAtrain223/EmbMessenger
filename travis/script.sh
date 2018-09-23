@@ -10,10 +10,16 @@ cd shared
 cd ../host
 ./EmbMessengerHostTest
 
+cd ../device
+./EmbMessengerDeviceTest
+
 popd
 
 cd shared
 cppcheck src/*.cpp include/*.hpp
 
 cd ../host
+cppcheck src/*.cpp include/*.hpp
+
+cd ../device
 cppcheck src/*.cpp include/*.hpp

@@ -50,6 +50,11 @@ namespace emb
             }
         }
 
+        void read_and_validate()
+        {
+            (void)0;
+        }
+
         void write()
         {
             (void)0; // Noop
@@ -75,6 +80,8 @@ namespace emb
             {
                 m_commands[i] = nullptr;
             }
+
+            m_in_command = false;
         }
 
         bool attachCommand(int id, CommandFunction command)
@@ -151,7 +158,9 @@ namespace emb
                 {
                     if (setjmp(m_jmp_buf) == 0)
                     {
+                        m_in_command = true;
                         m_commands[m_command_id]();
+                        m_in_command = false;
                     }
                     else
                     {
@@ -183,7 +192,7 @@ namespace emb
         }
 
         template <typename T, typename... Ts>
-        void read(T& value, Ts&... args)
+        void read(T&& value, Ts&&... args)
         {
             if (!m_in_command)
             {
@@ -194,14 +203,14 @@ namespace emb
             {
                 reportError(static_cast<DataError>(DataError::kParameter0ReadError + m_parameter_index));
             }
-
+            
             ++m_parameter_index;
 
-            read(args...);
+            read(std::forward<Ts>(args)...);
         }
-
+        
         template <typename T, typename... Ts>
-        void read(T& value, std::function<bool(T)>& validator, Ts&... args)
+        void read_and_validate(T&& value, std::function<bool(decltype(value))>&& validator, Ts&&... args)
         {
             if (!m_in_command)
             {
@@ -215,7 +224,7 @@ namespace emb
                 reportError(static_cast<DataError>(DataError::kParameter0Invalid + m_parameter_index - 1u));
             }
 
-            read(args...);
+            read_and_validate(std::forward<Ts>(args)...);
         }
 
         template <typename T, typename... Ts>
