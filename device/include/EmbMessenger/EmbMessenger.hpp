@@ -15,6 +15,13 @@
 
 namespace emb
 {
+    namespace
+    {
+        template<typename T> struct remove_reference { typedef T type; };
+        template<typename T> struct remove_reference<T&> { typedef T type; };
+        template<typename T> struct remove_reference<T&&> { typedef T type; };
+    }
+
     class IBuffer;
 
     template <uint8_t MaxCommands, uint8_t MaxPeriodicCommands>
@@ -210,7 +217,7 @@ namespace emb
         }
         
         template <typename T, typename... Ts>
-        void read_and_validate(T&& value, std::function<bool(decltype(value))>&& validator, Ts&&... args)
+        void read_and_validate(T&& value, bool(*validator)(typename remove_reference<T>::type), Ts&&... args)
         {
             if (!m_in_command)
             {
