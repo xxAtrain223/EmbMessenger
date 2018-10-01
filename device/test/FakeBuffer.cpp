@@ -44,7 +44,7 @@ namespace emb
             crc = crc::Calculate8(crc, DataType::kCrc);
             message.emplace_back(crc);
 
-            bool rv = device == message;
+            bool rv = std::equal(std::begin(message), std::end(message), std::begin(device));
 
             device.erase(std::begin(device), std::begin(device) + ((device.size() < message.size()) ? device.size() : message.size()));
 

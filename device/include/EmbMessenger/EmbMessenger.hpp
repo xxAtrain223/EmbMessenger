@@ -30,16 +30,24 @@ namespace emb
     protected:
 #ifndef EMB_TESTING
         using CommandFunction = (void)(*)(void);
+        using MillisFunction = (uint32_t)(*)(void);
 #else
         using CommandFunction = std::function<void()>;
+        using MillisFunction = std::function<uint32_t()>;
 #endif
+
+        struct PeriodicCommand
+        {
+            uint8_t command_id = 255;
+            uint16_t message_id = 0;
+            uint32_t millis_interval = 0;
+            uint32_t next_millis = 0;
+        };
 
         IBuffer* m_buffer;
         Reader m_reader;
         Writer m_writer;
         jmp_buf m_jmp_buf;
-
-        CommandFunction m_commands[MaxCommands];
 
         uint8_t m_command_id;
         uint16_t m_message_id;
@@ -48,6 +56,11 @@ namespace emb
         uint8_t m_num_messages;
 
         uint8_t m_parameter_index;
+
+        MillisFunction m_millis;
+
+        CommandFunction m_commands[MaxCommands];
+        PeriodicCommand m_periodic_commands[MaxPeriodicCommands];
 
         void read()
         {
@@ -74,11 +87,78 @@ namespace emb
                 m_buffer->readByte());
         }
 
+        void resetPeriodicCommands()
+        {
+            read();
+            for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
+            {
+                m_periodic_commands[i].command_id = 255;
+                m_periodic_commands[i].message_id = 0;
+                m_periodic_commands[i].millis_interval = 0;
+                m_periodic_commands[i].next_millis = 0;
+            }
+        }
+
+        void registerPeriodicCommand()
+        {
+            uint8_t periodic_command_id;
+            uint32_t periodic_interval;
+
+            read(periodic_command_id, periodic_interval);
+
+            if (m_commands[periodic_command_id] == nullptr)
+            {
+                reportError(DataError::kParameter0Invalid);
+            }
+
+            bool registeredCommand = false;
+            for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
+            {
+                if (m_periodic_commands[i].command_id >= 0xF0)
+                {
+                    m_periodic_commands[i].command_id = periodic_command_id;
+                    m_periodic_commands[i].message_id = m_message_id;
+                    m_periodic_commands[i].millis_interval = periodic_interval;
+                    m_periodic_commands[i].next_millis = m_millis();
+                    registeredCommand = true;
+                    break;
+                }
+            }
+
+            if (!registeredCommand)
+            {
+                reportError(DataError::kOutOfPeriodicCommandSlots);
+                return;
+            }
+        }
+
+        void unregisterPeriodicCommand()
+        {
+            uint8_t periodic_command_id;
+
+            read(periodic_command_id);
+
+            for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
+            {
+                if (m_periodic_commands[i].command_id == periodic_command_id)
+                {
+                    m_periodic_commands[i].command_id = 255;
+                    m_periodic_commands[i].message_id = 0;
+                    m_periodic_commands[i].millis_interval = 0;
+                    m_periodic_commands[i].next_millis = 0;
+                    return;
+                }
+            }
+
+            reportError(DataError::kParameter0Invalid);
+        }
+
     public:
-        EmbMessenger(IBuffer* buffer) :
+        EmbMessenger(IBuffer* buffer, MillisFunction millis = []() { return 0; }) :
             m_buffer(buffer),
             m_reader(buffer),
-            m_writer(buffer)
+            m_writer(buffer),
+            m_millis(millis)
         {
             static_assert(MaxCommands < 0xF0, "MaxCommands must be less than 0xF0 (240)");
             static_assert(MaxPeriodicCommands < 0xF0, "MaxPeriodicCommands must be less than 0xF0 (240)");
@@ -127,75 +207,104 @@ namespace emb
             m_buffer->update();
             m_num_messages = m_buffer->messagesAvailable();
 
-            if (m_num_messages == 0)
+            if (m_num_messages != 0)
             {
-                return;
-            }
+                m_reader.resetCrc();
+                m_message_id = 0;
+                m_parameter_index = 0;
 
-            m_reader.resetCrc();
-            m_message_id = 0;
-            m_parameter_index = 0;
-
-            if (!m_reader.read(m_message_id))
-            {
-                m_writer.writeError(DataError::kMessageIdReadError);
-                consumeMessage();
-                m_writer.writeCrc();
-                return;
-            }
-            m_writer.write(m_message_id);
-
-            if (!m_reader.read(m_command_id))
-            {
-                m_writer.writeError(DataError::kCommandIdReadError);
-                consumeMessage();
-                m_writer.writeCrc();
-                return;
-            }
-
-            switch (m_command_id)
-            {
-            default:
-                if (m_commands[m_command_id] == nullptr || m_command_id >= MaxCommands)
+                if (!m_reader.read(m_message_id))
                 {
-                    m_writer.writeError(DataError::kCommandIdInvalid);
+                    m_writer.writeError(DataError::kMessageIdReadError);
                     consumeMessage();
+                    m_writer.writeCrc();
+                    return;
+                }
+                m_writer.write(m_message_id);
+
+                if (!m_reader.read(m_command_id))
+                {
+                    m_writer.writeError(DataError::kCommandIdReadError);
+                    consumeMessage();
+                    m_writer.writeCrc();
+                    return;
+                }
+
+                m_in_command = true;
+                if (setjmp(m_jmp_buf) == 0)
+                {
+                    switch (m_command_id)
+                    {
+                    case 0xFF:
+                        resetPeriodicCommands();
+                        break;
+                    case 0xFE:
+                        registerPeriodicCommand();
+                        break;
+                    case 0xFD:
+                        unregisterPeriodicCommand();
+                        break;
+                    default:
+                        if (m_commands[m_command_id] == nullptr || m_command_id >= MaxCommands)
+                        {
+                            m_writer.writeError(DataError::kCommandIdInvalid);
+                            consumeMessage();
+                        }
+                        else
+                        {
+                            m_commands[m_command_id]();
+                        }
+                    }
                 }
                 else
                 {
-                    if (setjmp(m_jmp_buf) == 0)
+                    consumeMessage();
+                }
+                m_in_command = false;
+
+                if (m_buffer->messagesAvailable() == m_num_messages)
+                {
+                    if (m_reader.nextCrc())
                     {
-                        m_in_command = true;
-                        m_commands[m_command_id]();
-                        m_in_command = false;
+                        if (!m_reader.readCrc())
+                        {
+                            consumeMessage();
+                            m_writer.writeError(DataError::kCrcInvalid);
+                        }
                     }
                     else
                     {
                         consumeMessage();
-                        m_writer.writeCrc();
-                        return;
+                        m_writer.writeError(DataError::kExtraParameters);
                     }
                 }
+
+                m_writer.writeCrc();
             }
 
-            if (m_buffer->messagesAvailable() == m_num_messages)
+            m_is_periodic = true;
+            uint32_t mil = m_millis();
+            for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
             {
-                if (m_reader.nextCrc())
+                if (m_periodic_commands[i].command_id < 0xF0 &&
+                    m_periodic_commands[i].next_millis <= mil)
                 {
-                    if (!m_reader.readCrc())
+                    m_command_id = m_periodic_commands[i].command_id;
+                    m_message_id = m_periodic_commands[i].message_id;
+                    m_parameter_index = 0;
+
+                    m_writer.write(m_message_id);
+                    m_in_command = true;
+                    if (setjmp(m_jmp_buf) == 0)
                     {
-                        consumeMessage();
-                        m_writer.writeError(DataError::kCrcInvalid);
+                        m_commands[m_command_id]();
                     }
-                }
-                else
-                {
-                    consumeMessage();
-                    m_writer.writeError(DataError::kExtraParameters);
+                    m_in_command = false;
+                    m_writer.writeCrc();
+                    m_periodic_commands[i].next_millis += m_periodic_commands[i].millis_interval;
+                    mil = m_millis();
                 }
             }
-
-            m_writer.writeCrc();
         }
 
         template <typename T, typename... Ts>

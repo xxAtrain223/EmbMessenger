@@ -157,6 +157,107 @@ namespace emb
             ASSERT_TRUE(buffer.buffersEmpty());
         }
 
+        TEST(messenger_builtin_command, register_periodic_commands)
+        {
+            FakeBuffer buffer;
+
+            uint32_t millis_value = 0;
+
+            EmbMessenger<1, 1> messenger(&buffer, [&]() { return millis_value; });
+
+            bool ledState = false;
+
+            std::function<void()> toggleLed = [&] {
+                ledState = !ledState;
+                messenger.write(ledState);
+            };
+
+            messenger.attachCommand(0, toggleLed);
+
+            buffer.addHostMessage({ 0x01, DataType::kUint8, 0xFE, 0x00, DataType::kUint16, 0x03, 0xE8 });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01 }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kBoolTrue }));
+            ASSERT_TRUE(buffer.buffersEmpty());
+
+            millis_value += 600;
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+
+            millis_value += 600;
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kBoolFalse }));
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_builtin_command, unregister_periodic_commands)
+        {
+            FakeBuffer buffer;
+
+            uint32_t millis_value = 0;
+
+            EmbMessenger<1, 1> messenger(&buffer, [&]() { return millis_value; });
+
+            bool ledState = false;
+
+            std::function<void()> toggleLed = [&] {
+                ledState = !ledState;
+                messenger.write(ledState);
+            };
+
+            messenger.attachCommand(0, toggleLed);
+
+            buffer.addHostMessage({ 0x01, DataType::kUint8, 0xFE, 0x00, DataType::kUint16, 0x03, 0xE8 });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01 }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kBoolTrue }));
+            ASSERT_TRUE(buffer.buffersEmpty());
+
+            millis_value += 600;
+            buffer.addHostMessage({ 0x02, DataType::kUint8, 0xFD, 0x00 });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02 }));
+            ASSERT_TRUE(buffer.buffersEmpty());
+
+            millis_value += 600;
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
+        TEST(messenger_builtin_command, reset_periodic_commands)
+        {
+            FakeBuffer buffer;
+
+            uint32_t millis_value = 0;
+
+            EmbMessenger<1, 1> messenger(&buffer, [&]() { return millis_value; });
+
+            bool ledState = false;
+
+            std::function<void()> toggleLed = [&] {
+                ledState = !ledState;
+                messenger.write(ledState);
+            };
+
+            messenger.attachCommand(0, toggleLed);
+
+            buffer.addHostMessage({ 0x01, DataType::kUint8, 0xFE, 0x00, DataType::kUint16, 0x03, 0xE8 });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01 }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kBoolTrue }));
+            ASSERT_TRUE(buffer.buffersEmpty());
+
+            millis_value += 600;
+            buffer.addHostMessage({ 0x02, DataType::kUint8, 0xFF });
+            messenger.update();
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02 }));
+            ASSERT_TRUE(buffer.buffersEmpty());
+
+            millis_value += 600;
+            messenger.update();
+            ASSERT_TRUE(buffer.buffersEmpty());
+        }
+
         TEST(messenger_errors, parameter_read_error)
         {
             FakeBuffer buffer;
@@ -213,7 +314,7 @@ namespace emb
             std::function<void()> add = [&] {
                 int a = 0, b = 0;
                 messenger.read_and_validate(
-                    a, [](int val) { return val != 0; }, 
+                    a, [](int val) { return val != 0; },
                     b, [](int val) { return val != 0; });
                 messenger.write(a + b);
             };
