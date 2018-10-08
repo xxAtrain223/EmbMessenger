@@ -11,6 +11,10 @@
 #include <memory>
 #include <typeindex>
 
+#ifndef EMB_SINGLE_THREADED
+#include <thread>
+#endif
+
 namespace emb
 {
     class EmbMessenger
@@ -24,8 +28,17 @@ namespace emb
         std::map<std::type_index, uint8_t> m_command_ids;
         std::map<uint16_t, std::shared_ptr<Command>> m_commands;
         std::shared_ptr<Command> m_current_command;
-        std::function<int(double)> fdsa;
         uint8_t m_parameter_index;
+
+#ifndef EMB_SINGLE_THREADED
+        std::function<bool(std::exception_ptr)> m_exception_handler;
+
+        std::thread m_update_thread;
+        bool m_running;
+
+        void update();
+        void updateThread();
+#endif
 
         void write();
         void read();
@@ -34,9 +47,18 @@ namespace emb
         void consumeMessage();
 
     public:
+#ifdef EMB_SINGLE_THREADED
         EmbMessenger(IBuffer* buffer);
 
         void update();
+#else
+        EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler);
+        ~EmbMessenger();
+
+        bool running() const;
+
+        void stop();
+#endif
 
         template <typename T>
         void registerCommand(const uint8_t id)

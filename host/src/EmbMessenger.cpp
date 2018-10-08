@@ -2,7 +2,12 @@
 
 namespace emb
 {
+#ifdef EMB_SINGLE_THREADED
     EmbMessenger::EmbMessenger(IBuffer* buffer) :
+#else
+    EmbMessenger::EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler) :
+        m_exception_handler(exception_handler),
+#endif
         m_buffer(buffer),
         m_writer(buffer),
         m_reader(buffer)
@@ -12,7 +17,49 @@ namespace emb
         registerCommand<ResetCommand>(255);
         registerCommand<RegisterPeriodicCommand>(254);
         registerCommand<UnregisterPeriodicCommand>(253);
+
+#ifndef EMB_SINGLE_THREADED
+        m_update_thread = std::thread(&EmbMessenger::updateThread, this);
+#endif
     }
+
+#ifndef EMB_SINGLE_THREADED
+    EmbMessenger::~EmbMessenger()
+    {
+        m_running = false;
+        m_update_thread.join();
+    }
+
+    bool EmbMessenger::running() const
+    {
+        return m_running;
+    }
+
+    void EmbMessenger::stop()
+    {
+        m_running = false;
+    }
+
+    void EmbMessenger::updateThread()
+    {
+        m_running = true;
+
+        while (m_running)
+        {
+            try
+            {
+                update();
+            }
+            catch (...)
+            {
+                if (m_exception_handler)
+                {
+                    m_running = !m_exception_handler(std::current_exception());
+                }
+            }
+        }
+    }
+#endif
 
     std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command)
     {

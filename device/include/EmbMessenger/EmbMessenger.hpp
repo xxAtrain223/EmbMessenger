@@ -29,8 +29,8 @@ namespace emb
     {
     protected:
 #ifndef EMB_TESTING
-        using CommandFunction = (void)(*)(void);
-        using MillisFunction = (uint32_t)(*)(void);
+        using CommandFunction = void(*)(void);
+        using MillisFunction = uint32_t(*)(void);
 #else
         using CommandFunction = std::function<void()>;
         using MillisFunction = std::function<uint32_t()>;

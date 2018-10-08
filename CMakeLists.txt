@@ -4,7 +4,7 @@ project(EmbMessenger)
 set(gtest_force_shared_crt TRUE CACHE BOOL "")
 add_subdirectory(ext)
 
-option(ENABLE_TESTING "Enable Testing" ON)
+option(ENABLE_TESTING "Enable Testing" OFF)
 
 add_subdirectory(shared)
 add_subdirectory(host)
