@@ -1,4 +1,7 @@
 .vs/
+.vscode/
+
+.pioenvs/
 
 build/
 vs_build/

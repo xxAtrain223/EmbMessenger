@@ -1,7 +1,7 @@
 #ifndef EMBMESSENGER_WRITER_HPP
 #define EMBMESSENGER_WRITER_HPP
 
-#include <cstdint>
+#include <stdint.h>
 
 #include "EmbMessenger/Templates.hpp"
 

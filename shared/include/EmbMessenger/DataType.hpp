@@ -1,7 +1,7 @@
 #ifndef EMBMESSENGER_DATATYPE_HPP
 #define EMBMESSENGER_DATATYPE_HPP
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace emb
 {

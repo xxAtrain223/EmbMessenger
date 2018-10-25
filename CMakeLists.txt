@@ -5,7 +5,9 @@ set(gtest_force_shared_crt TRUE CACHE BOOL "")
 add_subdirectory(ext)
 
 option(ENABLE_TESTING "Enable Testing" OFF)
+option(BUILD_EXAMPLES "Build the examples" OFF)
 
 add_subdirectory(shared)
 add_subdirectory(host)
 add_subdirectory(device)
+add_subdirectory(examples)

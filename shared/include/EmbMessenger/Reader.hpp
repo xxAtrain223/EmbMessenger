@@ -1,7 +1,7 @@
 #ifndef EMBMESSENGER_READER_HPP
 #define EMBMESSENGER_READER_HPP
 
-#include <cstdint>
+#include <stdint.h>
 
 #include "EmbMessenger/Crc.hpp"
 #include "EmbMessenger/IBuffer.hpp"

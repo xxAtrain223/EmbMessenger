@@ -1,7 +1,7 @@
 #ifndef EMBMESSENGER_DATAERROR_HPP
 #define EMBMESSENGER_DATAERROR_HPP
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace emb
 {

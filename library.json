@@ -1,0 +1,16 @@
+{
+    "name": "EmbMessenger",
+    "version": "1.0.0",
+    "keywords": "command, communication, protocol, message",
+    "description": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xxAtrain223/EmbMessenger.git"
+    },
+    "export": {
+        "include": [
+            "device",
+            "shared"
+        ]
+    }
+}

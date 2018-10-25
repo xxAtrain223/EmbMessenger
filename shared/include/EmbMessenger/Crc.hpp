@@ -1,8 +1,8 @@
 #ifndef EMBMESSENGER_CRC_HPP
 #define EMBMESSENGER_CRC_HPP
 
-#include <cstdint>
-#include <cstddef>
+#include <stdint.h>
+#include <stddef.h>
 
 #if !defined(CRC8) && !defined(CRC16) && !defined(CRC32)
 #define CRC8

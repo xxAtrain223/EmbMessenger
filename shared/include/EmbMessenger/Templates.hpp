@@ -1,8 +1,8 @@
 #ifndef EMBMESSENGER_TEMPLATES_HPP
 #define EMBMESSENGER_TEMPLATES_HPP
 
-#include <cstdint>
-#include <cstddef>
+#include <stdint.h>
+#include <stddef.h>
 
 namespace emb
 {
