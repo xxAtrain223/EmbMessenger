@@ -304,6 +304,8 @@ namespace emb
     {
         std::shared_ptr<ResetCommand> resetCommand = std::make_shared<ResetCommand>();
         send(resetCommand);
+        #ifndef EMB_SINGLE_THREADED
         resetCommand->wait();
+        #endif
     }
 }

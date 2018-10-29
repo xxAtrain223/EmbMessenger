@@ -151,7 +151,9 @@ namespace emb
 
             std::shared_ptr<RegisterPeriodicCommand> registerCommand = std::make_shared<RegisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)), period);
             registerCommand->setCallback<RegisterPeriodicCommand>([=](auto&& registerCommand) {
+                #ifndef EMB_SINGLE_THREADED
                 std::lock_guard<std::mutex> lock(m_commands_mutex);
+                #endif
                 m_commands[periodic_command->getMessageId()] = periodic_command;
             });
             send(registerCommand);
@@ -168,7 +170,9 @@ namespace emb
         {
             std::shared_ptr<UnregisterPeriodicCommand> unregisterCommand = std::make_shared<UnregisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)));
             unregisterCommand->setCallback<UnregisterPeriodicCommand>([=](auto&& unregisterCommand) {
+                #ifndef EMB_SINGLE_THREADED
                 std::lock_guard<std::mutex> lock(m_commands_mutex);
+                #endif
                 m_commands.erase(unregisterCommand->m_periodic_message_id);
             });
             send(unregisterCommand);
