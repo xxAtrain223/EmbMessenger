@@ -2,9 +2,9 @@
 #include "ArduinoBuffer.hpp"
 
 ArduinoBuffer<64> buffer(&Serial);
-emb::EmbMessenger<4, 1> messenger(&buffer, millis);
+emb::EmbMessenger<5, 1> messenger(&buffer, millis);
 bool ledState = false;
-const uint8_t ledPin = 2;
+const uint8_t ledPin = LED_BUILTIN;
 
 void ping()
 {
@@ -52,6 +52,14 @@ void add(int a, int b, int& rv)
     rv = a + b;
 }
 
+void delayMs()
+{
+    uint16_t ms = 0;
+    messenger.read(ms);
+
+    delay(ms);
+}
+
 void setup()
 {
     Serial.begin(9600);
@@ -61,6 +69,7 @@ void setup()
     messenger.attachCommand(1, setLedAdaptor);
     messenger.attachCommand(2, toggleLedAdaptor);
     messenger.attachCommand(3, addAdaptor);
+    messenger.attachCommand(4, delayMs);
 }
 
 void loop()

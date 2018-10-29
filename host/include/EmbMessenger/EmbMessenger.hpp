@@ -13,6 +13,7 @@
 
 #ifndef EMB_SINGLE_THREADED
 #include <thread>
+#include <mutex>
 #endif
 
 namespace emb
@@ -35,6 +36,7 @@ namespace emb
 
         std::thread m_update_thread;
         bool m_running;
+        std::mutex m_commands_mutex;
 
         void update();
         void updateThread();
@@ -72,7 +74,12 @@ namespace emb
         std::shared_ptr<CommandType> send(std::shared_ptr<CommandType> command)
         {
             command->m_message_id = m_message_id;
-            m_commands.emplace(m_message_id, command);
+            {
+                #ifndef EMB_SINGLE_THREADED
+                std::lock_guard<std::mutex> lock(m_commands_mutex);
+                #endif
+                m_commands.emplace(m_message_id, command);
+            }
 
             write(m_message_id++, m_command_ids.at(typeid(CommandType)));
             command->send(this);
@@ -144,10 +151,14 @@ namespace emb
 
             std::shared_ptr<RegisterPeriodicCommand> registerCommand = std::make_shared<RegisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)), period);
             registerCommand->setCallback<RegisterPeriodicCommand>([=](auto&& registerCommand) {
+                std::lock_guard<std::mutex> lock(m_commands_mutex);
                 m_commands[periodic_command->getMessageId()] = periodic_command;
             });
             send(registerCommand);
-            // TODO: Wait for registerCommand to receive acknoledgement
+
+            #ifndef EMB_SINGLE_THREADED
+            registerCommand->wait();
+            #endif
 
             return periodic_command;
         }
@@ -157,10 +168,14 @@ namespace emb
         {
             std::shared_ptr<UnregisterPeriodicCommand> unregisterCommand = std::make_shared<UnregisterPeriodicCommand>(m_command_ids.at(typeid(CommandType)));
             unregisterCommand->setCallback<UnregisterPeriodicCommand>([=](auto&& unregisterCommand) {
+                std::lock_guard<std::mutex> lock(m_commands_mutex);
                 m_commands.erase(unregisterCommand->m_periodic_message_id);
             });
             send(unregisterCommand);
-            // TODO: Wait for unregisterCommand to receive acknoledgement
+
+            #ifndef EMB_SINGLE_THREADED
+            unregisterCommand->wait();
+            #endif
         }
     };
 }

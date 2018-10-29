@@ -6,6 +6,11 @@
 #include <memory>
 #include <typeindex>
 
+#ifndef EMB_SINGLE_THREADED
+#include <mutex>
+#include <condition_variable>
+#endif
+
 namespace emb
 {
     class EmbMessenger;
@@ -19,6 +24,13 @@ namespace emb
         uint16_t m_message_id;
         std::function<void(std::shared_ptr<Command>)> m_callback = nullptr;
         bool m_is_periodic = false;
+
+        #ifndef EMB_SINGLE_THREADED
+        std::mutex m_mutex;
+        std::condition_variable m_condition_variable;
+        bool m_is_waiting = false;
+        bool m_received = false;
+        #endif
 
     public:
         Command();
@@ -37,6 +49,10 @@ namespace emb
                 callback(std::static_pointer_cast<CommandType>(ptr));
             };
         }
+
+        #ifndef EMB_SINGLE_THREADED
+        void wait();
+        #endif
     };
 }
 

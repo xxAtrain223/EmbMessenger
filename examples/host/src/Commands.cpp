@@ -44,7 +44,32 @@ void Add::receive(emb::EmbMessenger* messenger)
     messenger->read(m_rv);
 }
 
+int16_t Add::getA() const
+{
+    return m_a;
+}
+
+int16_t Add::getB() const
+{
+    return m_b;
+}
+
 int16_t Add::getResult() const
 {
     return m_rv;
+}
+
+DelayMs::DelayMs(uint16_t ms)
+{
+    m_ms = ms;
+}
+
+void DelayMs::send(emb::EmbMessenger* messenger)
+{
+    messenger->write(m_ms);
+}
+
+uint16_t DelayMs::getDelayTime() const
+{
+    return m_ms;
 }

@@ -6,6 +6,8 @@
 #include "HostBuffer.hpp"
 #include "Commands.hpp"
 
+#include <chrono>
+
 int main(int argc, char** argv)
 {
     serial_t serial;
@@ -31,25 +33,38 @@ int main(int argc, char** argv)
     messenger.registerCommand<SetLed>(1);
     messenger.registerCommand<ToggleLed>(2);
     messenger.registerCommand<Add>(3);
+    messenger.registerCommand<DelayMs>(4);
 
-    using namespace std::chrono_literals;
+    std::cout << "Ping...";
+    auto pingCommand = std::make_shared<Ping>();
+    pingCommand->setCallback<Ping>([](auto&& ping){ std::cout << "Pong" << std::endl; });
+    messenger.send(pingCommand);
+    pingCommand->wait();
 
     auto setLedCommand = std::make_shared<SetLed>(true);
     setLedCommand->setCallback<SetLed>([](auto&& setLed){ std::cout << "Led Set to on." << std::endl; });
     messenger.send(setLedCommand);
-    std::this_thread::sleep_for(1s);
+    setLedCommand->wait();
 
     auto toggleLedCommand = std::make_shared<ToggleLed>();
     toggleLedCommand->setCallback<ToggleLed>([](auto&& toggleLed){
         std::cout << "Led State: " << std::boolalpha << toggleLed->getLedState() << std::endl;
     });
     messenger.send(toggleLedCommand);
-    std::this_thread::sleep_for(1s);
+    toggleLedCommand->wait();
 
     auto addCommand = std::make_shared<Add>(0x40, 0x50);
     addCommand->setCallback<Add>([](auto&& add){
-        std::cout << "a + b = " << +add->getResult() << std::endl;
+        std::cout << add->getA() << " + " << add->getB() << " = " << add->getResult() << std::endl;
     });
     messenger.send(addCommand);
-    std::this_thread::sleep_for(1s);
+    addCommand->wait();
+
+    auto delayCommand = std::make_shared<DelayMs>(2000);
+    std::cout << "Delaying for: " << delayCommand->getDelayTime() << "ms..." << std::flush;
+    delayCommand->setCallback<DelayMs>([](auto&& delayMs){
+        std::cout << "Done" << std::endl;
+    });
+    messenger.send(delayCommand);
+    delayCommand->wait();
 }

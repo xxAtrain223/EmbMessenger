@@ -20,7 +20,7 @@
     { \
     public: \
         name##HostException(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
-            emb::HostException(#name ": " + message, command) \
+            emb::HostException(#name "HostException: " + message, command) \
         {} \
     }
 
@@ -29,7 +29,7 @@
     { \
     public: \
         name(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
-            emb::DeviceException(code, #name ": " + message, command) \
+            emb::DeviceException(code, #name "DeviceException: " + message, command) \
         {} \
     }
 

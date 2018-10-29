@@ -1,4 +1,5 @@
 #include "EmbMessenger/EmbMessenger.hpp"
+#include <iostream>
 
 namespace emb
 {
@@ -69,7 +70,12 @@ namespace emb
         }
 
         command->m_message_id = m_message_id;
-        m_commands.emplace(m_message_id, command);
+        {
+            #ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+            #endif
+            m_commands.emplace(m_message_id, command);
+        }
 
         write(m_message_id++, m_command_ids.at(command->getTypeIndex()));
         command->send(this);
@@ -108,12 +114,14 @@ namespace emb
 
         try
         {
+            #ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+            #endif
             m_current_command = m_commands.at(message_id);
         }
         catch (std::out_of_range e)
         {
             consumeMessage();
-            m_commands.erase(message_id);
             throw MessageIdInvalidHostException("No command to receive message from the device", m_current_command);
         }
 
@@ -125,6 +133,9 @@ namespace emb
         catch (...)
         {
             consumeMessage();
+            #ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+            #endif
             m_commands.erase(message_id);
             throw;
         }
@@ -136,6 +147,9 @@ namespace emb
         catch (...)
         {
             consumeMessage();
+            #ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+            #endif
             m_commands.erase(message_id);
             throw;
         }
@@ -144,6 +158,9 @@ namespace emb
         {
             if (!m_reader.readCrc())
             {
+                #ifndef EMB_SINGLE_THREADED
+                std::lock_guard<std::mutex> lock(m_commands_mutex);
+                #endif
                 m_commands.erase(message_id);
                 throw CrcInvalidHostException("Crc from the device was invalid", m_current_command);
             }
@@ -151,9 +168,20 @@ namespace emb
         else
         {
             consumeMessage();
+            #ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+            #endif
             m_commands.erase(message_id);
             throw ExtraParametersHostException("Message has extra parameters from the device", m_current_command);
         }
+
+        #ifndef EMB_SINGLE_THREADED
+        m_current_command->m_received = true;
+        if (m_current_command->m_is_waiting)
+        {
+            m_current_command->m_condition_variable.notify_all();
+        }
+        #endif
 
         if (m_current_command->m_callback != nullptr)
         {
@@ -162,9 +190,14 @@ namespace emb
 
         m_current_command = nullptr;
 
-        if (!m_commands.at(message_id)->m_is_periodic)
         {
-            m_commands.erase(message_id);
+            #ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+            #endif
+            if (!m_commands.at(message_id)->m_is_periodic)
+            {
+                m_commands.erase(message_id);
+            }
         }
     }
 
@@ -271,6 +304,6 @@ namespace emb
     {
         std::shared_ptr<ResetCommand> resetCommand = std::make_shared<ResetCommand>();
         send(resetCommand);
-        // TODO: Wait for resetCommand to receive acknoledgement
+        resetCommand->wait();
     }
 }

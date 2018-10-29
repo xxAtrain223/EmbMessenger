@@ -28,4 +28,13 @@ namespace emb
     {
         return m_message_id;
     }
+
+    #ifndef EMB_SINGLE_THREADED
+    void Command::wait()
+    {
+        m_is_waiting = true;
+        std::unique_lock<std::mutex> lk(m_mutex);
+        m_condition_variable.wait(lk, [&]{ return m_received; });
+    }
+    #endif
 }
