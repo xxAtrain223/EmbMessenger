@@ -6,8 +6,6 @@
 #include "HostBuffer.hpp"
 #include "Commands.hpp"
 
-#include <chrono>
-
 int main(int argc, char** argv)
 {
     serial_t serial;
@@ -35,6 +33,10 @@ int main(int argc, char** argv)
     messenger.registerCommand<Add>(3);
     messenger.registerCommand<DelayMs>(4);
 
+   messenger.registerPeriodicCommand<ToggleLed>(250, [](auto&& cmd) {
+       std::cout << "Led is " << (cmd->getLedState() ? "On" : "Off") << std::endl;
+    });
+
     std::cout << "Ping...";
     auto pingCommand = std::make_shared<Ping>();
     pingCommand->setCallback<Ping>([](auto&& ping){ std::cout << "Pong" << std::endl; });
@@ -46,13 +48,6 @@ int main(int argc, char** argv)
     messenger.send(setLedCommand);
     setLedCommand->wait();
 
-    auto toggleLedCommand = std::make_shared<ToggleLed>();
-    toggleLedCommand->setCallback<ToggleLed>([](auto&& toggleLed){
-        std::cout << "Led State: " << std::boolalpha << toggleLed->getLedState() << std::endl;
-    });
-    messenger.send(toggleLedCommand);
-    toggleLedCommand->wait();
-
     auto addCommand = std::make_shared<Add>(0x40, 0x50);
     addCommand->setCallback<Add>([](auto&& add){
         std::cout << add->getA() << " + " << add->getB() << " = " << add->getResult() << std::endl;
@@ -60,11 +55,7 @@ int main(int argc, char** argv)
     messenger.send(addCommand);
     addCommand->wait();
 
-    auto delayCommand = std::make_shared<DelayMs>(2000);
-    std::cout << "Delaying for: " << delayCommand->getDelayTime() << "ms..." << std::flush;
-    delayCommand->setCallback<DelayMs>([](auto&& delayMs){
-        std::cout << "Done" << std::endl;
-    });
-    messenger.send(delayCommand);
-    delayCommand->wait();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    messenger.unregisterPeriodicCommand<ToggleLed>();
 }

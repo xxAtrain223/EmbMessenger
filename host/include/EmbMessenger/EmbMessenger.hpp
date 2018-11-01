@@ -50,11 +50,11 @@ namespace emb
 
     public:
 #ifdef EMB_SINGLE_THREADED
-        EmbMessenger(IBuffer* buffer);
+        EmbMessenger(IBuffer* buffer, std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
 
         void update();
 #else
-        EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler);
+        EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler, std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
         ~EmbMessenger();
 
         bool running() const;

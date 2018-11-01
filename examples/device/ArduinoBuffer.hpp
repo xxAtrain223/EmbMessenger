@@ -71,6 +71,13 @@ public:
             m_streamFront = (m_streamFront + 1) % BufferSize;
         }
     }
+
+    void zero() override
+    {
+        m_streamFront = 0;
+        m_readFront = 0;
+        m_numberMessages = 0;
+    }
 };
 
 #endif // ARDUINOBUFFER_HPP

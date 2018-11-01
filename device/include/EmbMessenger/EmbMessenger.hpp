@@ -142,6 +142,8 @@ namespace emb
             {
                 if (m_periodic_commands[i].command_id == periodic_command_id)
                 {
+                    write(m_periodic_commands[i].message_id);
+
                     m_periodic_commands[i].command_id = 255;
                     m_periodic_commands[i].message_id = 0;
                     m_periodic_commands[i].millis_interval = 0;

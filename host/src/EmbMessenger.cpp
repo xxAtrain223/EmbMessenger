@@ -1,23 +1,58 @@
 #include "EmbMessenger/EmbMessenger.hpp"
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 namespace emb
 {
 #ifdef EMB_SINGLE_THREADED
     EmbMessenger::EmbMessenger(IBuffer* buffer) :
 #else
-    EmbMessenger::EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler) :
+    EmbMessenger::EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler, std::chrono::milliseconds init_timeout) :
         m_exception_handler(exception_handler),
 #endif
         m_buffer(buffer),
         m_writer(buffer),
         m_reader(buffer)
     {
-        m_message_id = 1;
+        m_message_id = 0;
 
         registerCommand<ResetCommand>(255);
         registerCommand<RegisterPeriodicCommand>(254);
         registerCommand<UnregisterPeriodicCommand>(253);
+
+        using clock_t = std::chrono::steady_clock;
+        bool initializing = true;
+        auto initializingEnd = clock_t::now() + init_timeout;
+
+        while (clock_t::now() < initializingEnd && initializing)
+        {
+            auto resetCommand = std::make_shared<ResetCommand>();
+            resetCommand->setCallback<ResetCommand>([&](auto&& cmd) {
+                initializing = false;
+            });
+            send(resetCommand);
+
+            for (auto end = clock_t::now() + std::chrono::milliseconds(500); clock_t::now() < end;)
+            {
+                try
+                {
+                    update();
+                }
+                catch (BaseException e)
+                { }
+            }
+        }
+
+        if (!initializing)
+        {
+            m_commands.clear();
+            m_buffer->zero();
+        }
+        else
+        {
+            throw InitializingErrorHostException("Timed out initializing connection");
+        }
 
 #ifndef EMB_SINGLE_THREADED
         m_update_thread = std::thread(&EmbMessenger::updateThread, this);
@@ -292,7 +327,7 @@ namespace emb
 
     void EmbMessenger::UnregisterPeriodicCommand::send(EmbMessenger* messenger)
     {
-        messenger->write(m_message_id);
+        messenger->write(m_command_id);
     }
 
     void EmbMessenger::UnregisterPeriodicCommand::receive(EmbMessenger* messenger)

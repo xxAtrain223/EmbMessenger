@@ -76,6 +76,31 @@ public:
             m_streamFront = (m_streamFront + 1) % BufferSize;
         }
     }
+
+    void zero() override
+    {
+        m_streamFront = 0;
+        m_readFront = 0;
+        m_numberMessages = 0;
+
+        for (uint8_t i = 0; i < BufferSize; i++)
+        {
+            m_buffer[i] = 0;
+        }
+    }
+
+    void print() const override
+    {
+        for (int i = 0; i < BufferSize; i += 16)
+        {
+            for (int j = 0; j < 16; j++)
+            {
+                printf("%02X ", m_buffer[i + j]);
+            }
+            printf("\n");
+        }
+        fflush(stdout);
+    }
 };
 
 #endif // HOSTBUFFER_HPP

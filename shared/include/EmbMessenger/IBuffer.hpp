@@ -59,6 +59,10 @@ namespace emb
          * @brief Updates the internal buffer.
          */
         virtual void update() = 0;
+
+        virtual void zero() = 0;
+
+        virtual void print() const { }
     };
 }
 #endif // EMBMESSENGER_IBUFFER_HPP

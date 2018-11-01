@@ -75,6 +75,13 @@ namespace emb
         }
     };
 
+    class InitializingErrorHostException : public HostException
+    {
+    public:
+        InitializingErrorHostException(const std::string& message) :
+            HostException("InitializingErrorHostException: " + message, nullptr) { }
+    };
+
     class ParameterReadErrorHostException : public HostException
     {
     private:
@@ -82,7 +89,7 @@ namespace emb
 
     public:
         ParameterReadErrorHostException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
-            m_parameter_index(parameterIndex), HostException("Error reading parameter " + std::to_string(parameterIndex), command) { }
+            m_parameter_index(parameterIndex), HostException("ParameterReadErrorHostException: Error reading parameter " + std::to_string(parameterIndex), command) { }
 
         inline uint8_t getParameterIndex() const
         {
@@ -103,7 +110,7 @@ namespace emb
 
     public:
         ParameterReadErrorDeviceException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
-            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0ReadError + parameterIndex, "Error reading parameter " + std::to_string(parameterIndex), command) { }
+            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0ReadError + parameterIndex, "ParameterReadErrorDeviceException: Error reading parameter " + std::to_string(parameterIndex), command) { }
 
         inline uint8_t getParameterIndex() const
         {
@@ -118,7 +125,7 @@ namespace emb
 
     public:
         ParameterInvalidDeviceException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
-            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0Invalid + parameterIndex, "Parameter " + std::to_string(parameterIndex) + " is invalid", command) { }
+            m_parameter_index(parameterIndex), DeviceException(DataError::kParameter0Invalid + parameterIndex, "ParameterInvalidDeviceException: Parameter " + std::to_string(parameterIndex) + " is invalid", command) { }
 
         inline uint8_t getParameterIndex() const
         {
