@@ -21,7 +21,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -42,7 +45,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -63,7 +69,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -85,7 +94,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -107,7 +119,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -127,7 +142,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -157,7 +175,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -189,7 +210,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
 
             ASSERT_NO_THROW(messenger.update());
         }
@@ -198,7 +222,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -219,7 +246,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -239,13 +269,17 @@ namespace emb
         TEST(messenger_exceptions_host, crc_invalid)
         {
             FakeBuffer buffer;
-            buffer.writeValidCrc(false);
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
             messenger.registerCommand<Add>(3);
+
+            buffer.writeValidCrc(false);
 
             auto pingCommand = std::make_shared<Ping>();
             messenger.send(pingCommand);
@@ -262,7 +296,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
 
             buffer.addDeviceMessage({ 0x01 });
 
@@ -275,7 +312,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -296,7 +336,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
 
             buffer.addDeviceMessage({ DataType::kError, DataError::kMessageIdReadError });
 
@@ -309,7 +352,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -330,7 +376,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -351,7 +400,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -372,7 +424,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -393,7 +448,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -414,7 +472,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -435,7 +496,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -456,7 +520,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -477,7 +544,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<Ping>(0);
             messenger.registerCommand<SetLed>(1);
             messenger.registerCommand<ToggleLed>(2);
@@ -500,7 +570,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<UserError>(0);
 
             auto userErrorCommand = std::make_shared<UserError>();
@@ -518,7 +591,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<UserError>(0);
 
             auto userErrorCommand = std::make_shared<UserError>();
@@ -536,7 +612,10 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            EmbMessenger messenger(&buffer);
+            buffer.addDeviceMessage({ 0x00 });
+            EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+            ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
             messenger.registerCommand<UserError>(0);
 
             auto userErrorCommand = std::make_shared<UserError>();

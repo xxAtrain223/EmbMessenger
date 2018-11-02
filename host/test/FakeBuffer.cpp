@@ -103,5 +103,12 @@ namespace emb
         {
             (void)0; // Noop
         }
+
+        void FakeBuffer::zero()
+        {
+            deviceMessages = 0;
+            device.clear();
+            readCrc = false;
+        }
     }
 }

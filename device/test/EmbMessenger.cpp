@@ -216,7 +216,7 @@ namespace emb
             millis_value += 600;
             buffer.addHostMessage({ 0x02, DataType::kUint8, 0xFD, 0x00 });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02 }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, 0x01 }));
             ASSERT_TRUE(buffer.buffersEmpty());
 
             millis_value += 600;

@@ -22,17 +22,17 @@ namespace emb
 
         public:
             /**
-             * @brief Appends a message to the device buffer, auto adds crc.
-             *   Used for adding a message to be read by the host.
+             * @brief Appends a message to the host buffer, auto adds crc.
+             *   Used for adding a message to be read by the device.
              *
              * @param message Message to append
              */
             void addHostMessage(std::vector<uint8_t>&& message);
 
             /**
-             * @brief Checks if the message is in the host buffer, auto adds crc.
-             *   Used for checking if the host wrote what was expected.
-             *   Removes the number of elements in message from the host buffer.
+             * @brief Checks if the message is in the device buffer, auto adds crc.
+             *   Used for checking if the device wrote what was expected.
+             *   Removes the number of elements in message from the device buffer.
              *
              * @param message Message to check for in the host buffer
              *
@@ -45,7 +45,7 @@ namespace emb
             void writeCrc(const bool value);
             void writeValidCrc(const bool value);
 
-            void printBuffers();
+            void print();
 
             virtual void writeByte(const uint8_t byte) override;
             virtual uint8_t peek() const override;
@@ -54,6 +54,7 @@ namespace emb
             virtual size_t size() const override;
             virtual uint8_t messagesAvailable() const override;
             virtual void update() override;
+            virtual void zero() override;
         };
     }
 }

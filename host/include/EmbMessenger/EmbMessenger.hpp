@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <typeindex>
+#include <chrono>
 
 #ifndef EMB_SINGLE_THREADED
 #include <thread>

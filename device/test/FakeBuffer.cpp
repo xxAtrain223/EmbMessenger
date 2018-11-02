@@ -66,7 +66,7 @@ namespace emb
             validCrc = value;
         }
 
-        void FakeBuffer::printBuffers()
+        void FakeBuffer::print()
         {
             printf("Device:");
             for (uint8_t byte : device)
@@ -129,6 +129,13 @@ namespace emb
         void FakeBuffer::update()
         {
             (void)0; // Noop
+        }
+
+        void FakeBuffer::zero()
+        {
+            hostMessages = 0;
+            host.clear();
+            readCrc = false;
         }
     }
 }

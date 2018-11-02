@@ -50,6 +50,7 @@ namespace emb
             virtual size_t size() const override;
             virtual uint8_t messagesAvailable() const override;
             virtual void update() override;
+            virtual void zero() override;
         };
     }
 }

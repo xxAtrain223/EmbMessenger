@@ -6,7 +6,7 @@
 namespace emb
 {
 #ifdef EMB_SINGLE_THREADED
-    EmbMessenger::EmbMessenger(IBuffer* buffer) :
+    EmbMessenger::EmbMessenger(IBuffer* buffer, std::chrono::milliseconds init_timeout) :
 #else
     EmbMessenger::EmbMessenger(IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler, std::chrono::milliseconds init_timeout) :
         m_exception_handler(exception_handler),
@@ -33,7 +33,7 @@ namespace emb
             });
             send(resetCommand);
 
-            for (auto end = clock_t::now() + std::chrono::milliseconds(500); clock_t::now() < end;)
+            for (auto end = clock_t::now() + std::chrono::milliseconds(500); clock_t::now() < end && initializing;)
             {
                 try
                 {
