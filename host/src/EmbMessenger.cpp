@@ -33,7 +33,13 @@ namespace emb
             });
             send(resetCommand);
 
-            for (auto end = clock_t::now() + std::chrono::milliseconds(500); clock_t::now() < end && initializing;)
+            auto end = clock_t::now() + std::chrono::milliseconds(500);
+            if (end > initializingEnd)
+            {
+                end = initializingEnd;
+            }
+
+            while (clock_t::now() < end && initializing)
             {
                 try
                 {

@@ -206,6 +206,13 @@ namespace emb
             ASSERT_TRUE(buffer.buffersEmpty());
         }
 
+        TEST(messenger_exceptions_host, initialization_timeout)
+        {
+            FakeBuffer buffer;
+
+            ASSERT_THROW(EmbMessenger messenger(&buffer, std::chrono::milliseconds(20)), InitializingErrorHostException);
+        }
+
         TEST(messenger_exceptions_host, no_messages_available)
         {
             FakeBuffer buffer;
