@@ -12,7 +12,7 @@ namespace emb
 
         class UserError : public Command
         {
-            void reportError(const uint8_t error, std::shared_ptr<Command> ptr)
+            void reportError(const uint8_t error, const int16_t data, std::shared_ptr<Command> ptr)
             {
                 switch (error)
                 {

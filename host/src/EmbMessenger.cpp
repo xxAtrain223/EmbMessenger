@@ -257,7 +257,9 @@ namespace emb
         while (m_reader.nextError())
         {
             uint8_t error = 0;
+            int16_t data = 0;
             m_reader.readError(error);
+            m_reader.read(data);
             
             switch (error)
             {
@@ -265,30 +267,16 @@ namespace emb
                 throw ExtraParametersDeviceException("The device received one or more extra parameters", m_current_command);
             case DataError::kOutOfPeriodicCommandSlots:
                 throw OutOfPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots", m_current_command);
-            case DataError::kParameter0ReadError:
-            case DataError::kParameter1ReadError:
-            case DataError::kParameter2ReadError:
-            case DataError::kParameter3ReadError:
-            case DataError::kParameter4ReadError:
-            case DataError::kParameter5ReadError:
-            case DataError::kParameter6ReadError:
-            case DataError::kParameter7ReadError:
-                throw ParameterReadErrorDeviceException(error - DataError::kParameter0ReadError, m_current_command);
+            case DataError::kParameterReadError:
+                throw ParameterReadErrorDeviceException(data, m_current_command);
             case DataError::kMessageIdReadError:
                 throw MessageIdReadErrorDeviceException("The device encountered an error reading the message id", m_current_command);
             case DataError::kCommandIdReadError:
                 throw CommandIdReadErrorDeviceException("The device encountered an error reading the command id", m_current_command);
             case DataError::kCrcReadError:
                 throw CrcReadErrorDeviceException("The device encountered an error reading the CRC", m_current_command);
-            case DataError::kParameter0Invalid:
-            case DataError::kParameter1Invalid:
-            case DataError::kParameter2Invalid:
-            case DataError::kParameter3Invalid:
-            case DataError::kParameter4Invalid:
-            case DataError::kParameter5Invalid:
-            case DataError::kParameter6Invalid:
-            case DataError::kParameter7Invalid:
-                throw ParameterInvalidDeviceException(error - DataError::kParameter0Invalid, m_current_command);
+            case DataError::kParameterInvalid:
+                throw ParameterInvalidDeviceException(data, m_current_command);
             case DataError::kMessageIdInvalid:
                 throw MessageIdInvalidDeviceException("The device read an invalid message id", m_current_command);
             case DataError::kCommandIdInvalid:
@@ -296,7 +284,7 @@ namespace emb
             case DataError::kCrcInvalid:
                 throw CrcInvalidDeviceException("The device read an invalid CRC", m_current_command);
             default:
-                m_current_command->reportError(error, m_current_command);
+                m_current_command->reportError(error, data, m_current_command);
                 throw DeviceException(error, "The device reported a user defined error.", m_current_command);
             }
         }

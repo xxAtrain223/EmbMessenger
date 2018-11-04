@@ -987,31 +987,31 @@ namespace emb
             MockBuffer buffer;
 
             EXPECT_CALL(buffer, empty())
-                .WillOnce(Return(false)) // 1
-                .WillOnce(Return(false)) // 1
-                .WillOnce(Return(false)) // 2
-                .WillOnce(Return(false)) // 3
-                .WillOnce(Return(true)); // 4
+                .WillOnce(Return(false))
+                .WillOnce(Return(false))
+                .WillOnce(Return(false))
+                .WillOnce(Return(false))
+                .WillOnce(Return(true));
             EXPECT_CALL(buffer, peek())
-                .WillOnce(Return(DataType::kError)) // 1
-                .WillOnce(Return(DataType::kError)) // 3
-                .WillOnce(Return(DataType::kNull)); // 2
+                .WillOnce(Return(DataType::kError))
+                .WillOnce(Return(DataType::kError))
+                .WillOnce(Return(DataType::kNull));
             EXPECT_CALL(buffer, readByte())
-                .WillOnce(Return(DataType::kError)) // 1
-                .WillOnce(Return(DataError::kParameter0ReadError)); // 1
+                .WillOnce(Return(DataType::kError))
+                .WillOnce(Return(DataError::kParameterReadError));
             EXPECT_CALL(buffer, size())
-                .WillOnce(Return(2))  // 1
-                .WillOnce(Return(2))  // 1
-                .WillOnce(Return(1)); // 3
+                .WillOnce(Return(2))
+                .WillOnce(Return(2))
+                .WillOnce(Return(1));
 
             Reader reader(&buffer);
 
             uint8_t value = DataError::kExtraParameters;
-            EXPECT_TRUE(reader.readError(value));  // 1 Pass
-            EXPECT_EQ(value, DataError::kParameter0ReadError);
-            EXPECT_FALSE(reader.readError(value)); // 2 Fail - Type
-            EXPECT_FALSE(reader.readError(value)); // 3 Fail - Size
-            EXPECT_FALSE(reader.readError(value)); // 4 Fail - Empty
+            EXPECT_TRUE(reader.readError(value));
+            EXPECT_EQ(value, DataError::kParameterReadError);
+            EXPECT_FALSE(reader.readError(value));
+            EXPECT_FALSE(reader.readError(value));
+            EXPECT_FALSE(reader.readError(value));
         }
 
         TEST(reader_readers, read_crc)

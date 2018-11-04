@@ -15,7 +15,7 @@ namespace emb
     {
     }
 
-    void Command::reportError(const uint8_t error, std::shared_ptr<Command> ptr)
+    void Command::reportError(const uint8_t error, const int16_t data, std::shared_ptr<Command> ptr)
     {
     }
 

@@ -288,9 +288,9 @@ namespace emb
             buffer.addHostMessage({ 0x01, 0x03, DataType::kBoolTrue });
             buffer.addHostMessage({ 0x02, 0x03, 0x07 });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kParameter0ReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kParameterReadError, 0x00 }));
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kParameter1ReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kParameterReadError, 0x01 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -327,9 +327,9 @@ namespace emb
             buffer.addHostMessage({ 0x01, 0x03, 0x00, 0x07 });
             buffer.addHostMessage({ 0x02, 0x03, 0x07, 0x00 });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kParameter0Invalid }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kParameterInvalid, 0x00 }));
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kParameter1Invalid }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kParameterInvalid, 0x01 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -349,9 +349,9 @@ namespace emb
             buffer.addHostMessage({ });
             buffer.addHostMessage({ DataType::kBoolFalse });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError, 0x00 }));
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError, 0x00 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -371,9 +371,9 @@ namespace emb
             buffer.addHostMessage({ 0x01 });
             buffer.addHostMessage({ 0x02, DataType::kBoolFalse });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCommandIdReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCommandIdReadError, 0x00 }));
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kCommandIdReadError }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kCommandIdReadError, 0x00 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -393,9 +393,9 @@ namespace emb
             buffer.addHostMessage({ 0x01, 0x01 });
             buffer.addHostMessage({ 0x02, 0x02 });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCommandIdInvalid }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCommandIdInvalid, 0x01 }));
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kCommandIdInvalid }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, DataType::kError, DataError::kCommandIdInvalid, 0x02 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -415,7 +415,7 @@ namespace emb
 
             buffer.addHostMessage({ 0x01, 0x00 });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCrcInvalid }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kCrcInvalid, 0x00 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
@@ -434,7 +434,7 @@ namespace emb
 
             buffer.addHostMessage({ 0x01, 0x00, DataType::kBoolFalse });
             messenger.update();
-            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kExtraParameters }));
+            ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, DataType::kError, DataError::kExtraParameters, 0x00 }));
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }

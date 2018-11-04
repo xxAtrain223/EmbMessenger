@@ -190,11 +190,11 @@ namespace emb
             MockBuffer buffer;
 
             EXPECT_CALL(buffer, writeByte(DataType::kError));
-            EXPECT_CALL(buffer, writeByte(DataError::kParameter0ReadError));
+            EXPECT_CALL(buffer, writeByte(DataError::kParameterReadError));
 
             Writer writer(&buffer);
 
-            writer.writeError(DataError::kParameter0ReadError);
+            writer.writeError(DataError::kParameterReadError);
         }
 
         TEST(writer, write_crc)

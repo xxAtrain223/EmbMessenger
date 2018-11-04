@@ -37,7 +37,7 @@ namespace emb
 
         virtual void send(EmbMessenger* messenger);
         virtual void receive(EmbMessenger* messenger);
-        virtual void reportError(const uint8_t error, std::shared_ptr<Command> ptr);
+        virtual void reportError(const uint8_t error, const int16_t data, std::shared_ptr<Command> ptr);
 
         std::type_index getTypeIndex() const;
         uint16_t getMessageId() const;

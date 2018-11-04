@@ -55,7 +55,7 @@ namespace emb
         bool m_in_command;
         uint8_t m_num_messages;
 
-        uint8_t m_parameter_index;
+        uint16_t m_parameter_index;
 
         MillisFunction m_millis;
 
@@ -108,7 +108,7 @@ namespace emb
 
             if (m_commands[periodic_command_id] == nullptr)
             {
-                reportError(DataError::kParameter0Invalid);
+                reportError(DataError::kParameterInvalid, 0);
             }
 
             bool registeredCommand = false;
@@ -152,7 +152,7 @@ namespace emb
                 }
             }
 
-            reportError(DataError::kParameter0Invalid);
+            reportError(DataError::kParameterInvalid, 0);
         }
 
     public:
@@ -218,6 +218,7 @@ namespace emb
                 if (!m_reader.read(m_message_id))
                 {
                     m_writer.writeError(DataError::kMessageIdReadError);
+                    m_writer.write(0);
                     consumeMessage();
                     m_writer.writeCrc();
                     return;
@@ -227,6 +228,7 @@ namespace emb
                 if (!m_reader.read(m_command_id))
                 {
                     m_writer.writeError(DataError::kCommandIdReadError);
+                    m_writer.write(0);
                     consumeMessage();
                     m_writer.writeCrc();
                     return;
@@ -247,9 +249,10 @@ namespace emb
                         unregisterPeriodicCommand();
                         break;
                     default:
-                        if (m_commands[m_command_id] == nullptr || m_command_id >= MaxCommands)
+                        if (m_command_id >= MaxCommands || m_commands[m_command_id] == nullptr)
                         {
                             m_writer.writeError(DataError::kCommandIdInvalid);
+                            m_writer.write(m_command_id);
                             consumeMessage();
                         }
                         else
@@ -272,12 +275,14 @@ namespace emb
                         {
                             consumeMessage();
                             m_writer.writeError(DataError::kCrcInvalid);
+                            m_writer.write(0);
                         }
                     }
                     else
                     {
                         consumeMessage();
                         m_writer.writeError(DataError::kExtraParameters);
+                        m_writer.write(0);
                     }
                 }
 
@@ -319,7 +324,7 @@ namespace emb
 
             if (!m_reader.read(value))
             {
-                reportError(static_cast<DataError>(DataError::kParameter0ReadError + m_parameter_index));
+                reportError(static_cast<DataError>(DataError::kParameterReadError), m_parameter_index);
             }
             
             ++m_parameter_index;
@@ -339,10 +344,9 @@ namespace emb
 
             if (!validator(value))
             {
-                reportError(static_cast<DataError>(DataError::kParameter0Invalid + m_parameter_index - 1u));
+                reportError(static_cast<DataError>(DataError::kParameterInvalid), m_parameter_index - 1u);
             }
 
-            //read_and_validate(std::forward<Ts>(args)...);
             read_and_validate(args...);
         }
 
@@ -359,7 +363,7 @@ namespace emb
             write(args...);
         }
 
-        void reportError(const DataError code)
+        void reportError(const DataError code, const int16_t data = 0)
         {
             if (!m_in_command)
             {
@@ -367,6 +371,7 @@ namespace emb
             }
 
             m_writer.writeError(code);
+            m_writer.write(data);
             
             longjmp(m_jmp_buf, code);
         }

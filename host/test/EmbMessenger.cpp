@@ -396,7 +396,7 @@ namespace emb
             messenger.send(setLedCommand);
 
             ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x01, DataType::kBoolTrue }));
-            buffer.addDeviceMessage({ 0x01, DataType::kError, DataError::kParameter0ReadError });
+            buffer.addDeviceMessage({ 0x01, DataType::kError, DataError::kParameterReadError, 0x00 });
 
             ASSERT_THROW(messenger.update(), ParameterReadErrorDeviceException);
 
@@ -420,7 +420,7 @@ namespace emb
             messenger.send(setLedCommand);
 
             ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x01, DataType::kBoolTrue }));
-            buffer.addDeviceMessage({ 0x01, DataType::kError, DataError::kParameter0Invalid });
+            buffer.addDeviceMessage({ 0x01, DataType::kError, DataError::kParameterInvalid, 0x00 });
 
             ASSERT_THROW(messenger.update(), ParameterInvalidDeviceException);
 
