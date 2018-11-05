@@ -9,13 +9,13 @@ namespace emb
     {
         class Ping : public Command
         {
-        public:
+           public:
             Ping()
             {
                 m_type_index = typeid(Ping);
             }
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_PING_HPP
+#endif  // EMBMESSENGER_TEST_PING_HPP

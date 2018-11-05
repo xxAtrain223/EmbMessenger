@@ -1,9 +1,9 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "EmbMessenger/Writer.hpp"
-#include "EmbMessenger/DataType.hpp"
 #include "EmbMessenger/DataError.hpp"
+#include "EmbMessenger/DataType.hpp"
+#include "EmbMessenger/Writer.hpp"
 #include "MockBuffer.hpp"
 
 namespace emb
@@ -413,5 +413,5 @@ namespace emb
             writer.write(data1);
             writer.write(data2);
         }
-    }
-}
+    }  // namespace test
+}  // namespace emb

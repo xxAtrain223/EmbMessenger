@@ -1,8 +1,8 @@
 #ifndef EMBMESSENGER_TEMPLATES_HPP
 #define EMBMESSENGER_TEMPLATES_HPP
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 namespace emb
 {
@@ -13,9 +13,9 @@ namespace emb
     template <> struct var_uint<8> { using type = uint64_t; };
 
     /**
-    * @brief Gives a `uint` the same size of `T`
-    */
+     * @brief Gives a `uint` the same size of `T`
+     */
     template <typename T> using var_uint_t = typename var_uint<sizeof(T)>::type;
-}
+}  // namespace emb
 
 #endif

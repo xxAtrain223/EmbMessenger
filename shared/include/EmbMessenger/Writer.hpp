@@ -15,7 +15,7 @@ namespace emb
      */
     class Writer
     {
-    protected:
+       protected:
         IBuffer* m_buffer;
         uint8_t m_crc;
 
@@ -37,7 +37,7 @@ namespace emb
             union
             {
                 T in;
-                var_uint_t<T> out; // uint the size of T
+                var_uint_t<T> out;  // uint the size of T
             } u;
             u.in = value;
 
@@ -47,7 +47,7 @@ namespace emb
             }
         }
 
-    public:
+       public:
         /**
          * @brief Constructs a buffer writer using the @p buffer.
          *
@@ -77,52 +77,52 @@ namespace emb
         void write(const uint16_t value);
 
         /**
-        * @brief Writes a `uint32_t` to the buffer.
-        *
-        * @param value `uint32_t` to write to the buffer
-        */
+         * @brief Writes a `uint32_t` to the buffer.
+         *
+         * @param value `uint32_t` to write to the buffer
+         */
         void write(const uint32_t value);
 
         /**
-        * @brief Writes a `uint64_t` to the buffer.
-        *
-        * @param value `uint64_t` to write to the buffer
-        */
+         * @brief Writes a `uint64_t` to the buffer.
+         *
+         * @param value `uint64_t` to write to the buffer
+         */
         void write(const uint64_t value);
 
         /**
-        * @brief Writes a `int8_t` to the buffer.
-        *
-        * @param value `int8_t` to write to the buffer
-        */
+         * @brief Writes a `int8_t` to the buffer.
+         *
+         * @param value `int8_t` to write to the buffer
+         */
         void write(const int8_t value);
 
         /**
-        * @brief Writes a `int16_t` to the buffer.
-        *
-        * @param value `int16_t` to write to the buffer
-        */
+         * @brief Writes a `int16_t` to the buffer.
+         *
+         * @param value `int16_t` to write to the buffer
+         */
         void write(const int16_t value);
 
         /**
-        * @brief Writes a `int32_t` to the buffer.
-        *
-        * @param value `int32_t` to write to the buffer
-        */
+         * @brief Writes a `int32_t` to the buffer.
+         *
+         * @param value `int32_t` to write to the buffer
+         */
         void write(const int32_t value);
 
         /**
-        * @brief Writes a `int64_t` to the buffer.
-        *
-        * @param value `int64_t` to write to the buffer
-        */
+         * @brief Writes a `int64_t` to the buffer.
+         *
+         * @param value `int64_t` to write to the buffer
+         */
         void write(const int64_t value);
 
         /**
-        * @brief Writes a `float` to the buffer.
-        *
-        * @param value `float` to write to the buffer
-        */
+         * @brief Writes a `float` to the buffer.
+         *
+         * @param value `float` to write to the buffer
+         */
         void write(const float value);
 
         /**
@@ -143,6 +143,6 @@ namespace emb
          */
         void writeCrc();
     };
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_WRITER_HPP
+#endif  // EMBMESSENGER_WRITER_HPP

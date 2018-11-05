@@ -6,31 +6,34 @@
 #include <string>
 #include "EmbMessenger/DataError.hpp"
 
-#define NEW_EX(name) \
-    class name##Exception : public emb::BaseException \
-    { \
-    public: \
+#define NEW_EX(name)                                                                                   \
+    class name##Exception : public emb::BaseException                                                  \
+    {                                                                                                  \
+       public:                                                                                         \
         name##Exception(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
-            emb::BaseException(#name ": " + message, command) \
-        {} \
+            emb::BaseException(#name ": " + message, command)                                          \
+        {                                                                                              \
+        }                                                                                              \
     }
 
-#define NEW_HOST_EX(name) \
-    class name##HostException : public emb::HostException \
-    { \
-    public: \
+#define NEW_HOST_EX(name)                                                                                  \
+    class name##HostException : public emb::HostException                                                  \
+    {                                                                                                      \
+       public:                                                                                             \
         name##HostException(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
-            emb::HostException(#name "HostException: " + message, command) \
-        {} \
+            emb::HostException(#name "HostException: " + message, command)                                 \
+        {                                                                                                  \
+        }                                                                                                  \
     }
 
-#define NEW_DEVICE_EX(code, name) \
-    class name : public emb::DeviceException \
-    { \
-    public: \
+#define NEW_DEVICE_EX(code, name)                                                           \
+    class name : public emb::DeviceException                                                \
+    {                                                                                       \
+       public:                                                                              \
         name(const std::string& message = "", std::shared_ptr<Command> command = nullptr) : \
-            emb::DeviceException(code, #name "DeviceException: " + message, command) \
-        {} \
+            emb::DeviceException(code, #name "DeviceException: " + message, command)        \
+        {                                                                                   \
+        }                                                                                   \
     }
 
 #define NEW_CODE_EX(code) NEW_DEVICE_EX(emb::k##code, code##DeviceException)
@@ -43,9 +46,12 @@ namespace emb
     {
         std::shared_ptr<Command> m_command;
 
-    public:
+       public:
         BaseException(const std::string& message, std::shared_ptr<Command> command = nullptr) :
-            std::runtime_error(message), m_command(command) { }
+            std::runtime_error(message),
+            m_command(command)
+        {
+        }
 
         std::shared_ptr<Command> getCommand() const
         {
@@ -55,19 +61,25 @@ namespace emb
 
     class HostException : public BaseException
     {
-    public:
+       public:
         HostException(const std::string& message, std::shared_ptr<Command> command = nullptr) :
-            BaseException(message, command) { }
+            BaseException(message, command)
+        {
+        }
     };
 
     class DeviceException : public BaseException
     {
-    private:
+       private:
         uint8_t m_error_code;
 
-    public:
-        DeviceException(const uint8_t errorCode, const std::string& message, std::shared_ptr<Command> command = nullptr) :
-            m_error_code(errorCode), BaseException(message, command) { }
+       public:
+        DeviceException(const uint8_t errorCode, const std::string& message,
+                        std::shared_ptr<Command> command = nullptr) :
+            m_error_code(errorCode),
+            BaseException(message, command)
+        {
+        }
 
         inline uint8_t getErrorCode() const
         {
@@ -77,26 +89,32 @@ namespace emb
 
     class InitializingErrorHostException : public HostException
     {
-    public:
+       public:
         InitializingErrorHostException(const std::string& message) :
-            HostException("InitializingErrorHostException: " + message, nullptr) { }
+            HostException("InitializingErrorHostException: " + message, nullptr)
+        {
+        }
     };
 
     class ParameterReadErrorHostException : public HostException
     {
-    private:
+       private:
         uint8_t m_parameter_index;
 
-    public:
+       public:
         ParameterReadErrorHostException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
-            m_parameter_index(parameterIndex), HostException("ParameterReadErrorHostException: Error reading parameter " + std::to_string(parameterIndex), command) { }
+            m_parameter_index(parameterIndex),
+            HostException("ParameterReadErrorHostException: Error reading parameter " + std::to_string(parameterIndex),
+                          command)
+        {
+        }
 
         inline uint8_t getParameterIndex() const
         {
             return m_parameter_index;
         }
     };
-    
+
     NEW_HOST_EX(MessageIdReadError);
     NEW_HOST_EX(MessageIdInvalid);
     NEW_HOST_EX(CrcInvalid);
@@ -105,12 +123,17 @@ namespace emb
 
     class ParameterReadErrorDeviceException : public DeviceException
     {
-    private:
+       private:
         uint8_t m_parameter_index;
 
-    public:
+       public:
         ParameterReadErrorDeviceException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
-            m_parameter_index(parameterIndex), DeviceException(DataError::kParameterReadError, "ParameterReadErrorDeviceException: Error reading parameter " + std::to_string(parameterIndex), command) { }
+            m_parameter_index(parameterIndex),
+            DeviceException(
+                DataError::kParameterReadError,
+                "ParameterReadErrorDeviceException: Error reading parameter " + std::to_string(parameterIndex), command)
+        {
+        }
 
         inline uint8_t getParameterIndex() const
         {
@@ -120,12 +143,17 @@ namespace emb
 
     class ParameterInvalidDeviceException : public DeviceException
     {
-    private:
+       private:
         uint8_t m_parameter_index;
 
-    public:
+       public:
         ParameterInvalidDeviceException(const uint8_t parameterIndex, std::shared_ptr<Command> command = nullptr) :
-            m_parameter_index(parameterIndex), DeviceException(DataError::kParameterInvalid, "ParameterInvalidDeviceException: Parameter " + std::to_string(parameterIndex) + " is invalid", command) { }
+            m_parameter_index(parameterIndex),
+            DeviceException(
+                DataError::kParameterInvalid,
+                "ParameterInvalidDeviceException: Parameter " + std::to_string(parameterIndex) + " is invalid", command)
+        {
+        }
 
         inline uint8_t getParameterIndex() const
         {
@@ -141,6 +169,6 @@ namespace emb
     NEW_CODE_EX(MessageIdInvalid);
     NEW_CODE_EX(CommandIdInvalid);
     NEW_CODE_EX(CrcInvalid);
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_EXCEPTIONS_HPP
+#endif  // EMBMESSENGER_EXCEPTIONS_HPP

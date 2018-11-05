@@ -1,14 +1,14 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "EmbMessenger/EmbMessenger.hpp"
 #include "EmbMessenger/DataType.hpp"
+#include "EmbMessenger/EmbMessenger.hpp"
 #include "FakeBuffer.hpp"
 
+#include "Add.hpp"
 #include "Ping.hpp"
 #include "SetLed.hpp"
 #include "ToggleLed.hpp"
-#include "Add.hpp"
 #include "UserError.hpp"
 
 using namespace testing;
@@ -210,7 +210,8 @@ namespace emb
         {
             FakeBuffer buffer;
 
-            ASSERT_THROW(EmbMessenger messenger(&buffer, std::chrono::milliseconds(20)), InitializingErrorHostException);
+            ASSERT_THROW(EmbMessenger messenger(&buffer, std::chrono::milliseconds(20)),
+                         InitializingErrorHostException);
         }
 
         TEST(messenger_exceptions_host, no_messages_available)
@@ -220,7 +221,6 @@ namespace emb
             buffer.addDeviceMessage({ 0x00 });
             EmbMessenger messenger(&buffer, std::chrono::seconds(1));
             ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
-
 
             ASSERT_NO_THROW(messenger.update());
         }
@@ -307,7 +307,6 @@ namespace emb
             EmbMessenger messenger(&buffer, std::chrono::seconds(1));
             ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
 
-
             buffer.addDeviceMessage({ 0x01 });
 
             ASSERT_THROW(messenger.update(), MessageIdInvalidHostException);
@@ -346,7 +345,6 @@ namespace emb
             buffer.addDeviceMessage({ 0x00 });
             EmbMessenger messenger(&buffer, std::chrono::seconds(1));
             ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
-
 
             buffer.addDeviceMessage({ DataType::kError, DataError::kMessageIdReadError });
 
@@ -648,5 +646,5 @@ namespace emb
             messenger.update();
             ASSERT_TRUE(buffer.buffersEmpty());
         }
-    }
-}
+    }  // namespace test
+}  // namespace emb

@@ -16,18 +16,18 @@ namespace emb
             {
                 switch (error)
                 {
-                case 0x42:
-                    throw UserErrorException("Something happened on the device", ptr);
+                    case 0x42:
+                        throw UserErrorException("Something happened on the device", ptr);
                 }
             }
 
-        public:
+           public:
             UserError()
             {
                 m_type_index = typeid(UserError);
             }
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_USERERROR_HPP
+#endif  // EMBMESSENGER_TEST_USERERROR_HPP

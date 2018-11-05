@@ -9,10 +9,10 @@ namespace emb
     {
         class SetLed : public Command
         {
-        protected:
+           protected:
             bool ledState;
 
-        public:
+           public:
             SetLed(bool state)
             {
                 ledState = state;
@@ -24,7 +24,7 @@ namespace emb
                 messenger->write(ledState);
             }
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_SETLED_HPP
+#endif  // EMBMESSENGER_TEST_SETLED_HPP

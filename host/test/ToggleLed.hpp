@@ -9,7 +9,7 @@ namespace emb
     {
         class ToggleLed : public Command
         {
-        public:
+           public:
             bool ledState;
 
             ToggleLed()
@@ -22,7 +22,7 @@ namespace emb
                 messenger->read(ledState);
             }
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_TOGGLELED_HPP
+#endif  // EMBMESSENGER_TEST_TOGGLELED_HPP

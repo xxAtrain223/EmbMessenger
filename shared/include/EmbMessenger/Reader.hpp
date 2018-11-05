@@ -17,7 +17,7 @@ namespace emb
      */
     class Reader
     {
-    protected:
+       protected:
         IBuffer* m_buffer;
         uint8_t m_crc;
 
@@ -59,7 +59,7 @@ namespace emb
 
             union
             {
-                var_uint_t<T> in; // uint the size of T
+                var_uint_t<T> in;  // uint the size of T
                 T out;
             } u;
             u.in = 0;
@@ -83,12 +83,12 @@ namespace emb
          */
         bool removeByte();
 
-    public:
+       public:
         /**
-        * @brief Constructs a message reader using the @p buffer.
-        *
-        * @param buffer Buffer to use for communicating
-        */
+         * @brief Constructs a message reader using the @p buffer.
+         *
+         * @param buffer Buffer to use for communicating
+         */
         Reader(IBuffer* buffer);
 
         /**
@@ -284,11 +284,11 @@ namespace emb
         bool readError(uint8_t& value);
 
         /**
-        * @brief Reads the CRC and checks if it's valid.
-        * This will remove the CRC bytes if successful.
-        *
-        * @returns True if the CRC is valid.
-        */
+         * @brief Reads the CRC and checks if it's valid.
+         * This will remove the CRC bytes if successful.
+         *
+         * @returns True if the CRC is valid.
+         */
         bool readCrc();
 
         /**
@@ -297,7 +297,7 @@ namespace emb
          */
         void resetCrc();
 
-    protected:
+       protected:
         // Helper functions
 
         template <typename ReadType, typename ConvertType>
@@ -314,12 +314,12 @@ namespace emb
         {
             if (m_buffer->size() >= sizeof(T) + 1)
             {
-                removeByte(); // Remove Type Byte
+                removeByte();  // Remove Type Byte
                 return readData(t);
             }
             return false;
         }
     };
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_READER_HPP
+#endif  // EMBMESSENGER_READER_HPP

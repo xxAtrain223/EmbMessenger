@@ -24,6 +24,6 @@ namespace emb
         kCommandIdInvalid = 0x1A,
         kCrcInvalid = 0x1B
     };
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_DATAERROR_HPP
+#endif  // EMBMESSENGER_DATAERROR_HPP

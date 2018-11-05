@@ -17,4 +17,4 @@ namespace emb
         crc = crc::Calculate8(crc, crc);
         ASSERT_EQ(crc, 0x00);
     }
-}
+}  // namespace emb

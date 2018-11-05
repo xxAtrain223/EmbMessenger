@@ -1288,5 +1288,5 @@ namespace emb
             EXPECT_TRUE(reader.read(value));
             EXPECT_EQ(value, (uint64_t)0x0000000000000041);
         }
-    }
-}
+    }  // namespace test
+}  // namespace emb

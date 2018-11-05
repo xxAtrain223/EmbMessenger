@@ -1,6 +1,6 @@
 #include "FakeBuffer.hpp"
-#include "EmbMessenger/DataType.hpp"
 #include "EmbMessenger/Crc.hpp"
+#include "EmbMessenger/DataType.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -46,7 +46,8 @@ namespace emb
 
             bool rv = std::equal(std::begin(message), std::end(message), std::begin(device));
 
-            device.erase(std::begin(device), std::begin(device) + ((device.size() < message.size()) ? device.size() : message.size()));
+            device.erase(std::begin(device),
+                         std::begin(device) + ((device.size() < message.size()) ? device.size() : message.size()));
 
             return rv;
         }
@@ -128,7 +129,7 @@ namespace emb
 
         void FakeBuffer::update()
         {
-            (void)0; // Noop
+            (void)0;  // Noop
         }
 
         void FakeBuffer::zero()
@@ -137,5 +138,5 @@ namespace emb
             host.clear();
             readCrc = false;
         }
-    }
-}
+    }  // namespace test
+}  // namespace emb

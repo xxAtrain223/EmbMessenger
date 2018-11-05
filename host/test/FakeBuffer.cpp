@@ -1,6 +1,6 @@
 #include "FakeBuffer.hpp"
-#include "EmbMessenger/DataType.hpp"
 #include "EmbMessenger/Crc.hpp"
+#include "EmbMessenger/DataType.hpp"
 
 #include <algorithm>
 
@@ -101,7 +101,7 @@ namespace emb
 
         void FakeBuffer::update()
         {
-            (void)0; // Noop
+            (void)0;  // Noop
         }
 
         void FakeBuffer::zero()
@@ -110,5 +110,5 @@ namespace emb
             device.clear();
             readCrc = false;
         }
-    }
-}
+    }  // namespace test
+}  // namespace emb

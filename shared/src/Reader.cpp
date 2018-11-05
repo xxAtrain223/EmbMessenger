@@ -63,52 +63,52 @@ namespace emb
 
         switch (byte)
         {
-        case DataType::kNull:
-            type = DataType::kNull;
-            break;
-        case DataType::kBoolFalse:
-            type = DataType::kBoolFalse;
-            break;
-        case DataType::kBoolTrue:
-            type = DataType::kBoolTrue;
-            break;
-        case DataType::kFloat:
-            type = DataType::kFloat;
-            break;
-        case DataType::kUint8:
-            type = DataType::kUint8;
-            break;
-        case DataType::kUint16:
-            type = DataType::kUint16;
-            break;
-        case DataType::kUint32:
-            type = DataType::kUint32;
-            break;
-        case DataType::kUint64:
-            type = DataType::kUint64;
-            break;
-        case DataType::kInt8:
-            type = DataType::kInt8;
-            break;
-        case DataType::kInt16:
-            type = DataType::kInt16;
-            break;
-        case DataType::kInt32:
-            type = DataType::kInt32;
-            break;
-        case DataType::kInt64:
-            type = DataType::kInt64;
-            break;
-        case DataType::kCrc:
-            type = DataType::kCrc;
-            break;
-        case DataType::kError:
-            type = DataType::kError;
-            break;
-        default:
-            return false;
+            case DataType::kNull:
+                type = DataType::kNull;
+                break;
+            case DataType::kBoolFalse:
+                type = DataType::kBoolFalse;
+                break;
+            case DataType::kBoolTrue:
+                type = DataType::kBoolTrue;
+                break;
+            case DataType::kFloat:
+                type = DataType::kFloat;
+                break;
+            case DataType::kUint8:
+                type = DataType::kUint8;
+                break;
+            case DataType::kUint16:
+                type = DataType::kUint16;
+                break;
+            case DataType::kUint32:
+                type = DataType::kUint32;
+                break;
+            case DataType::kUint64:
+                type = DataType::kUint64;
+                break;
+            case DataType::kInt8:
+                type = DataType::kInt8;
+                break;
+            case DataType::kInt16:
+                type = DataType::kInt16;
+                break;
+            case DataType::kInt32:
+                type = DataType::kInt32;
+                break;
+            case DataType::kInt64:
+                type = DataType::kInt64;
+                break;
+            case DataType::kCrc:
+                type = DataType::kCrc;
+                break;
+            case DataType::kError:
+                type = DataType::kError;
+                break;
+            default:
+                return false;
         }
-        
+
         return true;
     }
 
@@ -122,9 +122,9 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kBoolFalse:
-        case DataType::kBoolTrue:
-            return true;
+            case DataType::kBoolFalse:
+            case DataType::kBoolTrue:
+                return true;
         }
 
         return false;
@@ -151,13 +151,13 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kInt8:
-        case DataType::kInt16:
-        case DataType::kInt32:
-        case DataType::kInt64:
-        case DataType::kPosFixInt:
-        case DataType::kNegFixInt:
-            return true;
+            case DataType::kInt8:
+            case DataType::kInt16:
+            case DataType::kInt32:
+            case DataType::kInt64:
+            case DataType::kPosFixInt:
+            case DataType::kNegFixInt:
+                return true;
         }
 
         return false;
@@ -173,17 +173,17 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kUint8:
-        case DataType::kUint16:
-        case DataType::kUint32:
-        case DataType::kUint64:
-        case DataType::kPosFixInt:
-            return true;
+            case DataType::kUint8:
+            case DataType::kUint16:
+            case DataType::kUint32:
+            case DataType::kUint64:
+            case DataType::kPosFixInt:
+                return true;
         }
 
         return false;
     }
-    
+
     bool Reader::nextFloat() const
     {
         DataType type;
@@ -260,13 +260,13 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-            readByte(value);
-            return true;
-        case DataType::kUint8:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+                readByte(value);
+                return true;
+            case DataType::kUint8:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -280,13 +280,13 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-        case DataType::kUint8:
-            return readAndConvert<uint8_t>(value);
-        case DataType::kUint16:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+            case DataType::kUint8:
+                return readAndConvert<uint8_t>(value);
+            case DataType::kUint16:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -300,14 +300,14 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-        case DataType::kUint8:
-        case DataType::kUint16:
-            return readAndConvert<uint16_t>(value);
-        case DataType::kUint32:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+            case DataType::kUint8:
+            case DataType::kUint16:
+                return readAndConvert<uint16_t>(value);
+            case DataType::kUint32:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -321,15 +321,15 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-        case DataType::kUint8:
-        case DataType::kUint16:
-        case DataType::kUint32:
-            return readAndConvert<uint32_t>(value);
-        case DataType::kUint64:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+            case DataType::kUint8:
+            case DataType::kUint16:
+            case DataType::kUint32:
+                return readAndConvert<uint32_t>(value);
+            case DataType::kUint64:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -344,18 +344,18 @@ namespace emb
         uint8_t data;
         switch (type)
         {
-        case DataType::kPosFixInt:
-            readByte(data);
-            value = data;
-            return true;
-        case DataType::kNegFixInt:
-            readByte(data);
-            value = data;
-            return true;
-        case DataType::kInt8:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+                readByte(data);
+                value = data;
+                return true;
+            case DataType::kNegFixInt:
+                readByte(data);
+                value = data;
+                return true;
+            case DataType::kInt8:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -369,14 +369,14 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-        case DataType::kNegFixInt:
-        case DataType::kInt8:
-            return readAndConvert<int8_t>(value);
-        case DataType::kInt16:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+            case DataType::kNegFixInt:
+            case DataType::kInt8:
+                return readAndConvert<int8_t>(value);
+            case DataType::kInt16:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -390,15 +390,15 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-        case DataType::kNegFixInt:
-        case DataType::kInt8:
-        case DataType::kInt16:
-            return readAndConvert<int16_t>(value);
-        case DataType::kInt32:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+            case DataType::kNegFixInt:
+            case DataType::kInt8:
+            case DataType::kInt16:
+                return readAndConvert<int16_t>(value);
+            case DataType::kInt32:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -412,16 +412,16 @@ namespace emb
 
         switch (type)
         {
-        case DataType::kPosFixInt:
-        case DataType::kNegFixInt:
-        case DataType::kInt8:
-        case DataType::kInt16:
-        case DataType::kInt32:
-            return readAndConvert<int32_t>(value);
-        case DataType::kInt64:
-            return removeTypeAndRead(value);
-        default:
-            return false;
+            case DataType::kPosFixInt:
+            case DataType::kNegFixInt:
+            case DataType::kInt8:
+            case DataType::kInt16:
+            case DataType::kInt32:
+                return readAndConvert<int32_t>(value);
+            case DataType::kInt64:
+                return removeTypeAndRead(value);
+            default:
+                return false;
         }
     }
 
@@ -435,7 +435,7 @@ namespace emb
 
         if (type == DataType::kFloat && m_buffer->size() >= sizeof(value) + 1)
         {
-            removeByte(); // Remove Type Byte
+            removeByte();  // Remove Type Byte
             return readData(value);
         }
 
@@ -449,7 +449,7 @@ namespace emb
             return false;
         }
 
-        removeByte(); // Remove Type Byte
+        removeByte();  // Remove Type Byte
 
         return true;
     }
@@ -479,8 +479,8 @@ namespace emb
 
         if (m_buffer->size() >= 2)
         {
-            removeByte(); // Remove Type Byte
-            removeByte(); // Consume the CRC byte, Updates internal CRC
+            removeByte();  // Remove Type Byte
+            removeByte();  // Consume the CRC byte, Updates internal CRC
 
             return m_crc == 0x00;
         }
@@ -492,4 +492,4 @@ namespace emb
     {
         m_crc = 0;
     }
-}
+}  // namespace emb

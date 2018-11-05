@@ -12,14 +12,14 @@ namespace emb
     {
         class FakeBuffer : public IBuffer
         {
-        protected:
+           protected:
             std::vector<uint8_t> host;
             std::vector<uint8_t> device;
             int deviceMessages = 0;
             bool readCrc = false;
             bool validCrc = true;
 
-        public:
+           public:
             /**
              * @brief Appends a message to the device buffer, auto adds crc.
              *   Used for adding a message to be read by the host.
@@ -52,7 +52,7 @@ namespace emb
             virtual void update() override;
             virtual void zero() override;
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_FAKEBUFFER_HPP
+#endif  // EMBMESSENGER_TEST_FAKEBUFFER_HPP

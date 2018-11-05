@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "EmbMessenger/EmbMessenger.hpp"
 #include "EmbMessenger/DataType.hpp"
+#include "EmbMessenger/EmbMessenger.hpp"
 #include "FakeBuffer.hpp"
 
 using namespace testing;
@@ -346,7 +346,7 @@ namespace emb
 
             messenger.attachCommand(0, ping);
 
-            buffer.addHostMessage({ });
+            buffer.addHostMessage({});
             buffer.addHostMessage({ DataType::kBoolFalse });
             messenger.update();
             ASSERT_TRUE(buffer.checkDeviceBuffer({ DataType::kError, DataError::kMessageIdReadError, 0x00 }));
@@ -438,5 +438,5 @@ namespace emb
 
             ASSERT_TRUE(buffer.buffersEmpty());
         }
-    }
-}
+    }  // namespace test
+}  // namespace emb

@@ -27,6 +27,6 @@ namespace emb
         kCrc = 0xC1,
         kError = 0xCB
     };
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_DATATYPE_HPP
+#endif  // EMBMESSENGER_DATATYPE_HPP

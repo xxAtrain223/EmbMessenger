@@ -1,8 +1,8 @@
 #ifndef EMBMESSENGER_IBUFFER_HPP
 #define EMBMESSENGER_IBUFFER_HPP
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 namespace emb
 {
@@ -11,7 +11,7 @@ namespace emb
      */
     class IBuffer
     {
-    public:
+       public:
         /**
          * @brief Writes the @p byte to the end of the buffer.
          *
@@ -53,7 +53,7 @@ namespace emb
          *
          * @returns Number of available messages
          */
-        virtual uint8_t messagesAvailable() const = 0; // TODO: Change to better name
+        virtual uint8_t messagesAvailable() const = 0;  // TODO: Change to better name
 
         /**
          * @brief Updates the internal buffer.
@@ -62,7 +62,7 @@ namespace emb
 
         virtual void zero() = 0;
 
-        virtual void print() const { }
+        virtual void print() const {}
     };
-}
-#endif // EMBMESSENGER_IBUFFER_HPP
+}  // namespace emb
+#endif  // EMBMESSENGER_IBUFFER_HPP

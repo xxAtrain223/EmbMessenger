@@ -181,4 +181,4 @@ namespace emb
         writeByte(DataType::kCrc);
         writeData(m_crc);
     }
-}
+}  // namespace emb

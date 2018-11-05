@@ -7,8 +7,8 @@
 #include <typeindex>
 
 #ifndef EMB_SINGLE_THREADED
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
 #endif
 
 namespace emb
@@ -19,20 +19,20 @@ namespace emb
     {
         friend class EmbMessenger;
 
-    protected:
+       protected:
         std::type_index m_type_index;
         uint16_t m_message_id;
         std::function<void(std::shared_ptr<Command>)> m_callback = nullptr;
         bool m_is_periodic = false;
 
-        #ifndef EMB_SINGLE_THREADED
+#ifndef EMB_SINGLE_THREADED
         std::mutex m_mutex;
         std::condition_variable m_condition_variable;
         bool m_is_waiting = false;
         bool m_received = false;
-        #endif
+#endif
 
-    public:
+       public:
         Command();
 
         virtual void send(EmbMessenger* messenger);
@@ -50,10 +50,10 @@ namespace emb
             };
         }
 
-        #ifndef EMB_SINGLE_THREADED
+#ifndef EMB_SINGLE_THREADED
         void wait();
-        #endif
+#endif
     };
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_COMMAND_HPP
+#endif  // EMBMESSENGER_COMMAND_HPP

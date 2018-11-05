@@ -11,7 +11,7 @@ namespace emb
     {
         class MockBuffer : public IBuffer
         {
-        public:
+           public:
             MOCK_METHOD1(writeByte, void(const uint8_t byte));
             MOCK_CONST_METHOD0(peek, uint8_t());
             MOCK_METHOD0(readByte, uint8_t());
@@ -21,7 +21,7 @@ namespace emb
             MOCK_METHOD0(update, void());
             MOCK_METHOD0(zero, void());
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_MOCKBUFFER_HPP
+#endif  // EMBMESSENGER_TEST_MOCKBUFFER_HPP

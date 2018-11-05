@@ -1,12 +1,12 @@
 #ifndef EMBMESSENGER_EMBMESSENGER_HPP
 #define EMBMESSENGER_EMBMESSENGER_HPP
 
-#include <stdint.h>
 #include <setjmp.h>
+#include <stdint.h>
 
+#include "EmbMessenger/DataError.hpp"
 #include "EmbMessenger/Reader.hpp"
 #include "EmbMessenger/Writer.hpp"
-#include "EmbMessenger/DataError.hpp"
 
 #ifndef EMB_TESTING
 #else
@@ -17,20 +17,35 @@ namespace emb
 {
     namespace
     {
-        template<typename T> struct remove_reference { typedef T type; };
-        template<typename T> struct remove_reference<T&> { typedef T type; };
-        template<typename T> struct remove_reference<T&&> { typedef T type; };
-    }
+        template <typename T>
+        struct remove_reference
+        {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct remove_reference<T&>
+        {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct remove_reference<T&&>
+        {
+            typedef T type;
+        };
+
+    }  // namespace
 
     class IBuffer;
 
     template <uint8_t MaxCommands, uint8_t MaxPeriodicCommands>
     class EmbMessenger
     {
-    protected:
+       protected:
 #ifndef EMB_TESTING
-        using CommandFunction = void(*)(void);
-        using MillisFunction = uint32_t(*)(void);
+        using CommandFunction = void (*)(void);
+        using MillisFunction = uint32_t (*)(void);
 #else
         using CommandFunction = std::function<void()>;
         using MillisFunction = std::function<uint32_t()>;
@@ -77,14 +92,15 @@ namespace emb
 
         void write()
         {
-            (void)0; // Noop
+            (void)0;
         }
 
         void consumeMessage()
         {
             for (uint8_t n = m_buffer->messagesAvailable();
-                n > 0 && n == m_buffer->messagesAvailable() && n == m_num_messages && !m_buffer->empty();
-                m_buffer->readByte());
+                 n > 0 && n == m_buffer->messagesAvailable() && n == m_num_messages && !m_buffer->empty();
+                 m_buffer->readByte())
+                ;
         }
 
         void resetPeriodicCommands()
@@ -155,7 +171,7 @@ namespace emb
             reportError(DataError::kParameterInvalid, 0);
         }
 
-    public:
+       public:
         EmbMessenger(IBuffer* buffer, MillisFunction millis = []() { return 0; }) :
             m_buffer(buffer),
             m_reader(buffer),
@@ -239,26 +255,26 @@ namespace emb
                 {
                     switch (m_command_id)
                     {
-                    case 0xFF:
-                        resetPeriodicCommands();
-                        break;
-                    case 0xFE:
-                        registerPeriodicCommand();
-                        break;
-                    case 0xFD:
-                        unregisterPeriodicCommand();
-                        break;
-                    default:
-                        if (m_command_id >= MaxCommands || m_commands[m_command_id] == nullptr)
-                        {
-                            m_writer.writeError(DataError::kCommandIdInvalid);
-                            m_writer.write(m_command_id);
-                            consumeMessage();
-                        }
-                        else
-                        {
-                            m_commands[m_command_id]();
-                        }
+                        case 0xFF:
+                            resetPeriodicCommands();
+                            break;
+                        case 0xFE:
+                            registerPeriodicCommand();
+                            break;
+                        case 0xFD:
+                            unregisterPeriodicCommand();
+                            break;
+                        default:
+                            if (m_command_id >= MaxCommands || m_commands[m_command_id] == nullptr)
+                            {
+                                m_writer.writeError(DataError::kCommandIdInvalid);
+                                m_writer.write(m_command_id);
+                                consumeMessage();
+                            }
+                            else
+                            {
+                                m_commands[m_command_id]();
+                            }
                     }
                 }
                 else
@@ -293,8 +309,7 @@ namespace emb
             uint32_t mil = m_millis();
             for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
             {
-                if (m_periodic_commands[i].command_id < 0xF0 &&
-                    m_periodic_commands[i].next_millis <= mil)
+                if (m_periodic_commands[i].command_id < 0xF0 && m_periodic_commands[i].next_millis <= mil)
                 {
                     m_command_id = m_periodic_commands[i].command_id;
                     m_message_id = m_periodic_commands[i].message_id;
@@ -326,14 +341,14 @@ namespace emb
             {
                 reportError(static_cast<DataError>(DataError::kParameterReadError), m_parameter_index);
             }
-            
+
             ++m_parameter_index;
 
             read(args...);
         }
-        
+
         template <typename T, typename... Ts>
-        void read_and_validate(T&& value, bool(*validator)(typename remove_reference<T>::type), Ts&&... args)
+        void read_and_validate(T&& value, bool (*validator)(typename remove_reference<T>::type), Ts&&... args)
         {
             if (!m_in_command)
             {
@@ -372,10 +387,10 @@ namespace emb
 
             m_writer.writeError(code);
             m_writer.write(data);
-            
+
             longjmp(m_jmp_buf, code);
         }
     };
-}
+}  // namespace emb
 
-#endif // EMBMESSENGER_EMBMESSENGER_HPP
+#endif  // EMBMESSENGER_EMBMESSENGER_HPP

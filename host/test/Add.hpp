@@ -10,10 +10,10 @@ namespace emb
     {
         class Add : public Command
         {
-        protected:
+           protected:
             int A, B;
 
-        public:
+           public:
             int Result;
 
             Add(int a, int b)
@@ -33,7 +33,7 @@ namespace emb
                 messenger->read(Result);
             }
         };
-    }
-}
+    }  // namespace test
+}  // namespace emb
 
-#endif // EMBMESSENGER_TEST_SETLED_HPP
+#endif  // EMBMESSENGER_TEST_SETLED_HPP
