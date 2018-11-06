@@ -313,7 +313,7 @@ namespace emb
             };
             std::function<void()> add = [&] {
                 int a = 0, b = 0;
-                messenger.read_and_validate(
+                messenger.read(
                     a, [](int val) { return val != 0; },
                     b, [](int val) { return val != 0; });
                 messenger.write(a + b);

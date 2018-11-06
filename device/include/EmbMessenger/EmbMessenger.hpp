@@ -35,6 +35,38 @@ namespace emb
             typedef T type;
         };
 
+        struct true_type
+        {
+        };
+        struct false_type
+        {
+        };
+
+        template <typename T>
+        using void_t = void;
+
+        template <typename T>
+        T declval();
+
+        template <typename F, typename... Args>
+        using result_of_t = decltype(declval<F>()(declval<Args>()...));
+
+        template <typename T, typename F, typename = void>
+        struct is_validator
+        {
+            using type = false_type;
+        };
+
+        template <typename T, typename F>
+        struct is_validator<
+            T, F, void_t<decltype(static_cast<bool>(declval<result_of_t<F, T&>>()))>>
+        {
+            using type = true_type;
+        };
+
+        template <typename T, typename F>
+        using is_validator_t = typename is_validator<T, F>::type;
+
     }  // namespace
 
     class IBuffer;
@@ -67,7 +99,6 @@ namespace emb
         uint8_t m_command_id;
         uint16_t m_message_id;
         bool m_is_periodic;
-        bool m_in_command;
         uint8_t m_num_messages;
 
         uint16_t m_parameter_index;
@@ -77,19 +108,39 @@ namespace emb
         CommandFunction m_commands[MaxCommands];
         PeriodicCommand m_periodic_commands[MaxPeriodicCommands];
 
-        void read()
+        template <typename T, typename... Ts>
+        void read_helper(false_type, T& value, Ts&&... args)
         {
-            if (m_reader.nextCrc() && !m_reader.readCrc())
+            read(value);
+            read(args...);
+        }
+
+        template <typename T, typename F, typename... Ts>
+        void read_helper(true_type, T& value, F&& validate)
+        {
+            read(value);
+
+            if (!validate(value))
             {
-                reportError(DataError::kCrcInvalid);
+                reportError(static_cast<DataError>(DataError::kParameterInvalid), m_parameter_index - 1u);
             }
+
+            checkCrc();
         }
 
-        void read_and_validate()
+        template <typename T, typename F, typename... Ts>
+        void read_helper(true_type, T& value, F&& validate, Ts&&... args)
         {
-            (void)0;
-        }
+            read(value);
 
+            if (!validate(value))
+            {
+                reportError(static_cast<DataError>(DataError::kParameterInvalid), m_parameter_index - 1u);
+            }
+
+            read(args...);
+        }
+        
         void write()
         {
             (void)0;
@@ -105,7 +156,7 @@ namespace emb
 
         void resetPeriodicCommands()
         {
-            read();
+            checkCrc();
             for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
             {
                 m_periodic_commands[i].command_id = 255;
@@ -185,8 +236,6 @@ namespace emb
             {
                 m_commands[i] = nullptr;
             }
-
-            m_in_command = false;
         }
 
         bool attachCommand(int id, CommandFunction command)
@@ -250,7 +299,6 @@ namespace emb
                     return;
                 }
 
-                m_in_command = true;
                 if (setjmp(m_jmp_buf) == 0)
                 {
                     switch (m_command_id)
@@ -281,7 +329,6 @@ namespace emb
                 {
                     consumeMessage();
                 }
-                m_in_command = false;
 
                 if (m_buffer->messages() == m_num_messages)
                 {
@@ -316,12 +363,10 @@ namespace emb
                     m_parameter_index = 0;
 
                     m_writer.write(m_message_id);
-                    m_in_command = true;
                     if (setjmp(m_jmp_buf) == 0)
                     {
                         m_commands[m_command_id]();
                     }
-                    m_in_command = false;
                     m_writer.writeCrc();
                     m_periodic_commands[i].next_millis += m_periodic_commands[i].millis_interval;
                     mil = m_millis();
@@ -329,14 +374,17 @@ namespace emb
             }
         }
 
-        template <typename T, typename... Ts>
-        void read(T&& value, Ts&&... args)
+        void checkCrc()
         {
-            if (!m_in_command)
+            if (m_reader.nextCrc() && !m_reader.readCrc())
             {
-                return;
+                reportError(DataError::kCrcInvalid);
             }
+        }
 
+        template <typename T>
+        void read(T& value)
+        {
             if (!m_reader.read(value))
             {
                 reportError(static_cast<DataError>(DataError::kParameterReadError), m_parameter_index);
@@ -344,35 +392,19 @@ namespace emb
 
             ++m_parameter_index;
 
-            read(args...);
+            checkCrc();
         }
 
-        template <typename T, typename... Ts>
-        void read_and_validate(T&& value, bool (*validator)(typename remove_reference<T>::type), Ts&&... args)
+        template <typename T, typename F, typename... Ts>
+        void read(T& value, F&& validator, Ts&&... args)
         {
-            if (!m_in_command)
-            {
-                return;
-            }
-
-            read(value);
-
-            if (!validator(value))
-            {
-                reportError(static_cast<DataError>(DataError::kParameterInvalid), m_parameter_index - 1u);
-            }
-
-            read_and_validate(args...);
+            read_helper(is_validator_t<T, F>{}, value, validator, args...);
         }
 
+        
         template <typename T, typename... Ts>
         void write(const T value, const Ts... args)
         {
-            if (!m_in_command)
-            {
-                return;
-            }
-
             m_writer.write(value);
 
             write(args...);
@@ -380,11 +412,6 @@ namespace emb
 
         void reportError(const DataError code, const int16_t data = 0)
         {
-            if (!m_in_command)
-            {
-                return;
-            }
-
             m_writer.writeError(code);
             m_writer.write(data);
 
