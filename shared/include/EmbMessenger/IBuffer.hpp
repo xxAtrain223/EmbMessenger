@@ -49,19 +49,25 @@ namespace emb
         virtual size_t size() const = 0;
 
         /**
-         * @brief Gets the number of available messages
+         * @brief Gets the number of available messages.
          *
          * @returns Number of available messages
          */
-        virtual uint8_t messagesAvailable() const = 0;  // TODO: Change to better name
+        virtual uint8_t messages() const = 0;
 
         /**
          * @brief Updates the internal buffer.
          */
         virtual void update() = 0;
 
+        /**
+         * @brief Zeroes out the buffer.
+         */
         virtual void zero() = 0;
 
+        /**
+         * @brief Debug method for printing the buffer.
+         */
         virtual void print() const {}
     };
 }  // namespace emb

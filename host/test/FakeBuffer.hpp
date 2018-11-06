@@ -48,7 +48,7 @@ namespace emb
             virtual uint8_t readByte() override;
             virtual bool empty() const override;
             virtual size_t size() const override;
-            virtual uint8_t messagesAvailable() const override;
+            virtual uint8_t messages() const override;
             virtual void update() override;
             virtual void zero() override;
         };

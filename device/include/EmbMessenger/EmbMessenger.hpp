@@ -97,8 +97,8 @@ namespace emb
 
         void consumeMessage()
         {
-            for (uint8_t n = m_buffer->messagesAvailable();
-                 n > 0 && n == m_buffer->messagesAvailable() && n == m_num_messages && !m_buffer->empty();
+            for (uint8_t n = m_buffer->messages();
+                 n > 0 && n == m_buffer->messages() && n == m_num_messages && !m_buffer->empty();
                  m_buffer->readByte())
                 ;
         }
@@ -223,7 +223,7 @@ namespace emb
         void update()
         {
             m_buffer->update();
-            m_num_messages = m_buffer->messagesAvailable();
+            m_num_messages = m_buffer->messages();
 
             if (m_num_messages != 0)
             {
@@ -283,7 +283,7 @@ namespace emb
                 }
                 m_in_command = false;
 
-                if (m_buffer->messagesAvailable() == m_num_messages)
+                if (m_buffer->messages() == m_num_messages)
                 {
                     if (m_reader.nextCrc())
                     {

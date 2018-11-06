@@ -54,7 +54,7 @@ public:
         return (BufferSize + m_streamFront - m_readFront) % BufferSize;
     }
 
-    uint8_t messagesAvailable() const override
+    uint8_t messages() const override
     {
         return m_numberMessages;
     }

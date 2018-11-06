@@ -122,7 +122,7 @@ namespace emb
             return host.size();
         }
 
-        uint8_t FakeBuffer::messagesAvailable() const
+        uint8_t FakeBuffer::messages() const
         {
             return hostMessages;
         }

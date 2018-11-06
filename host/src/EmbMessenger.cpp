@@ -130,7 +130,7 @@ namespace emb
     {
         m_buffer->update();
 
-        if (m_buffer->messagesAvailable() == 0)
+        if (m_buffer->messages() == 0)
         {
             return;
         }
@@ -298,8 +298,8 @@ namespace emb
 
     void EmbMessenger::consumeMessage()
     {
-        for (uint8_t n = m_buffer->messagesAvailable();
-             n > 0 && n == m_buffer->messagesAvailable();
+        for (uint8_t n = m_buffer->messages();
+             n > 0 && n == m_buffer->messages();
              m_buffer->readByte());
     }
 
