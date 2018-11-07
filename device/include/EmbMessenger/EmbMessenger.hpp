@@ -238,7 +238,7 @@ namespace emb
             }
         }
 
-        bool attachCommand(int id, CommandFunction command)
+        bool registerCommand(int id, CommandFunction command)
         {
             if (id >= MaxCommands)
             {

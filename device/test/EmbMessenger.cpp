@@ -33,10 +33,10 @@ namespace emb
                 messenger.write(a + b);
             };
 
-            messenger.attachCommand(0, ping);
-            messenger.attachCommand(1, setLed);
-            messenger.attachCommand(2, toggleLed);
-            messenger.attachCommand(3, add);
+            messenger.registerCommand(0, ping);
+            messenger.registerCommand(1, setLed);
+            messenger.registerCommand(2, toggleLed);
+            messenger.registerCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x00 });
             messenger.update();
@@ -66,10 +66,10 @@ namespace emb
                 messenger.write(a + b);
             };
 
-            messenger.attachCommand(0, ping);
-            messenger.attachCommand(1, setLed);
-            messenger.attachCommand(2, toggleLed);
-            messenger.attachCommand(3, add);
+            messenger.registerCommand(0, ping);
+            messenger.registerCommand(1, setLed);
+            messenger.registerCommand(2, toggleLed);
+            messenger.registerCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x01, DataType::kBoolTrue });
             messenger.update();
@@ -106,10 +106,10 @@ namespace emb
                 messenger.write(a + b);
             };
 
-            messenger.attachCommand(0, ping);
-            messenger.attachCommand(1, setLed);
-            messenger.attachCommand(2, toggleLed);
-            messenger.attachCommand(3, add);
+            messenger.registerCommand(0, ping);
+            messenger.registerCommand(1, setLed);
+            messenger.registerCommand(2, toggleLed);
+            messenger.registerCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x02 });
             messenger.update();
@@ -146,10 +146,10 @@ namespace emb
                 messenger.write(a + b);
             };
 
-            messenger.attachCommand(0, ping);
-            messenger.attachCommand(1, setLed);
-            messenger.attachCommand(2, toggleLed);
-            messenger.attachCommand(3, add);
+            messenger.registerCommand(0, ping);
+            messenger.registerCommand(1, setLed);
+            messenger.registerCommand(2, toggleLed);
+            messenger.registerCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x03, 0x07, 0x02 });
             messenger.update();
@@ -172,7 +172,7 @@ namespace emb
                 messenger.write(ledState);
             };
 
-            messenger.attachCommand(0, toggleLed);
+            messenger.registerCommand(0, toggleLed);
 
             buffer.addHostMessage({ 0x01, DataType::kUint8, 0xFE, 0x00, DataType::kUint16, 0x03, 0xE8 });
             messenger.update();
@@ -205,7 +205,7 @@ namespace emb
                 messenger.write(ledState);
             };
 
-            messenger.attachCommand(0, toggleLed);
+            messenger.registerCommand(0, toggleLed);
 
             buffer.addHostMessage({ 0x01, DataType::kUint8, 0xFE, 0x00, DataType::kUint16, 0x03, 0xE8 });
             messenger.update();
@@ -239,7 +239,7 @@ namespace emb
                 messenger.write(ledState);
             };
 
-            messenger.attachCommand(0, toggleLed);
+            messenger.registerCommand(0, toggleLed);
 
             buffer.addHostMessage({ 0x01, DataType::kUint8, 0xFE, 0x00, DataType::kUint16, 0x03, 0xE8 });
             messenger.update();
@@ -280,10 +280,10 @@ namespace emb
                 messenger.write(a + b);
             };
 
-            messenger.attachCommand(0, ping);
-            messenger.attachCommand(1, setLed);
-            messenger.attachCommand(2, toggleLed);
-            messenger.attachCommand(3, add);
+            messenger.registerCommand(0, ping);
+            messenger.registerCommand(1, setLed);
+            messenger.registerCommand(2, toggleLed);
+            messenger.registerCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x03, DataType::kBoolTrue });
             buffer.addHostMessage({ 0x02, 0x03, 0x07 });
@@ -319,10 +319,10 @@ namespace emb
                 messenger.write(a + b);
             };
 
-            messenger.attachCommand(0, ping);
-            messenger.attachCommand(1, setLed);
-            messenger.attachCommand(2, toggleLed);
-            messenger.attachCommand(3, add);
+            messenger.registerCommand(0, ping);
+            messenger.registerCommand(1, setLed);
+            messenger.registerCommand(2, toggleLed);
+            messenger.registerCommand(3, add);
 
             buffer.addHostMessage({ 0x01, 0x03, 0x00, 0x07 });
             buffer.addHostMessage({ 0x02, 0x03, 0x07, 0x00 });
@@ -344,7 +344,7 @@ namespace emb
 
             std::function<void()> ping = [&] {};
 
-            messenger.attachCommand(0, ping);
+            messenger.registerCommand(0, ping);
 
             buffer.addHostMessage({});
             buffer.addHostMessage({ DataType::kBoolFalse });
@@ -366,7 +366,7 @@ namespace emb
 
             std::function<void()> ping = [&] {};
 
-            messenger.attachCommand(0, ping);
+            messenger.registerCommand(0, ping);
 
             buffer.addHostMessage({ 0x01 });
             buffer.addHostMessage({ 0x02, DataType::kBoolFalse });
@@ -388,7 +388,7 @@ namespace emb
 
             std::function<void()> ping = [&] {};
 
-            messenger.attachCommand(0, ping);
+            messenger.registerCommand(0, ping);
 
             buffer.addHostMessage({ 0x01, 0x01 });
             buffer.addHostMessage({ 0x02, 0x02 });
@@ -411,7 +411,7 @@ namespace emb
 
             std::function<void()> ping = [&] {};
 
-            messenger.attachCommand(0, ping);
+            messenger.registerCommand(0, ping);
 
             buffer.addHostMessage({ 0x01, 0x00 });
             messenger.update();
@@ -430,7 +430,7 @@ namespace emb
 
             std::function<void()> ping = [&] {};
 
-            messenger.attachCommand(0, ping);
+            messenger.registerCommand(0, ping);
 
             buffer.addHostMessage({ 0x01, 0x00, DataType::kBoolFalse });
             messenger.update();
