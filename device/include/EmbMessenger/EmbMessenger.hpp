@@ -51,7 +51,7 @@ namespace emb
         template <typename F, typename... Args>
         using result_of_t = decltype(declval<F>()(declval<Args>()...));
 
-        template <typename T, typename F, typename = void>
+        template <typename T, typename F, typename = bool>
         struct is_validator
         {
             using type = false_type;
@@ -59,7 +59,7 @@ namespace emb
 
         template <typename T, typename F>
         struct is_validator<
-            T, F, void_t<decltype(static_cast<bool>(declval<result_of_t<F, T&>>()))>>
+            T, F, decltype(static_cast<bool>(declval<result_of_t<F, T&>>()))>
         {
             using type = true_type;
         };
