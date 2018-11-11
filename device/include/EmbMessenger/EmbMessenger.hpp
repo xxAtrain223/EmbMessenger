@@ -80,15 +80,15 @@ namespace emb
         using MillisFunction = uint32_t (*)(void);
 #else
         using CommandFunction = std::function<void()>;
-        using MillisFunction = std::function<uint32_t()>;
+        using TimeFunction = std::function<uint32_t()>;
 #endif
 
         struct PeriodicCommand
         {
             uint8_t command_id = 255;
             uint16_t message_id = 0;
-            uint32_t millis_interval = 0;
-            uint32_t next_millis = 0;
+            uint32_t time_interval = 0;
+            uint32_t next_time = 0;
         };
 
         IBuffer* m_buffer;
@@ -103,7 +103,7 @@ namespace emb
 
         uint16_t m_parameter_index;
 
-        MillisFunction m_millis;
+        TimeFunction m_time_func;
 
         CommandFunction m_commands[MaxCommands];
         PeriodicCommand m_periodic_commands[MaxPeriodicCommands];
@@ -161,8 +161,8 @@ namespace emb
             {
                 m_periodic_commands[i].command_id = 255;
                 m_periodic_commands[i].message_id = 0;
-                m_periodic_commands[i].millis_interval = 0;
-                m_periodic_commands[i].next_millis = 0;
+                m_periodic_commands[i].time_interval = 0;
+                m_periodic_commands[i].next_time = 0;
             }
         }
 
@@ -185,8 +185,8 @@ namespace emb
                 {
                     m_periodic_commands[i].command_id = periodic_command_id;
                     m_periodic_commands[i].message_id = m_message_id;
-                    m_periodic_commands[i].millis_interval = periodic_interval;
-                    m_periodic_commands[i].next_millis = m_millis();
+                    m_periodic_commands[i].time_interval = periodic_interval;
+                    m_periodic_commands[i].next_time = m_time_func();
                     registeredCommand = true;
                     break;
                 }
@@ -213,8 +213,8 @@ namespace emb
 
                     m_periodic_commands[i].command_id = 255;
                     m_periodic_commands[i].message_id = 0;
-                    m_periodic_commands[i].millis_interval = 0;
-                    m_periodic_commands[i].next_millis = 0;
+                    m_periodic_commands[i].time_interval = 0;
+                    m_periodic_commands[i].next_time = 0;
                     return;
                 }
             }
@@ -223,11 +223,11 @@ namespace emb
         }
 
        public:
-        EmbMessenger(IBuffer* buffer, MillisFunction millis = []() { return 0; }) :
+        EmbMessenger(IBuffer* buffer, TimeFunction timeFunc = []() { return 0; }) :
             m_buffer(buffer),
             m_reader(buffer),
             m_writer(buffer),
-            m_millis(millis)
+            m_time_func(timeFunc)
         {
             static_assert(MaxCommands < 0xF0, "MaxCommands must be less than 0xF0 (240)");
             static_assert(MaxPeriodicCommands < 0xF0, "MaxPeriodicCommands must be less than 0xF0 (240)");
@@ -353,10 +353,10 @@ namespace emb
             }
 
             m_is_periodic = true;
-            uint32_t mil = m_millis();
+            uint32_t current_time = m_time_func();
             for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
             {
-                if (m_periodic_commands[i].command_id < 0xF0 && m_periodic_commands[i].next_millis <= mil)
+                if (m_periodic_commands[i].command_id < 0xF0 && m_periodic_commands[i].next_time <= current_time)
                 {
                     m_command_id = m_periodic_commands[i].command_id;
                     m_message_id = m_periodic_commands[i].message_id;
@@ -368,8 +368,8 @@ namespace emb
                         m_commands[m_command_id]();
                     }
                     m_writer.writeCrc();
-                    m_periodic_commands[i].next_millis += m_periodic_commands[i].millis_interval;
-                    mil = m_millis();
+                    m_periodic_commands[i].next_time += m_periodic_commands[i].time_interval;
+                    current_time = m_time_func();
                 }
             }
         }
