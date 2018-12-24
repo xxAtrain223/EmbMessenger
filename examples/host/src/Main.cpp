@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     }
     
     HostBuffer<64> buffer(&serial);
-    emb::EmbMessenger messenger(&buffer, [&](std::exception_ptr eptr){
+    emb::host::EmbMessenger messenger(&buffer, [&](std::exception_ptr eptr){
         try
         {
             std::rethrow_exception(eptr);

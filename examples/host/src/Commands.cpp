@@ -7,7 +7,7 @@ SetLed::SetLed(bool ledState)
     m_type_index = typeid(SetLed);
 }
 
-void SetLed::send(emb::EmbMessenger* messenger)
+void SetLed::send(emb::host::EmbMessenger* messenger)
 {
     messenger->write(m_ledState);
 }
@@ -17,7 +17,7 @@ ToggleLed::ToggleLed()
     m_type_index = typeid(ToggleLed);
 }
 
-void ToggleLed::receive(emb::EmbMessenger* messenger)
+void ToggleLed::receive(emb::host::EmbMessenger* messenger)
 {
     messenger->read(m_ledState);
 }
@@ -34,12 +34,12 @@ Add::Add(int16_t a, int16_t b)
     m_rv = 0;
 }
 
-void Add::send(emb::EmbMessenger* messenger)
+void Add::send(emb::host::EmbMessenger* messenger)
 {
     messenger->write(m_a, m_b);
 }
 
-void Add::receive(emb::EmbMessenger* messenger)
+void Add::receive(emb::host::EmbMessenger* messenger)
 {
     messenger->read(m_rv);
 }
@@ -64,7 +64,7 @@ DelayMs::DelayMs(uint16_t ms)
     m_ms = ms;
 }
 
-void DelayMs::send(emb::EmbMessenger* messenger)
+void DelayMs::send(emb::host::EmbMessenger* messenger)
 {
     messenger->write(m_ms);
 }

@@ -6,28 +6,31 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        NEW_DEVICE_EX(0x42, UserErrorException);
-
-        class UserError : public Command
+        namespace test
         {
-            void reportError(const uint8_t error, const int16_t data, std::shared_ptr<Command> ptr)
-            {
-                switch (error)
-                {
-                    case 0x42:
-                        throw UserErrorException("Something happened on the device", ptr);
-                }
-            }
+            NEW_DEVICE_EX(0x42, UserErrorException);
 
-           public:
-            UserError()
+            class UserError : public Command
             {
-                m_type_index = typeid(UserError);
-            }
-        };
-    }  // namespace test
+                void reportError(const uint8_t error, const int16_t data, std::shared_ptr<Command> ptr)
+                {
+                    switch (error)
+                    {
+                        case 0x42:
+                            throw UserErrorException("Something happened on the device", ptr);
+                    }
+                }
+
+            public:
+                UserError()
+                {
+                    m_type_index = typeid(UserError);
+                }
+            };
+        }  // namespace test
+    }  // namespace host
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_USERERROR_HPP

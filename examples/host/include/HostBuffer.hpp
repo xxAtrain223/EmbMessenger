@@ -8,7 +8,7 @@
 #include <serial.h>
 
 template <uint8_t BufferSize>
-class HostBuffer : public emb::IBuffer
+class HostBuffer : public emb::shared::IBuffer
 {
 protected:
     serial_t* m_serial;
@@ -39,7 +39,7 @@ public:
     uint8_t readByte() override
     {
         uint8_t byte = m_buffer[m_readFront];
-        if (m_buffer[(BufferSize + m_readFront - 1) % BufferSize] == emb::DataType::kCrc)
+        if (m_buffer[(BufferSize + m_readFront - 1) % BufferSize] == emb::shared::DataType::kCrc)
         {
             --m_numberMessages;
         }
@@ -69,7 +69,7 @@ public:
         {
             serial_read(m_serial, m_buffer + m_streamFront, 1, 1000);
             //printf("read  0x%02X\n", m_buffer[m_streamFront]);
-            if (m_buffer[(BufferSize + m_streamFront - 1) % BufferSize] == emb::DataType::kCrc)
+            if (m_buffer[(BufferSize + m_streamFront - 1) % BufferSize] == emb::shared::DataType::kCrc)
             {
                 ++m_numberMessages;
             }

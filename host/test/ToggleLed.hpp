@@ -5,24 +5,27 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        class ToggleLed : public Command
+        namespace test
         {
-           public:
-            bool ledState;
-
-            ToggleLed()
+            class ToggleLed : public Command
             {
-                m_type_index = typeid(ToggleLed);
-            }
+            public:
+                bool ledState;
 
-            void receive(EmbMessenger* messenger)
-            {
-                messenger->read(ledState);
-            }
-        };
-    }  // namespace test
+                ToggleLed()
+                {
+                    m_type_index = typeid(ToggleLed);
+                }
+
+                void receive(EmbMessenger* messenger)
+                {
+                    messenger->read(ledState);
+                }
+            };
+        }  // namespace test
+    }  // namespace host
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_TOGGLELED_HPP

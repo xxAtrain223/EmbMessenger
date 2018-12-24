@@ -7,21 +7,24 @@
 
 namespace emb
 {
-    namespace test
+    namespace shared
     {
-        class MockBuffer : public IBuffer
+        namespace test
         {
-           public:
-            MOCK_METHOD1(writeByte, void(const uint8_t byte));
-            MOCK_CONST_METHOD0(peek, uint8_t());
-            MOCK_METHOD0(readByte, uint8_t());
-            MOCK_CONST_METHOD0(empty, bool());
-            MOCK_CONST_METHOD0(size, size_t());
-            MOCK_CONST_METHOD0(messages, uint8_t());
-            MOCK_METHOD0(update, void());
-            MOCK_METHOD0(zero, void());
-        };
-    }  // namespace test
+            class MockBuffer : public IBuffer
+            {
+            public:
+                MOCK_METHOD1(writeByte, void(const uint8_t byte));
+                MOCK_CONST_METHOD0(peek, uint8_t());
+                MOCK_METHOD0(readByte, uint8_t());
+                MOCK_CONST_METHOD0(empty, bool());
+                MOCK_CONST_METHOD0(size, size_t());
+                MOCK_CONST_METHOD0(messages, uint8_t());
+                MOCK_METHOD0(update, void());
+                MOCK_METHOD0(zero, void());
+            };
+        }  // namespace test
+    }  // namespace shared
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_MOCKBUFFER_HPP

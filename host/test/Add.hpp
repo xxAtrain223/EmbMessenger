@@ -6,34 +6,37 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        class Add : public Command
+        namespace test
         {
-           protected:
-            int A, B;
-
-           public:
-            int Result;
-
-            Add(int a, int b)
+            class Add : public Command
             {
-                m_type_index = typeid(Add);
-                A = a;
-                B = b;
-            }
+            protected:
+                int A, B;
 
-            void send(EmbMessenger* messenger)
-            {
-                messenger->write(A, B);
-            }
+            public:
+                int Result;
 
-            void receive(EmbMessenger* messenger)
-            {
-                messenger->read(Result);
-            }
-        };
-    }  // namespace test
+                Add(int a, int b)
+                {
+                    m_type_index = typeid(Add);
+                    A = a;
+                    B = b;
+                }
+
+                void send(EmbMessenger* messenger)
+                {
+                    messenger->write(A, B);
+                }
+
+                void receive(EmbMessenger* messenger)
+                {
+                    messenger->read(Result);
+                }
+            };
+        }  // namespace test
+    }  // namespace host
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_SETLED_HPP

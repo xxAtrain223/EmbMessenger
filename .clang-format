@@ -1,5 +1,6 @@
 ﻿---
 BasedOnStyle: Google
+AccessModifierOffset: -4
 AllowShortBlocksOnASingleLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: None

@@ -5,17 +5,20 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        class Ping : public Command
+        namespace test
         {
-           public:
-            Ping()
+            class Ping : public Command
             {
-                m_type_index = typeid(Ping);
-            }
-        };
-    }  // namespace test
+            public:
+                Ping()
+                {
+                    m_type_index = typeid(Ping);
+                }
+            };
+        }  // namespace test
+    }  // namespace host
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_PING_HPP

@@ -5,26 +5,29 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        class SetLed : public Command
+        namespace test
         {
-           protected:
-            bool ledState;
-
-           public:
-            SetLed(bool state)
+            class SetLed : public Command
             {
-                ledState = state;
-                m_type_index = typeid(SetLed);
-            }
+            protected:
+                bool ledState;
 
-            void send(EmbMessenger* messenger)
-            {
-                messenger->write(ledState);
-            }
-        };
-    }  // namespace test
+            public:
+                SetLed(bool state)
+                {
+                    ledState = state;
+                    m_type_index = typeid(SetLed);
+                }
+
+                void send(EmbMessenger* messenger)
+                {
+                    messenger->write(ledState);
+                }
+            };
+        }  // namespace test
+    }  // namespace host
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_SETLED_HPP

@@ -8,51 +8,54 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        class FakeBuffer : public IBuffer
+        namespace test
         {
-           protected:
-            std::vector<uint8_t> host;
-            std::vector<uint8_t> device;
-            int deviceMessages = 0;
-            bool readCrc = false;
-            bool validCrc = true;
+            class FakeBuffer : public shared::IBuffer
+            {
+            protected:
+                std::vector<uint8_t> host;
+                std::vector<uint8_t> device;
+                int deviceMessages = 0;
+                bool readCrc = false;
+                bool validCrc = true;
 
-           public:
-            /**
-             * @brief Appends a message to the device buffer, auto adds crc.
-             *   Used for adding a message to be read by the host.
-             *
-             * @param message Message to append
-             */
-            void addDeviceMessage(std::vector<uint8_t>&& message);
+            public:
+                /**
+                 * @brief Appends a message to the device buffer, auto adds crc.
+                 *   Used for adding a message to be read by the host.
+                 *
+                 * @param message Message to append
+                 */
+                void addDeviceMessage(std::vector<uint8_t>&& message);
 
-            /**
-             * @brief Checks if the message is in the host buffer, auto adds crc.
-             *   Used for checking if the host wrote what was expected.
-             *   Removes the number of elements in message from the host buffer.
-             *
-             * @param message Message to check for in the host buffer
-             *
-             * @returns True if the message was in the host buffer
-             */
-            bool checkHostBuffer(std::vector<uint8_t>&& message);
+                /**
+                 * @brief Checks if the message is in the host buffer, auto adds crc.
+                 *   Used for checking if the host wrote what was expected.
+                 *   Removes the number of elements in message from the host buffer.
+                 *
+                 * @param message Message to check for in the host buffer
+                 *
+                 * @returns True if the message was in the host buffer
+                 */
+                bool checkHostBuffer(std::vector<uint8_t>&& message);
 
-            bool buffersEmpty();
+                bool buffersEmpty();
 
-            void writeValidCrc(const bool value);
+                void writeValidCrc(const bool value);
 
-            virtual void writeByte(const uint8_t byte) override;
-            virtual uint8_t peek() const override;
-            virtual uint8_t readByte() override;
-            virtual bool empty() const override;
-            virtual size_t size() const override;
-            virtual uint8_t messages() const override;
-            virtual void update() override;
-            virtual void zero() override;
-        };
-    }  // namespace test
+                virtual void writeByte(const uint8_t byte) override;
+                virtual uint8_t peek() const override;
+                virtual uint8_t readByte() override;
+                virtual bool empty() const override;
+                virtual size_t size() const override;
+                virtual uint8_t messages() const override;
+                virtual void update() override;
+                virtual void zero() override;
+            };
+        }  // namespace test
+    } // namespace host
 }  // namespace emb
 
 #endif  // EMBMESSENGER_TEST_FAKEBUFFER_HPP

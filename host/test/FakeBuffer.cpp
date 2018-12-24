@@ -6,109 +6,112 @@
 
 namespace emb
 {
-    namespace test
+    namespace host
     {
-        void FakeBuffer::addDeviceMessage(std::vector<uint8_t>&& message)
+        namespace test
         {
-            uint8_t crc = 0;
-
-            auto addByte = [&](uint8_t byte) {
-                device.emplace_back(byte);
-                crc = crc::Calculate8(crc, byte);
-            };
-
-            for (uint8_t byte : message)
+            void FakeBuffer::addDeviceMessage(std::vector<uint8_t>&& message)
             {
-                addByte(byte);
+                uint8_t crc = 0;
+
+                auto addByte = [&](uint8_t byte) {
+                    device.emplace_back(byte);
+                    crc = shared::crc::Calculate8(crc, byte);
+                };
+
+                for (uint8_t byte : message)
+                {
+                    addByte(byte);
+                }
+                addByte(shared::DataType::kCrc);
+                addByte(crc + !validCrc);
+
+                ++deviceMessages;
             }
-            addByte(DataType::kCrc);
-            addByte(crc + !validCrc);
 
-            ++deviceMessages;
-        }
-
-        bool FakeBuffer::checkHostBuffer(std::vector<uint8_t>&& message)
-        {
-            uint8_t crc = 0;
-
-            for (uint8_t byte : message)
+            bool FakeBuffer::checkHostBuffer(std::vector<uint8_t>&& message)
             {
-                crc = crc::Calculate8(crc, byte);
+                uint8_t crc = 0;
+
+                for (uint8_t byte : message)
+                {
+                    crc = shared::crc::Calculate8(crc, byte);
+                }
+                message.emplace_back(shared::DataType::kCrc);
+                crc = shared::crc::Calculate8(crc, shared::DataType::kCrc);
+                message.emplace_back(crc);
+
+                bool rv = host == message;
+
+                host.erase(std::begin(host), std::begin(host) + message.size());
+
+                return rv;
             }
-            message.emplace_back(DataType::kCrc);
-            crc = crc::Calculate8(crc, DataType::kCrc);
-            message.emplace_back(crc);
 
-            bool rv = host == message;
-
-            host.erase(std::begin(host), std::begin(host) + message.size());
-
-            return rv;
-        }
-
-        bool FakeBuffer::buffersEmpty()
-        {
-            return host.empty() && device.empty();
-        }
-
-        void FakeBuffer::writeValidCrc(bool value)
-        {
-            validCrc = value;
-        }
-
-        void FakeBuffer::writeByte(const uint8_t byte)
-        {
-            host.emplace_back(byte);
-        }
-
-        uint8_t FakeBuffer::peek() const
-        {
-            return device.front();
-        }
-
-        uint8_t FakeBuffer::readByte()
-        {
-            uint8_t byte = device.front();
-            device.erase(std::begin(device));
-
-            if (byte == DataType::kCrc)
+            bool FakeBuffer::buffersEmpty()
             {
-                readCrc = true;
+                return host.empty() && device.empty();
             }
-            else if (readCrc == true)
+
+            void FakeBuffer::writeValidCrc(bool value)
             {
+                validCrc = value;
+            }
+
+            void FakeBuffer::writeByte(const uint8_t byte)
+            {
+                host.emplace_back(byte);
+            }
+
+            uint8_t FakeBuffer::peek() const
+            {
+                return device.front();
+            }
+
+            uint8_t FakeBuffer::readByte()
+            {
+                uint8_t byte = device.front();
+                device.erase(std::begin(device));
+
+                if (byte == shared::DataType::kCrc)
+                {
+                    readCrc = true;
+                }
+                else if (readCrc == true)
+                {
+                    readCrc = false;
+                    --deviceMessages;
+                }
+
+                return byte;
+            }
+
+            bool FakeBuffer::empty() const
+            {
+                return device.empty();
+            }
+
+            size_t FakeBuffer::size() const
+            {
+                return device.size();
+            }
+
+            uint8_t FakeBuffer::messages() const
+            {
+                return deviceMessages;
+            }
+
+            void FakeBuffer::update()
+            {
+                (void)0;  // Noop
+            }
+
+            void FakeBuffer::zero()
+            {
+                deviceMessages = 0;
+                device.clear();
                 readCrc = false;
-                --deviceMessages;
             }
-
-            return byte;
-        }
-
-        bool FakeBuffer::empty() const
-        {
-            return device.empty();
-        }
-
-        size_t FakeBuffer::size() const
-        {
-            return device.size();
-        }
-
-        uint8_t FakeBuffer::messages() const
-        {
-            return deviceMessages;
-        }
-
-        void FakeBuffer::update()
-        {
-            (void)0;  // Noop
-        }
-
-        void FakeBuffer::zero()
-        {
-            deviceMessages = 0;
-            device.clear();
-            readCrc = false;
-        }
-    }  // namespace test
+        }  // namespace test
+    }  // namespace host
 }  // namespace emb
