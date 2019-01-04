@@ -16,10 +16,10 @@ cd ../device
 popd
 
 cd shared
-cppcheck src/*.cpp include/*.hpp
+cppcheck src/*.cpp include/EmbMessenger/*.hpp
 
 cd ../host
-cppcheck src/*.cpp include/*.hpp
+cppcheck src/*.cpp include/EmbMessenger/*.hpp
 
 cd ../device
-cppcheck src/*.cpp include/*.hpp
+cppcheck src/*.cpp include/EmbMessenger/*.hpp
