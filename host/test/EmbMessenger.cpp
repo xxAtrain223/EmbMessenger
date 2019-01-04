@@ -213,7 +213,7 @@ namespace emb
                 FakeBuffer buffer;
 
                 ASSERT_THROW(EmbMessenger messenger(&buffer, std::chrono::milliseconds(20)),
-                             InitializingErrorHostException);
+                             InitializationError);
             }
 
             TEST(messenger_exceptions_host, no_messages_available)
@@ -246,7 +246,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
                 buffer.addDeviceMessage({ shared::DataType::kBoolFalse });
 
-                ASSERT_THROW(messenger.update(), MessageIdReadErrorHostException);
+                ASSERT_THROW(messenger.update(), MessageIdReadError);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -270,7 +270,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x02 }));
                 buffer.addDeviceMessage({ 0x01, 0x07 });
 
-                ASSERT_THROW(messenger.update(), ParameterReadErrorHostException);
+                ASSERT_THROW(messenger.update(), ParameterReadError);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -296,7 +296,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
                 buffer.addDeviceMessage({ 0x01 });
 
-                ASSERT_THROW(messenger.update(), CrcInvalidHostException);
+                ASSERT_THROW(messenger.update(), CrcInvalid);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -311,7 +311,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x01 });
 
-                ASSERT_THROW(messenger.update(), MessageIdInvalidHostException);
+                ASSERT_THROW(messenger.update(), MessageIdInvalid);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -335,7 +335,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x02 }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kBoolFalse, 0x42 });
 
-                ASSERT_THROW(messenger.update(), ExtraParametersHostException);
+                ASSERT_THROW(messenger.update(), ExtraParameters);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -350,7 +350,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ shared::DataType::kError, shared::DataError::kMessageIdReadError });
 
-                ASSERT_THROW(messenger.update(), MessageIdReadErrorDeviceException);
+                ASSERT_THROW(messenger.update(), MessageIdReadError);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -374,7 +374,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kCommandIdReadError });
 
-                ASSERT_THROW(messenger.update(), CommandIdReadErrorDeviceException);
+                ASSERT_THROW(messenger.update(), CommandIdReadError);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -399,7 +399,7 @@ namespace emb
                 buffer.addDeviceMessage(
                     { 0x01, shared::DataType::kError, shared::DataError::kParameterReadError, 0x00 });
 
-                ASSERT_THROW(messenger.update(), ParameterReadErrorDeviceException);
+                ASSERT_THROW(messenger.update(), ParameterReadError);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -423,7 +423,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x01, shared::DataType::kBoolTrue }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kParameterInvalid, 0x00 });
 
-                ASSERT_THROW(messenger.update(), ParameterInvalidDeviceException);
+                ASSERT_THROW(messenger.update(), ParameterInvalid);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -447,7 +447,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x01, shared::DataType::kBoolTrue }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kExtraParameters });
 
-                ASSERT_THROW(messenger.update(), ExtraParametersDeviceException);
+                ASSERT_THROW(messenger.update(), ExtraParameters);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -471,31 +471,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kCrcReadError });
 
-                ASSERT_THROW(messenger.update(), CrcReadErrorDeviceException);
-
-                ASSERT_TRUE(buffer.buffersEmpty());
-            }
-
-            TEST(messenger_exceptions_device, message_id_invalid)
-            {
-                FakeBuffer buffer;
-
-                buffer.addDeviceMessage({ 0x00 });
-                EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
-
-                messenger.registerCommand<Ping>(0);
-                messenger.registerCommand<SetLed>(1);
-                messenger.registerCommand<ToggleLed>(2);
-                messenger.registerCommand<Add>(3);
-
-                auto setLedCommand = std::make_shared<Ping>();
-                messenger.send(setLedCommand);
-
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
-                buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kMessageIdInvalid });
-
-                ASSERT_THROW(messenger.update(), MessageIdInvalidDeviceException);
+                ASSERT_THROW(messenger.update(), CrcReadError);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -519,7 +495,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x02 }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kCommandIdInvalid });
 
-                ASSERT_THROW(messenger.update(), CommandIdInvalidDeviceException);
+                ASSERT_THROW(messenger.update(), CommandIdInvalid);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -543,7 +519,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, shared::DataError::kCrcInvalid });
 
-                ASSERT_THROW(messenger.update(), CrcInvalidDeviceException);
+                ASSERT_THROW(messenger.update(), CrcInvalid);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -570,7 +546,7 @@ namespace emb
                 buffer.addDeviceMessage(
                     { 0x01, shared::DataType::kError, shared::DataError::kOutOfPeriodicCommandSlots });
 
-                ASSERT_THROW(messenger.update(), OutOfPeriodicCommandSlotsDeviceException);
+                ASSERT_THROW(messenger.update(), OutOfPeriodicCommandSlots);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
@@ -612,7 +588,7 @@ namespace emb
                 ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x00 }));
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kError, 0x43 });
 
-                ASSERT_THROW(messenger.update(), DeviceException);
+                ASSERT_THROW(messenger.update(), BaseException);
 
                 ASSERT_TRUE(buffer.buffersEmpty());
             }

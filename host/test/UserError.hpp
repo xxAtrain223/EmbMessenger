@@ -10,7 +10,7 @@ namespace emb
     {
         namespace test
         {
-            NEW_DEVICE_EX(0x42, UserErrorException);
+            NEW_EX_SOURCE(UserErrorException, Device);
 
             class UserError : public Command
             {

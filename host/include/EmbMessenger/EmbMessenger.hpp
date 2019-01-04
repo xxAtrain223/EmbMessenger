@@ -105,7 +105,7 @@ namespace emb
                 readErrors();
                 if (!m_reader.read(arg))
                 {
-                    throw ParameterReadErrorHostException(m_parameter_index, m_current_command);
+                    throw ParameterReadError(ExceptionSource::Host, m_parameter_index, m_current_command);
                 }
                 ++m_parameter_index;
                 read(args...);

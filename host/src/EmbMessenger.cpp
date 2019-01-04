@@ -2,6 +2,8 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <sstream>
+#include <iomanip>
 
 namespace emb
 {
@@ -59,7 +61,7 @@ namespace emb
             }
             else
             {
-                throw InitializingErrorHostException("Timed out initializing connection");
+                throw InitializationError("Timed out initializing connection");
             }
 
 #ifndef EMB_SINGLE_THREADED
@@ -109,7 +111,7 @@ namespace emb
         {
             if (command->getTypeIndex() == typeid(Command))
             {
-                throw InvalidCommandTypeIndexHostException(
+                throw InvalidCommandTypeIndex(
                     "Command has an invalid type index, override it in your command derived class.", command);
             }
 
@@ -153,7 +155,7 @@ namespace emb
             if (!m_reader.read(message_id))
             {
                 consumeMessage();
-                throw MessageIdReadErrorHostException("Error reading message Id");
+                throw MessageIdReadError(ExceptionSource::Host, "Error reading message Id");
             }
 
             try
@@ -166,7 +168,7 @@ namespace emb
             catch (std::out_of_range e)
             {
                 consumeMessage();
-                throw MessageIdInvalidHostException("No command to receive message from the device", m_current_command);
+                throw MessageIdInvalid("No command to receive message from the device", m_current_command);
             }
 
             m_parameter_index = 0;
@@ -206,7 +208,7 @@ namespace emb
                     std::lock_guard<std::mutex> lock(m_commands_mutex);
 #endif
                     m_commands.erase(message_id);
-                    throw CrcInvalidHostException("Crc from the device was invalid", m_current_command);
+                    throw CrcInvalid(ExceptionSource::Host, "Crc from the device was invalid", m_current_command);
                 }
             }
             else
@@ -216,7 +218,7 @@ namespace emb
                 std::lock_guard<std::mutex> lock(m_commands_mutex);
 #endif
                 m_commands.erase(message_id);
-                throw ExtraParametersHostException("Message has extra parameters from the device", m_current_command);
+                throw ExtraParameters(ExceptionSource::Host, "Message has extra parameters from the device", m_current_command);
             }
 
 #ifndef EMB_SINGLE_THREADED
@@ -267,43 +269,43 @@ namespace emb
                 switch (error)
                 {
                     case shared::DataError::kExtraParameters:
-                        throw ExtraParametersDeviceException("The device received one or more extra parameters",
+                        throw ExtraParameters(ExceptionSource::Device, "The device received one or more extra parameters",
                                                              m_current_command);
                     case shared::DataError::kOutOfPeriodicCommandSlots:
-                        throw OutOfPeriodicCommandSlotsDeviceException("The device ran out of periodic command slots",
+                        throw OutOfPeriodicCommandSlots("The device ran out of periodic command slots",
                                                                        m_current_command);
                     case shared::DataError::kParameterReadError:
-                        throw ParameterReadErrorDeviceException(data, m_current_command);
+                        throw ParameterReadError(ExceptionSource::Device, data, m_current_command);
                     case shared::DataError::kMessageIdReadError:
-                        throw MessageIdReadErrorDeviceException(
+                        throw MessageIdReadError(ExceptionSource::Device,
                             "The device encountered an error reading the message id", m_current_command);
                     case shared::DataError::kCommandIdReadError:
-                        throw CommandIdReadErrorDeviceException(
+                        throw CommandIdReadError(
                             "The device encountered an error reading the command id", m_current_command);
                     case shared::DataError::kCrcReadError:
-                        throw CrcReadErrorDeviceException("The device encountered an error reading the CRC",
+                        throw CrcReadError(ExceptionSource::Device, "The device encountered an error reading the CRC",
                                                           m_current_command);
                     case shared::DataError::kParameterInvalid:
-                        throw ParameterInvalidDeviceException(data, m_current_command);
-                    case shared::DataError::kMessageIdInvalid:
-                        throw MessageIdInvalidDeviceException("The device read an invalid message id",
-                                                              m_current_command);
+                        throw ParameterInvalid(data, m_current_command);
                     case shared::DataError::kCommandIdInvalid:
-                        throw CommandIdInvalidDeviceException("The device read an invalid command id",
+                        throw CommandIdInvalid("The device read an invalid command id",
                                                               m_current_command);
                     case shared::DataError::kCrcInvalid:
-                        throw CrcInvalidDeviceException("The device read an invalid CRC", m_current_command);
+                        throw CrcInvalid(ExceptionSource::Device, "The device read an invalid CRC", m_current_command);
                     default:
                         m_current_command->reportError(error, data, m_current_command);
-                        throw DeviceException(error, "The device reported a user defined error.", m_current_command);
+                        std::stringstream stream;
+                        stream << std::hex << error;
+                        throw BaseException(ExceptionSource::Device, "The device reported a user defined error. 0x" + stream.str(), m_current_command);
                 }
             }
         }
 
         void EmbMessenger::consumeMessage()
         {
-            for (uint8_t n = m_buffer->messages(); n > 0 && n == m_buffer->messages(); m_buffer->readByte())
-                ;
+            for (uint8_t n = m_buffer->messages(); 
+                 n > 0 && n == m_buffer->messages(); 
+                 m_buffer->readByte());
         }
 
         EmbMessenger::ResetCommand::ResetCommand()
