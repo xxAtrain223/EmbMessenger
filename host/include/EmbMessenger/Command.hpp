@@ -31,10 +31,6 @@ namespace emb
             friend class EmbMessenger;
 
         protected:
-            /**
-             * @brief JKLLJKL
-             * 
-             */
             std::type_index m_type_index;
             uint16_t m_message_id;
             std::function<void(std::shared_ptr<Command>)> m_callback = nullptr;

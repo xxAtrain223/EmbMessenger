@@ -109,10 +109,15 @@ namespace emb
 
         std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command)
         {
-            if (command->getTypeIndex() == typeid(Command))
+            std::type_index type_index = command->getTypeIndex();
+            uint8_t command_id = 0;
+            try
             {
-                throw InvalidCommandTypeIndex(
-                    "Command has an invalid type index, override it in your command derived class.", command);
+                command_id = m_command_ids.at(type_index);
+            }
+            catch (const std::out_of_range& e)
+            {
+                throw UnregisteredCommand("The command was not registered.");
             }
 
             command->m_message_id = m_message_id;

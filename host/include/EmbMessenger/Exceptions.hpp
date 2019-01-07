@@ -215,6 +215,13 @@ namespace emb
         NEW_EX_SOURCE(MessageIdInvalid, Host);
 
         /**
+         * @brief Exception for an Unregistered Command.
+         * 
+         * Ensure the Command Type is registered with the EmbMessenger.
+         */
+        NEW_EX_SOURCE(UnregisteredCommand, Host);
+
+        /**
          * @brief Exception for Command ID Read Error.
          * 
          * An error occurred while reading the Command ID.

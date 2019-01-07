@@ -21,6 +21,11 @@ namespace emb
 {
     namespace host
     {
+        /**
+         * @brief The messenger class for host computer. 
+         * 
+         * This class is responsible for the communication between the host and device.
+         */
         class EmbMessenger
         {
         protected:
@@ -53,30 +58,98 @@ namespace emb
 
         public:
 #ifdef EMB_SINGLE_THREADED
+            /**
+             * @brief Constructor for the Single Threaded EmbMessenger.
+             * 
+             * @param buffer Buffer for communication
+             * @param init_timeout Time to keep retrying to establish a connection
+             */
             EmbMessenger(shared::IBuffer* buffer, std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
 
+            /**
+             * @brief Public update method for the Single Threaded EmbMessenger.
+             * 
+             * This should be called whenever a message has been received from the device or faster.
+             */
             void update();
 #else
+            /**
+             * @brief Constructor for the Multi Threaded EmbMessenger.
+             * 
+             * @param buffer Buffer for communication
+             * @param exception_handler Handler for exceptions thrown in the update thread
+             * @param init_timeout Time to keep retrying to establish a connection
+             */
             EmbMessenger(shared::IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler,
                          std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
+
+            /**
+             * @brief Destructor for the Multi Threaded EmbMessenger.
+             * 
+             * Stops the update thread and joins it.
+             */
             ~EmbMessenger();
 
+            /**
+             * @brief Get the status of the update thread.
+             * 
+             * @return Returns `true` if the update thread is running
+             */
             bool running() const;
 
+            /**
+             * @brief Tell the update thread to stop running.
+             * 
+             * Does not block, the update thread will stop after finishing its current loop.
+             */
             void stop();
 #endif
 
-            template <typename T>
+            /**
+             * @brief Register a command.
+             * 
+             * @tparam CommandType The Command type
+             * @param id The ID for the command type
+             */
+            template <typename CommandType>
             void registerCommand(const uint8_t id)
             {
-                m_command_ids.emplace(typeid(T), id);
+                static_assert(!std::is_same<Command, CommandType>::value, "You can't register the base class Command.");
+                static_assert(std::is_base_of<Command, CommandType>::value, "Ensure CommandType is derived from Command.");
+                m_command_ids.emplace(typeid(CommandType), id);
             }
 
+            /**
+             * @brief Send a command to the device.
+             * 
+             * Uses `Command::m_type_index` to get the command ID, so be sure to set it in your command's constructor.
+             * 
+             * @param command Command to send
+             * @return std::shared_ptr<Command> Command sent to the device
+             */
             std::shared_ptr<Command> send(std::shared_ptr<Command> command);
 
+            /**
+             * @brief Send a command to the device.
+             * 
+             * Uses `typeid(CommandType)` to get the command ID.
+             * 
+             * @param command Command to send
+             * @return std::shared_ptr<Command> Command sent to the device
+             */
             template <typename CommandType>
             std::shared_ptr<CommandType> send(std::shared_ptr<CommandType> command)
             {
+                uint8_t command_id = 0;
+                try
+                {
+                    command_id = m_command_ids.at(typeid(CommandType));
+                }
+                catch (const std::out_of_range& e)
+                {
+                    throw UnregisteredCommand("The command was not registered.");
+                }
+
                 command->m_message_id = m_message_id;
                 {
 #ifndef EMB_SINGLE_THREADED
@@ -85,13 +158,21 @@ namespace emb
                     m_commands.emplace(m_message_id, command);
                 }
 
-                write(m_message_id++, m_command_ids.at(typeid(CommandType)));
+                write(m_message_id++, command_id);
                 command->send(this);
                 m_writer.writeCrc();
 
                 return command;
             }
 
+            /**
+             * @brief Use in Command::send to write values to the device.
+             * 
+             * @tparam T Type of the first parameter
+             * @tparam Ts Types of the rest of the parameters
+             * @param arg First parameter
+             * @param args The rest of the parameters
+             */
             template <typename T, typename... Ts>
             void write(const T arg, Ts... args)
             {
@@ -99,6 +180,14 @@ namespace emb
                 write(args...);
             }
 
+            /**
+             * @brief Use in Command::receive to read values from the device.
+             * 
+             * @tparam T Type of the first parameter
+             * @tparam Ts Types of the rest of the parameters
+             * @param arg First parameter
+             * @param args The rest of the parameters
+             */
             template <typename T, typename... Ts>
             void read(T& arg, Ts&... args)
             {
@@ -143,14 +232,27 @@ namespace emb
             };
 
         public:
+            /**
+             * @brief Send the Reset command to the device.
+             * 
+             * Resets all periodic commands on the device.
+             */
             void resetDevice();
 
+            /**
+             * @brief Register a Command to be executed on the device periodically.
+             * 
+             * @tparam CommandType The type of the command to send to the device
+             * @tparam CallbackType The type of the callback, this should be `std::function<void(std::shared_ptr<CommandType>)>`
+             * @param period The time to wait between each command execution. The unit is the same as the return value of the time function passed into the device messenger.
+             * @param callback The callback to be called when the periodic command returns a message.
+             * @return std::shared_ptr<CommandType> The command that will be receiving the messages.
+             */
             template <typename CommandType, typename CallbackType>
             std::shared_ptr<CommandType> registerPeriodicCommand(uint32_t period, CallbackType callback)
             {
                 std::shared_ptr<CommandType> periodic_command = std::make_shared<CommandType>();
                 periodic_command->m_is_periodic = true;
-                // Template dumbness/magic https://stackoverflow.com/a/2105906/4776344
                 periodic_command->template setCallback<CommandType>(callback);
                 periodic_command->m_message_id = m_message_id;
 
@@ -171,6 +273,11 @@ namespace emb
                 return periodic_command;
             }
 
+            /**
+             * @brief Unregister a command that is being executed periodically on the device.
+             * 
+             * @tparam CommandType The type of the command that is being executed periodically
+             */
             template <typename CommandType>
             void unregisterPeriodicCommand()
             {
