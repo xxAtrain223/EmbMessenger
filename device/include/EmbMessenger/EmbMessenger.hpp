@@ -28,7 +28,7 @@ namespace emb
         protected:
 #ifndef EMB_TESTING
             using CommandFunction = void (*)(void);
-            using MillisFunction = uint32_t (*)(void);
+            using TimeFunction = uint32_t (*)(void);
 #else
             using CommandFunction = std::function<void()>;
             using TimeFunction = std::function<uint32_t()>;
@@ -176,7 +176,21 @@ namespace emb
             }
 
         public:
-            EmbMessenger(shared::IBuffer* buffer, TimeFunction timeFunc = []() { return 0; }) :
+            EmbMessenger(shared::IBuffer* buffer) :
+                m_buffer(buffer),
+                m_reader(buffer),
+                m_writer(buffer)
+            {
+                static_assert(MaxCommands < 0xF0, "MaxCommands must be less than 0xF0 (240)");
+                static_assert(MaxPeriodicCommands == 0, "TimeFunction required for periodic commands");
+
+                for (uint8_t i = 0; i < MaxCommands; ++i)
+                {
+                    m_commands[i] = nullptr;
+                }
+            }
+
+            EmbMessenger(shared::IBuffer* buffer, TimeFunction timeFunc) :
                 m_buffer(buffer),
                 m_reader(buffer),
                 m_writer(buffer),
@@ -305,24 +319,27 @@ namespace emb
                     m_writer.writeCrc();
                 }
 
-                m_is_periodic = true;
-                uint32_t current_time = m_time_func();
-                for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
+                if (MaxPeriodicCommands > 0)
                 {
-                    if (m_periodic_commands[i].command_id < 0xF0 && m_periodic_commands[i].next_time <= current_time)
+                    m_is_periodic = true;
+                    uint32_t current_time = m_time_func();
+                    for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
                     {
-                        m_command_id = m_periodic_commands[i].command_id;
-                        m_message_id = m_periodic_commands[i].message_id;
-                        m_parameter_index = 0;
-
-                        m_writer.write(m_message_id);
-                        if (setjmp(m_jmp_buf) == 0)
+                        if (m_periodic_commands[i].command_id < 0xF0 && m_periodic_commands[i].next_time <= current_time)
                         {
-                            m_commands[m_command_id]();
+                            m_command_id = m_periodic_commands[i].command_id;
+                            m_message_id = m_periodic_commands[i].message_id;
+                            m_parameter_index = 0;
+
+                            m_writer.write(m_message_id);
+                            if (setjmp(m_jmp_buf) == 0)
+                            {
+                                m_commands[m_command_id]();
+                            }
+                            m_writer.writeCrc();
+                            m_periodic_commands[i].next_time += m_periodic_commands[i].time_interval;
+                            current_time = m_time_func();
                         }
-                        m_writer.writeCrc();
-                        m_periodic_commands[i].next_time += m_periodic_commands[i].time_interval;
-                        current_time = m_time_func();
                     }
                 }
             }
