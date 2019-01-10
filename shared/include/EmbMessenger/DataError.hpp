@@ -1,6 +1,10 @@
 #ifndef EMBMESSENGER_DATAERROR_HPP
 #define EMBMESSENGER_DATAERROR_HPP
 
+/**
+ * @file DataError.hpp
+ */
+
 #include <stdint.h>
 
 namespace emb

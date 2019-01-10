@@ -22,6 +22,14 @@ namespace emb
 
     namespace device
     {
+        /**
+         * @brief The messenger class for the device.
+         * 
+         * EmbMessenger has reserved 16 command IDs for internal usage
+         * 
+         * @tparam MaxCommands The maximum number of commands to store, must be less than `240`
+         * @tparam MaxPeriodicCommands The maximum number of periodic commands to store, must be less than `240`
+         */
         template <uint8_t MaxCommands, uint8_t MaxPeriodicCommands>
         class EmbMessenger
         {
@@ -73,8 +81,7 @@ namespace emb
 
                 if (!validate(value))
                 {
-                    reportError(static_cast<shared::DataError>(shared::DataError::kParameterInvalid),
-                                m_parameter_index - 1u);
+                    reportError(shared::DataError::kParameterInvalid, m_parameter_index - 1u);
                 }
 
                 checkCrc();
@@ -87,8 +94,7 @@ namespace emb
 
                 if (!validate(value))
                 {
-                    reportError(static_cast<shared::DataError>(shared::DataError::kParameterInvalid),
-                                m_parameter_index - 1u);
+                    reportError(shared::DataError::kParameterInvalid, m_parameter_index - 1u);
                 }
 
                 read(args...);
@@ -176,6 +182,13 @@ namespace emb
             }
 
         public:
+            /**
+             * @brief Constructor for EmbMessenger without periodic commands.
+             * 
+             * To use periodic commands, you must pass in a time function. e.g. `millis()`
+             * 
+             * @param buffer Buffer for communication
+             */
             EmbMessenger(shared::IBuffer* buffer) :
                 m_buffer(buffer),
                 m_reader(buffer),
@@ -190,6 +203,12 @@ namespace emb
                 }
             }
 
+            /**
+             * @brief Constructor for EmbMessenger with periodic commands.
+             * 
+             * @param buffer Buffer for communication
+             * @param timeFunc A function that keeps track of the time. e.g. `millis()`
+             */
             EmbMessenger(shared::IBuffer* buffer, TimeFunction timeFunc) :
                 m_buffer(buffer),
                 m_reader(buffer),
@@ -205,8 +224,24 @@ namespace emb
                 }
             }
 
-            bool registerCommand(int id, CommandFunction command)
+            /**
+             * @brief Registers a command
+             * 
+             * Command must be less than `0xF0` (`240`).
+             * Command must be less than MaxCommands.
+             * Command IDs cannot be reused/overridden.
+             * 
+             * @param id Unique ID for the command
+             * @param command The command to be registered
+             * @return True if successful
+             */
+            bool registerCommand(uint8_t id, CommandFunction command)
             {
+                if (id >= 0xF0)
+                {
+                    return false;
+                }
+
                 if (id >= MaxCommands)
                 {
                     return false;
@@ -221,21 +256,51 @@ namespace emb
                 return true;
             }
 
+            /**
+             * @brief Get the Command ID
+             * 
+             * For debugging, to be used within your command for sanity checks.
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @return uint8_t Current command ID
+             */
             uint8_t getCommandId() const
             {
                 return m_command_id;
             }
 
+            /**
+             * @brief Get the Message ID
+             * 
+             * For debugging, to be used within your command for sanity checks.
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @return uint16_t Current Message ID
+             */
             uint16_t getMessageId() const
             {
                 return m_message_id;
             }
 
+            /**
+             * @brief Determine if your command is being executed as a periodic command.
+             * 
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @return true Your command is being executed as a periodic command.
+             * @return false Your command is being executed as a standard command from the host.
+             */
             bool getIsPeriodic() const
             {
                 return m_is_periodic;
             }
 
+            /**
+             * @brief Update method for EmbMessenger.
+             * 
+             * This should be called as frequently as possible. e.g. in `loop()`
+             * Updates the buffer, reads data from the buffer for running commands, executes commands, and runs periodic commands.
+             */
             void update()
             {
                 m_buffer->update();
@@ -344,6 +409,13 @@ namespace emb
                 }
             }
 
+            /**
+             * @brief Checks the CRC.
+             * 
+             * Calling this is not neccessary if you read any values because it will be checked automatically.
+             * Call this if you don't read any values and you need to ensure the correct command is being executed.
+             * Calling this from outside a command is undefined behaviour.
+             */
             void checkCrc()
             {
                 if (m_reader.nextCrc() && !m_reader.readCrc())
@@ -352,13 +424,20 @@ namespace emb
                 }
             }
 
+            /**
+             * @brief Use in commands to read a value from the host.
+             * 
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @tparam T Type of the value to read
+             * @param value Variable to store the value
+             */
             template <typename T>
             void read(T& value)
             {
                 if (!m_reader.read(value))
                 {
-                    reportError(static_cast<shared::DataError>(shared::DataError::kParameterReadError),
-                                m_parameter_index);
+                    reportError(shared::DataError::kParameterReadError, m_parameter_index);
                 }
 
                 ++m_parameter_index;
@@ -366,12 +445,42 @@ namespace emb
                 checkCrc();
             }
 
+            /**
+             * @brief Use in commands to read multiple values and/or to validate values from the host.
+             * 
+             * Passing a function/lambda after a variable will use the function as a validator.
+             * A validator should take a single parameter with the same type as the variable before it in the read call.
+             * e.g.
+             * ```
+             * int16_t a = 0;
+             * messenger.read(a, [](int16_t val) { return val != 0; });
+             * ```
+             * 
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @tparam T Type of the first parameter
+             * @tparam F Type of the second parameter
+             * @tparam Ts Types of the rest of the parameters
+             * @param value Variable to store the value
+             * @param validator A validator for the first parameter or a second variable to store a value
+             * @param args The rest of the parameters
+             */
             template <typename T, typename F, typename... Ts>
             void read(T& value, F&& validator, Ts&&... args)
             {
                 read_helper(is_validator_t<T, F>{}, value, validator, args...);
             }
 
+            /**
+             * @brief Use in commands to write values to the host.
+             * 
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @tparam T Type of the first parameter
+             * @tparam Ts Types of the rest of the parameters
+             * @param value First parameter
+             * @param args The rest of the parameters
+             */
             template <typename T, typename... Ts>
             void write(const T value, const Ts... args)
             {
@@ -380,9 +489,26 @@ namespace emb
                 write(args...);
             }
 
-            void reportError(const shared::DataError code, const int16_t data = 0)
+            /**
+             * @brief Use this to interrupt execution and send an error to the host.
+             * 
+             * Calling this will `longjmp` and exit your command immediately.
+             * 
+             * emb::shared::DataErrors have predefined exceptions on the host ready to convert the error.
+             * 
+             * You can pass custom errors to be handled by your overridden Command::reportError in your Command.
+             * Custom errors should start at `0x20` as `0x00` - `0x1F` are reserved for EmbMessenger.
+             * 
+             * The data parameter can be used for further information about your error.
+             * 
+             * Calling this from outside a command is undefined behaviour.
+             * 
+             * @param code Error code to be sent to the host
+             * @param data Data to be sent to the host with the error code
+             */
+            void reportError(const uint8_t code, const int16_t data = 0)
             {
-                m_writer.writeError(code);
+                m_writer.writeError(static_cast<shared::DataError>(code));
                 m_writer.write(data);
 
                 longjmp(m_jmp_buf, code);

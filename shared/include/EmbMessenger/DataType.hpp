@@ -1,6 +1,10 @@
 #ifndef EMBMESSENGER_DATATYPE_HPP
 #define EMBMESSENGER_DATATYPE_HPP
 
+/**
+ * @file DataType.hpp
+ */
+
 #include <stdint.h>
 
 namespace emb
