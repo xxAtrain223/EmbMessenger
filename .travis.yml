@@ -30,6 +30,9 @@ script:
 after_script:
     - ./travis/after_script.sh
 
+before_deploy:
+    - doxygen Doxyfile
+
 deploy:
     provider: pages
     skip_cleanup: true
