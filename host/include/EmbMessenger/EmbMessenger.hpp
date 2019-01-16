@@ -15,6 +15,7 @@
 #ifndef EMB_SINGLE_THREADED
 #include <mutex>
 #include <thread>
+#include <atomic>
 #endif
 
 namespace emb
@@ -43,7 +44,7 @@ namespace emb
             std::function<bool(std::exception_ptr)> m_exception_handler;
 
             std::thread m_update_thread;
-            bool m_running;
+            std::atomic_bool m_running;
             std::mutex m_commands_mutex;
 
             void update();
