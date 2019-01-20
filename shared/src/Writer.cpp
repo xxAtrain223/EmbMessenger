@@ -180,7 +180,7 @@ namespace emb
 
         void Writer::writeCrc()
         {
-            writeByte(DataType::kCrc);
+            writeByte(DataType::kEndOfMessage);
             writeData(m_crc);
         }
     }  // namespace shared

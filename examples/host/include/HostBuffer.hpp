@@ -27,7 +27,6 @@ public:
 
     void writeByte(const uint8_t byte) override
     {
-        //printf("write 0x%02X\n", byte);
         serial_write(m_serial, &byte, 1);
     }
 
@@ -39,7 +38,7 @@ public:
     uint8_t readByte() override
     {
         uint8_t byte = m_buffer[m_readFront];
-        if (m_buffer[(BufferSize + m_readFront - 1) % BufferSize] == emb::shared::DataType::kCrc)
+        if (m_buffer[(BufferSize + m_readFront - 1) % BufferSize] == emb::shared::DataType::kEndOfMessage)
         {
             --m_numberMessages;
         }
@@ -68,8 +67,7 @@ public:
         while (serial_input_waiting(m_serial, &input_count) >= 0 && input_count > 0)
         {
             serial_read(m_serial, m_buffer + m_streamFront, 1, 1000);
-            //printf("read  0x%02X\n", m_buffer[m_streamFront]);
-            if (m_buffer[(BufferSize + m_streamFront - 1) % BufferSize] == emb::shared::DataType::kCrc)
+            if (m_buffer[(BufferSize + m_streamFront - 1) % BufferSize] == emb::shared::DataType::kEndOfMessage)
             {
                 ++m_numberMessages;
             }

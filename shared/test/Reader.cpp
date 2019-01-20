@@ -317,7 +317,7 @@ namespace emb
                 MockBuffer buffer;
 
                 EXPECT_CALL(buffer, empty()).WillOnce(Return(false)).WillOnce(Return(false)).WillOnce(Return(true));
-                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kNull)).WillOnce(Return(DataType::kCrc));
+                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kNull)).WillOnce(Return(DataType::kEndOfMessage));
 
                 Reader reader(&buffer);
 
@@ -340,7 +340,7 @@ namespace emb
                     .WillOnce(Return(DataType::kBoolFalse))
                     .WillOnce(Return(DataType::kBoolTrue))
                     .WillOnce(Return(DataType::kNull))
-                    .WillOnce(Return(DataType::kCrc));
+                    .WillOnce(Return(DataType::kEndOfMessage));
 
                 Reader reader(&buffer);
 
@@ -454,7 +454,7 @@ namespace emb
                 MockBuffer buffer;
 
                 EXPECT_CALL(buffer, empty()).WillOnce(Return(false)).WillOnce(Return(false)).WillOnce(Return(true));
-                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kError)).WillOnce(Return(DataType::kCrc));
+                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kError)).WillOnce(Return(DataType::kEndOfMessage));
 
                 Reader reader(&buffer);
 
@@ -468,7 +468,7 @@ namespace emb
                 MockBuffer buffer;
 
                 EXPECT_CALL(buffer, empty()).WillOnce(Return(false)).WillOnce(Return(false)).WillOnce(Return(true));
-                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kCrc)).WillOnce(Return(DataType::kError));
+                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kEndOfMessage)).WillOnce(Return(DataType::kError));
 
                 Reader reader(&buffer);
 
@@ -507,7 +507,7 @@ namespace emb
                     .WillOnce(Return(false))
                     .WillOnce(Return(false))
                     .WillOnce(Return(true));
-                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kBoolTrue)).WillOnce(Return(DataType::kCrc));
+                EXPECT_CALL(buffer, peek()).WillOnce(Return(DataType::kBoolTrue)).WillOnce(Return(DataType::kEndOfMessage));
                 EXPECT_CALL(buffer, readByte()).WillOnce(Return(DataType::kBoolTrue));
 
                 Reader reader(&buffer);
@@ -882,14 +882,14 @@ namespace emb
                     .WillOnce(Return(false))
                     .WillOnce(Return(true));
                 EXPECT_CALL(buffer, peek())
-                    .WillOnce(Return(DataType::kCrc))
-                    .WillOnce(Return(DataType::kCrc))
-                    .WillOnce(Return(DataType::kCrc))
+                    .WillOnce(Return(DataType::kEndOfMessage))
+                    .WillOnce(Return(DataType::kEndOfMessage))
+                    .WillOnce(Return(DataType::kEndOfMessage))
                     .WillOnce(Return(DataType::kNull));
                 EXPECT_CALL(buffer, readByte())
-                    .WillOnce(Return(DataType::kCrc))
+                    .WillOnce(Return(DataType::kEndOfMessage))
                     .WillOnce(Return(0x28))
-                    .WillOnce(Return(DataType::kCrc))
+                    .WillOnce(Return(DataType::kEndOfMessage))
                     .WillOnce(Return(0x29));
                 EXPECT_CALL(buffer, size()).WillOnce(Return(2)).WillOnce(Return(2)).WillOnce(Return(1));
 

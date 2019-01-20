@@ -24,7 +24,7 @@ namespace emb
                 {
                     addByte(byte);
                 }
-                addByte(shared::DataType::kCrc);
+                addByte(shared::DataType::kEndOfMessage);
 
                 if (appendCrc)
                 {
@@ -42,8 +42,8 @@ namespace emb
                 {
                     crc = shared::crc::Calculate8(crc, byte);
                 }
-                message.emplace_back(shared::DataType::kCrc);
-                crc = shared::crc::Calculate8(crc, shared::DataType::kCrc);
+                message.emplace_back(shared::DataType::kEndOfMessage);
+                crc = shared::crc::Calculate8(crc, shared::DataType::kEndOfMessage);
                 message.emplace_back(crc);
 
                 bool rv = std::equal(std::begin(message), std::end(message), std::begin(device));
@@ -101,7 +101,7 @@ namespace emb
                 uint8_t byte = host.front();
                 host.erase(std::begin(host));
 
-                if (byte == shared::DataType::kCrc)
+                if (byte == shared::DataType::kEndOfMessage)
                 {
                     readCrc = true;
                 }

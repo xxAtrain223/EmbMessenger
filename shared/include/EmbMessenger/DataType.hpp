@@ -30,7 +30,7 @@ namespace emb
             kInt64 = 0xD3,
             kPosFixInt = 0x00,
             kNegFixInt = 0xE0,
-            kCrc = 0xC1,
+            kEndOfMessage = 0xC1,
             kError = 0xCB
         };
     }  // namespace shared

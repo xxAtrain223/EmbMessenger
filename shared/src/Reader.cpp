@@ -101,8 +101,8 @@ namespace emb
                 case DataType::kInt64:
                     type = DataType::kInt64;
                     break;
-                case DataType::kCrc:
-                    type = DataType::kCrc;
+                case DataType::kEndOfMessage:
+                    type = DataType::kEndOfMessage;
                     break;
                 case DataType::kError:
                     type = DataType::kError;
@@ -227,7 +227,7 @@ namespace emb
                 return false;
             }
 
-            return type == DataType::kCrc;
+            return type == DataType::kEndOfMessage;
         }
 
         bool Reader::read(bool& value)

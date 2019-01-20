@@ -203,7 +203,7 @@ namespace emb
             {
                 MockBuffer buffer;
 
-                EXPECT_CALL(buffer, writeByte(DataType::kCrc));
+                EXPECT_CALL(buffer, writeByte(DataType::kEndOfMessage));
                 EXPECT_CALL(buffer, writeByte(0x28));
 
                 Writer writer(&buffer);

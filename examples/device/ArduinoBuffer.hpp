@@ -36,7 +36,7 @@ public:
     uint8_t readByte() override
     {
         uint8_t byte = m_buffer[m_readFront];
-        if (m_buffer[(BufferSize + m_readFront - 1) % BufferSize] == emb::shared::DataType::kCrc)
+        if (m_buffer[(BufferSize + m_readFront - 1) % BufferSize] == emb::shared::DataType::kEndOfMessage)
         {
             --m_numberMessages;
         }
@@ -64,7 +64,7 @@ public:
         while (m_stream->available() > 0)
         {
             m_buffer[m_streamFront] = m_stream->read();
-            if (m_buffer[(BufferSize + m_streamFront - 1) % BufferSize] == emb::shared::DataType::kCrc)
+            if (m_buffer[(BufferSize + m_streamFront - 1) % BufferSize] == emb::shared::DataType::kEndOfMessage)
             {
                 ++m_numberMessages;
             }
