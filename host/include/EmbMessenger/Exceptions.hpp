@@ -6,7 +6,7 @@
 #include <string>
 #include "EmbMessenger/DataError.hpp"
 
-#define NEW_EX(name)                                                                                                \
+#define NEW_EMB_EX(name)                                                                                            \
     class name : public emb::host::BaseException                                                                    \
     {                                                                                                               \
     public:                                                                                                         \
@@ -17,9 +17,9 @@
             emb::host::BaseException(source, #name ": " + message, command)                                         \
         {                                                                                                           \
         }                                                                                                           \
-    }
+    };
 
-#define NEW_EX_SOURCE(name, source)                                                                     \
+#define NEW_EMB_EX_SOURCE(name, source)                                                                 \
     class name : public emb::host::BaseException                                                        \
     {                                                                                                   \
     public:                                                                                             \
@@ -29,7 +29,7 @@
             emb::host::BaseException(emb::host::ExceptionSource::source, #name ": " + message, command) \
         {                                                                                               \
         }                                                                                               \
-    }
+    };
 
 namespace emb
 {
@@ -170,77 +170,77 @@ namespace emb
          * The CRC should only be read after all parameters have been read.
          * So if the CRC is expected, then you have extra parameters.
          */
-        NEW_EX(CrcReadError);
+        NEW_EMB_EX(CrcReadError);
 
         /**
          * @brief Exception for an invalid CRC.
          * 
          * One or more bytes got corrupted in transit.
          */
-        NEW_EX(CrcInvalid);
+        NEW_EMB_EX(CrcInvalid);
 
         /**
          * @brief Exception for Message ID Read Error.
          * 
          * An error occurred when reading the message ID.
          */
-        NEW_EX(MessageIdReadError);
+        NEW_EMB_EX(MessageIdReadError);
 
         /**
          * @brief Exception for Extra Parameters.
          * 
          * Not all parameters were read.
          */
-        NEW_EX(ExtraParameters);
+        NEW_EMB_EX(ExtraParameters);
 
         /**
          * @brief Exception for an Initialization Error.
          * 
          * e.g. Timed out while establishing a connection.
          */
-        NEW_EX_SOURCE(InitializationError, Host);
+        NEW_EMB_EX_SOURCE(InitializationError, Host);
 
         /**
          * @brief Exception for an Invalid Command Type Index.
          * 
          * Occurs when a command gets sent using the nontemplate version of EmbMessenger::send and the command did not set Command::m_type_index.
          */
-        NEW_EX_SOURCE(InvalidCommandTypeIndex, Host);
+        NEW_EMB_EX_SOURCE(InvalidCommandTypeIndex, Host);
 
         /**
          * @brief Exception for an Invalid Message ID.
          * 
          * A message sent by the device doesn't have a command to receive it.
          */
-        NEW_EX_SOURCE(MessageIdInvalid, Host);
+        NEW_EMB_EX_SOURCE(MessageIdInvalid, Host);
 
         /**
          * @brief Exception for an Unregistered Command.
          * 
          * Ensure the Command Type is registered with the EmbMessenger.
          */
-        NEW_EX_SOURCE(UnregisteredCommand, Host);
+        NEW_EMB_EX_SOURCE(UnregisteredCommand, Host);
 
         /**
          * @brief Exception for Command ID Read Error.
          * 
          * An error occurred while reading the Command ID.
          */
-        NEW_EX_SOURCE(CommandIdReadError, Device);
+        NEW_EMB_EX_SOURCE(CommandIdReadError, Device);
 
         /**
          * @brief Exception for an Invalid Command ID.
          * 
          * Occurs when a command is not registered on the device.
          */
-        NEW_EX_SOURCE(CommandIdInvalid, Device);
+        NEW_EMB_EX_SOURCE(CommandIdInvalid, Device);
 
         /**
          * @brief Exception for when the device is Out of Periodic Command Slots.
          * 
          * Occurs when too many periodic commands are registered.
          */
-        NEW_EX_SOURCE(OutOfPeriodicCommandSlots, Device);
+        NEW_EMB_EX_SOURCE(OutOfPeriodicCommandSlots, Device);
     }  // namespace host
 }  // namespace emb
 
