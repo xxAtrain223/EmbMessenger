@@ -3,4 +3,4 @@ set -e
 mkdir build
 cd build
 
-cmake -DENABLE_TESTING:BOOL=ON ..
+cmake -DEMB_ENABLE_TESTING:BOOL=ON ..
