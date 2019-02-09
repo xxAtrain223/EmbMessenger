@@ -6,6 +6,7 @@ option(BUILD_EXAMPLES "Build the examples" OFF)
 
 add_subdirectory(shared)
 add_subdirectory(host)
+add_subdirectory(decoder)
 
 if (EMB_ENABLE_TESTING)
     set(gtest_force_shared_crt TRUE CACHE BOOL "")
