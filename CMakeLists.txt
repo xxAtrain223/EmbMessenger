@@ -3,10 +3,10 @@ project(EmbMessenger)
 
 option(EMB_ENABLE_TESTING "Enable Testing for EmbMessenger" OFF)
 option(BUILD_EXAMPLES "Build the examples" OFF)
+option(BUILD_UTILITIES "Build the utilities" OFF)
 
 add_subdirectory(shared)
 add_subdirectory(host)
-add_subdirectory(decoder)
 
 if (EMB_ENABLE_TESTING)
     set(gtest_force_shared_crt TRUE CACHE BOOL "")
@@ -16,4 +16,8 @@ endif()
 
 if (BUILD_EXAMPLES)
     add_subdirectory(examples)
+endif()
+
+if (BUILD_UTILITIES)
+    add_subdirectory(decoder)
 endif()
