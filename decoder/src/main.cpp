@@ -97,7 +97,7 @@ void decode(DecodeBuffer& buffer)
         case kBoolTrue: {
             bool value = false;
             reader.read(value);
-            printf("%c", (value) ? "True" : "False");
+            printf("%s", (value) ? "True" : "False");
         } break;
 
         case kPosFixInt:
@@ -141,11 +141,11 @@ void decode(DecodeBuffer& buffer)
         case kError: {
             uint8_t code;
             reader.readError(code);
-            printf("%u 0x%02X ", code);
+            printf("%u 0x%02X ", code, code);
 
             int16_t data;
             reader.read(data);
-            printf("%d, data");
+            printf("%d", data);
         } break;
 
         case kEndOfMessage: {
