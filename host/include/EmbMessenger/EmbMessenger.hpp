@@ -30,7 +30,7 @@ namespace emb
         class EmbMessenger
         {
         protected:
-            shared::IBuffer* m_buffer;
+            std::shared_ptr<shared::IBuffer> m_buffer;
             shared::Writer m_writer;
             shared::Reader m_reader;
 
@@ -65,7 +65,7 @@ namespace emb
              * @param buffer Buffer for communication
              * @param init_timeout Time to keep retrying to establish a connection
              */
-            EmbMessenger(shared::IBuffer* buffer, std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
+            EmbMessenger(std::shared_ptr<shared::IBuffer> buffer, std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
 
             /**
              * @brief Public update method for the Single Threaded EmbMessenger.
@@ -81,7 +81,7 @@ namespace emb
              * @param exception_handler Handler for exceptions thrown in the update thread
              * @param init_timeout Time to keep retrying to establish a connection
              */
-            EmbMessenger(shared::IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler,
+            EmbMessenger(std::shared_ptr<shared::IBuffer> buffer, std::function<bool(std::exception_ptr)> exception_handler,
                          std::chrono::milliseconds init_timeout = std::chrono::seconds(10));
 
             /**

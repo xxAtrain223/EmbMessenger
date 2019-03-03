@@ -10,15 +10,15 @@ namespace emb
     namespace host
     {
 #ifdef EMB_SINGLE_THREADED
-        EmbMessenger::EmbMessenger(shared::IBuffer* buffer, std::chrono::milliseconds init_timeout) :
+        EmbMessenger::EmbMessenger(std::shared_ptr<shared::IBuffer> buffer, std::chrono::milliseconds init_timeout) :
 #else
-        EmbMessenger::EmbMessenger(shared::IBuffer* buffer, std::function<bool(std::exception_ptr)> exception_handler,
+        EmbMessenger::EmbMessenger(std::shared_ptr<shared::IBuffer> buffer, std::function<bool(std::exception_ptr)> exception_handler,
                                    std::chrono::milliseconds init_timeout) :
             m_exception_handler(exception_handler),
 #endif
             m_buffer(buffer),
-            m_writer(buffer),
-            m_reader(buffer)
+            m_writer(buffer.get()),
+            m_reader(buffer.get())
         {
             m_message_id = 0;
 
