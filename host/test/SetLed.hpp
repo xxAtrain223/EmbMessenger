@@ -18,7 +18,6 @@ namespace emb
                 SetLed(bool state)
                 {
                     ledState = state;
-                    m_type_index = typeid(SetLed);
                 }
 
                 void send(EmbMessenger* messenger)

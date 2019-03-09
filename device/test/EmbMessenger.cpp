@@ -13,7 +13,7 @@ namespace emb
     {
         namespace test
         {
-            TEST(messenger_command, ping)
+            TEST(device_command, ping)
             {
                 FakeBuffer buffer;
 
@@ -44,7 +44,7 @@ namespace emb
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
 
-            TEST(messenger_command, set_led)
+            TEST(device_command, set_led)
             {
                 FakeBuffer buffer;
 
@@ -82,7 +82,7 @@ namespace emb
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
 
-            TEST(messenger_command, toggle_led)
+            TEST(device_command, toggle_led)
             {
                 FakeBuffer buffer;
 
@@ -120,7 +120,7 @@ namespace emb
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
 
-            TEST(messenger_command, add)
+            TEST(device_command, add)
             {
                 FakeBuffer buffer;
 

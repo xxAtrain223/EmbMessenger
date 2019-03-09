@@ -141,29 +141,8 @@ namespace emb
             template <typename CommandType>
             std::shared_ptr<CommandType> send(std::shared_ptr<CommandType> command)
             {
-                uint8_t command_id = 0;
-                try
-                {
-                    command_id = m_command_ids.at(typeid(CommandType));
-                }
-                catch (const std::out_of_range& e)
-                {
-                    throw UnregisteredCommand("The command was not registered.");
-                }
-
-                command->m_message_id = m_message_id;
-                {
-#ifndef EMB_SINGLE_THREADED
-                    std::lock_guard<std::mutex> lock(m_commands_mutex);
-#endif
-                    m_commands.emplace(m_message_id, command);
-                }
-
-                write(m_message_id++, command_id);
-                command->send(this);
-                m_writer.writeCrc();
-
-                return command;
+                command->m_type_index = typeid(CommandType);
+                return std::static_pointer_cast<CommandType>(send(std::static_pointer_cast<Command>(command)));
             }
 
             /**

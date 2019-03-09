@@ -19,7 +19,7 @@ namespace emb
     {
         namespace test
         {
-            TEST(messenger_command, ping)
+            TEST(host_command, ping)
             {
                 FakeBuffer buffer;
 
@@ -43,7 +43,7 @@ namespace emb
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
 
-            TEST(messenger_command, set_led)
+            TEST(host_command, set_led)
             {
                 FakeBuffer buffer;
 
@@ -67,7 +67,7 @@ namespace emb
                 ASSERT_TRUE(buffer.buffersEmpty());
             }
 
-            TEST(messenger_command, toggle_led)
+            TEST(host_command, toggle_led)
             {
                 FakeBuffer buffer;
 
@@ -92,7 +92,7 @@ namespace emb
                 ASSERT_EQ(toggleLedCommand->ledState, true);
             }
 
-            TEST(messenger_command, add)
+            TEST(host_command, add)
             {
                 FakeBuffer buffer;
 
@@ -115,6 +115,34 @@ namespace emb
 
                 ASSERT_TRUE(buffer.buffersEmpty());
                 ASSERT_EQ(addCommand->Result, 9);
+            }
+
+            TEST(host_command, command_state)
+            {
+                FakeBuffer buffer;
+
+                buffer.addDeviceMessage({ 0x00 });
+                EmbMessenger messenger(&buffer, std::chrono::seconds(1));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+
+                messenger.registerCommand<Ping>(0);
+                messenger.registerCommand<SetLed>(1);
+                messenger.registerCommand<ToggleLed>(2);
+                messenger.registerCommand<Add>(3);
+
+                auto addCommand = std::make_shared<Add>(7, 7);
+                ASSERT_EQ(addCommand->getCommandState(), CommandState::NotSent);
+                messenger.send(addCommand);
+                ASSERT_EQ(addCommand->getCommandState(), CommandState::Sent);
+
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x03, 0x07, 0x07 }));
+                buffer.addDeviceMessage({ 0x01, 0x0E });
+
+                messenger.update();
+
+                ASSERT_EQ(addCommand->getCommandState(), CommandState::Received);
+                ASSERT_TRUE(buffer.buffersEmpty());
+                ASSERT_EQ(addCommand->Result, 14);
             }
 
             TEST(messenger_builtin_command, reset)

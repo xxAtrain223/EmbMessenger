@@ -130,6 +130,7 @@ namespace emb
 
             write(m_message_id++, m_command_ids.at(command->getTypeIndex()));
             command->send(this);
+            command->m_command_state = CommandState::Sent;
             m_writer.writeCrc();
 
             return command;
@@ -226,8 +227,8 @@ namespace emb
                 throw ExtraParameters(ExceptionSource::Host, "Message has extra parameters from the device", m_current_command);
             }
 
+            m_current_command->m_command_state = CommandState::Received;
 #ifndef EMB_SINGLE_THREADED
-            m_current_command->m_received = true;
             if (m_current_command->m_is_waiting)
             {
                 m_current_command->m_condition_variable.notify_all();
