@@ -12,6 +12,8 @@ if (EMB_ENABLE_TESTING)
     set(gtest_force_shared_crt TRUE CACHE BOOL "")
     add_subdirectory(ext)
     add_subdirectory(device)
+
+	cmake_policy(SET CMP0057 NEW)
 	include(GoogleTest)
 	gtest_add_tests(EmbMessengerSharedTest "" AUTO)
 	gtest_add_tests(EmbMessengerHostTest "" AUTO)

@@ -123,8 +123,6 @@ namespace emb
             /**
              * @brief Send a command to the device.
              * 
-             * Uses `Command::m_type_index` to get the command ID, so be sure to set it in your command's constructor.
-             * 
              * @param command Command to send
              * @return std::shared_ptr<Command> Command sent to the device
              */
@@ -133,10 +131,8 @@ namespace emb
             /**
              * @brief Send a command to the device.
              * 
-             * Uses `typeid(CommandType)` to get the command ID.
-             * 
              * @param command Command to send
-             * @return std::shared_ptr<Command> Command sent to the device
+             * @return std::shared_ptr<CommandType> Command sent to the device
              */
             template <typename CommandType>
             std::shared_ptr<CommandType> send(std::shared_ptr<CommandType> command)
@@ -179,6 +175,13 @@ namespace emb
                 ++m_parameter_index;
                 read(args...);
             }
+
+            /**
+             * @brief Gets the state of all sent commands.
+             *
+             * @return True if the all commands sent have been received
+             */
+            bool commandsReceived() const;
 
         protected:
             class ResetCommand : public Command

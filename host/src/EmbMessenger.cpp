@@ -346,6 +346,22 @@ namespace emb
             messenger->read(m_periodic_message_id);
         }
 
+        bool EmbMessenger::commandsReceived() const
+        {
+#ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+#endif
+            for (const auto& x : m_commands)
+            {
+                if (x.second->getCommandState() != CommandState::Received)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         void EmbMessenger::resetDevice()
         {
             std::shared_ptr<ResetCommand> resetCommand = std::make_shared<ResetCommand>();
