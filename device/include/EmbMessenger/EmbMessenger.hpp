@@ -315,7 +315,7 @@ namespace emb
                     if (!m_reader.read(m_message_id))
                     {
                         m_writer.writeError(shared::DataError::kMessageIdReadError);
-                        m_writer.write(0);
+                        m_writer.write((uint8_t)0);
                         consumeMessage();
                         m_writer.writeCrc();
                         return;
@@ -325,7 +325,7 @@ namespace emb
                     if (!m_reader.read(m_command_id))
                     {
                         m_writer.writeError(shared::DataError::kCommandIdReadError);
-                        m_writer.write(0);
+                        m_writer.write((uint8_t)0);
                         consumeMessage();
                         m_writer.writeCrc();
                         return;
@@ -370,14 +370,14 @@ namespace emb
                             {
                                 consumeMessage();
                                 m_writer.writeError(shared::DataError::kCrcInvalid);
-                                m_writer.write(0);
+                                m_writer.write((uint8_t)0);
                             }
                         }
                         else
                         {
                             consumeMessage();
                             m_writer.writeError(shared::DataError::kExtraParameters);
-                            m_writer.write(0);
+                            m_writer.write((uint8_t)0);
                         }
                     }
 
