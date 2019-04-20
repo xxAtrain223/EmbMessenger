@@ -12,37 +12,19 @@ namespace emb
         // Helper for getting the number of used bytes
         constexpr const uint8_t getWidth(uint16_t value16)
         {
-            uint8_t value8 = static_cast<uint8_t>(value16);
-
-            if (value16 == value8)
-            {
-                return 2;
-            }
-            return 4;
+            return (value16 == static_cast<uint8_t>(value16)) ? 2 : 4;
         }
 
         // Helper for getting the number of used bytes
         constexpr const uint8_t getWidth(uint32_t value32)
         {
-            uint16_t value16 = static_cast<uint16_t>(value32);
-
-            if (value32 == value16)
-            {
-                return getWidth(value16);
-            }
-            return 8;
+            return (value32 == static_cast<uint16_t>(value32)) ? getWidth(static_cast<uint16_t>(value32)) : 8;
         }
 
         // Helper for getting the number of used bytes
         constexpr const uint8_t getWidth(uint64_t value64)
         {
-            uint32_t value32 = static_cast<uint32_t>(value64);
-
-            if (value64 == value32)
-            {
-                return getWidth(value32);
-            }
-            return 16;
+            return (value64 == static_cast<uint32_t>(value64)) ? getWidth(static_cast<uint32_t>(value64)) : 16;
         }
 
         DebugBuffer::DecodeBuffer::DecodeBuffer(BufferType type, std::function<void(std::string)> print_func) :
