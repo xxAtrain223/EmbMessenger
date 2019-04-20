@@ -10,7 +10,7 @@ namespace emb
     namespace host
     {
         // Helper for getting the number of used bytes
-        constexpr uint8_t getWidth(uint16_t value16)
+        constexpr const uint8_t getWidth(uint16_t value16)
         {
             uint8_t value8 = static_cast<uint8_t>(value16);
 
@@ -18,14 +18,11 @@ namespace emb
             {
                 return 2;
             }
-            else
-            {
-                return 4;
-            }
+            return 4;
         }
 
         // Helper for getting the number of used bytes
-        constexpr uint8_t getWidth(uint32_t value32)
+        constexpr const uint8_t getWidth(uint32_t value32)
         {
             uint16_t value16 = static_cast<uint16_t>(value32);
 
@@ -33,14 +30,11 @@ namespace emb
             {
                 return getWidth(value16);
             }
-            else
-            {
-                return 8;
-            }
+            return 8;
         }
 
         // Helper for getting the number of used bytes
-        constexpr uint8_t getWidth(uint64_t value64)
+        constexpr const uint8_t getWidth(uint64_t value64)
         {
             uint32_t value32 = static_cast<uint32_t>(value64);
 
@@ -48,10 +42,7 @@ namespace emb
             {
                 return getWidth(value32);
             }
-            else
-            {
-                return 16;
-            }
+            return 16;
         }
 
         DebugBuffer::DecodeBuffer::DecodeBuffer(BufferType type, std::function<void(std::string)> print_func) :
