@@ -3,21 +3,23 @@ project(EmbMessenger)
 
 option(EMB_ENABLE_TESTING "Enable Testing for EmbMessenger" OFF)
 option(BUILD_EXAMPLES "Build the examples" OFF)
-option(BUILD_UTILITIES "Build the utilities" OFF)
 
 add_subdirectory(shared)
 add_subdirectory(host)
 
 if (EMB_ENABLE_TESTING)
+	enable_testing()
     set(gtest_force_shared_crt TRUE CACHE BOOL "")
     add_subdirectory(ext)
     add_subdirectory(device)
+
+	cmake_policy(SET CMP0057 NEW)
+	include(GoogleTest)
+	gtest_add_tests(EmbMessengerSharedTest "" AUTO)
+	gtest_add_tests(EmbMessengerHostTest "" AUTO)
+	gtest_add_tests(EmbMessengerDeviceTest "" AUTO)
 endif()
 
 if (BUILD_EXAMPLES)
     add_subdirectory(examples)
-endif()
-
-if (BUILD_UTILITIES)
-    add_subdirectory(decoder)
 endif()
