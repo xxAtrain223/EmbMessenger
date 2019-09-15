@@ -181,7 +181,7 @@ namespace emb
              *
              * @return True if the all commands sent have been received
              */
-            bool commandsReceived() const;
+            bool commandsReceived();
 
         protected:
             class ResetCommand : public Command

@@ -346,7 +346,7 @@ namespace emb
             messenger->read(m_periodic_message_id);
         }
 
-        bool EmbMessenger::commandsReceived() const
+        bool EmbMessenger::commandsReceived()
         {
 #ifndef EMB_SINGLE_THREADED
             std::lock_guard<std::mutex> lock(m_commands_mutex);
