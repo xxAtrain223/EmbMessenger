@@ -35,7 +35,7 @@ namespace emb
             shared::Reader m_reader;
 
             uint16_t m_message_id;
-            std::map<std::type_index, uint8_t> m_command_ids;
+            std::map<std::type_index, uint16_t> m_command_ids;
             std::map<uint16_t, std::shared_ptr<Command>> m_commands;
             std::shared_ptr<Command> m_current_command;
             uint8_t m_parameter_index;
@@ -113,7 +113,7 @@ namespace emb
              * @param id The ID for the command type
              */
             template <typename CommandType>
-            void registerCommand(const uint8_t id)
+            void registerCommand(const uint16_t id)
             {
                 static_assert(!std::is_same<Command, CommandType>::value, "You can't register the base class Command.");
                 static_assert(std::is_base_of<Command, CommandType>::value, "Ensure CommandType is derived from Command.");

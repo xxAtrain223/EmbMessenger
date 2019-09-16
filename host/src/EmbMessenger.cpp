@@ -22,9 +22,9 @@ namespace emb
         {
             m_message_id = 0;
 
-            registerCommand<ResetCommand>(255);
-            registerCommand<RegisterPeriodicCommand>(254);
-            registerCommand<UnregisterPeriodicCommand>(253);
+            registerCommand<ResetCommand>(0xFFFF);
+            registerCommand<RegisterPeriodicCommand>(0xFFFE);
+            registerCommand<UnregisterPeriodicCommand>(0xFFFD);
 
             using clock_t = std::chrono::steady_clock;
             bool initializing = true;

@@ -25,7 +25,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -49,7 +49,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -73,7 +73,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -98,7 +98,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -123,7 +123,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -151,7 +151,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -160,7 +160,7 @@ namespace emb
 
                 messenger.resetDevice();
 
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, shared::DataType::kUint8, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, shared::DataType::kUint16, 0xFF, 0xFF }));
                 buffer.addDeviceMessage({ 0x01 });
 
                 messenger.update();
@@ -174,7 +174,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -186,7 +186,7 @@ namespace emb
                     1000, [&](std::shared_ptr<ToggleLed>&& toggleLed) { ledState = toggleLed->ledState; });
 
                 ASSERT_TRUE(buffer.checkHostBuffer(
-                    { 0x01, shared::DataType::kUint8, 0xFE, 0x02, shared::DataType::kUint16, 0x03, 0xE8 }));
+                    { 0x01, shared::DataType::kUint16, 0xFF, 0xFE, 0x02, shared::DataType::kUint16, 0x03, 0xE8 }));
 
                 buffer.addDeviceMessage({ 0x01 });
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kBoolTrue });
@@ -207,7 +207,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -219,7 +219,7 @@ namespace emb
                     1000, [&](std::shared_ptr<ToggleLed>&& toggleLed) { ledState = toggleLed->ledState; });
 
                 ASSERT_TRUE(buffer.checkHostBuffer(
-                    { 0x01, shared::DataType::kUint8, 0xFE, 0x02, shared::DataType::kUint16, 0x03, 0xE8 }));
+                    { 0x01, shared::DataType::kUint16, 0xFF, 0xFE, 0x02, shared::DataType::kUint16, 0x03, 0xE8 }));
 
                 buffer.addDeviceMessage({ 0x01 });
                 buffer.addDeviceMessage({ 0x01, shared::DataType::kBoolTrue });
@@ -230,7 +230,7 @@ namespace emb
 
                 messenger.unregisterPeriodicCommand<ToggleLed>();
 
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x02, shared::DataType::kUint8, 0xFD, 0x02 }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x02, shared::DataType::kUint16, 0xFF, 0xFD, 0x02 }));
                 buffer.addDeviceMessage({ 0x02, 0x01 });
                 messenger.update();
                 ASSERT_TRUE(buffer.buffersEmpty());
@@ -250,7 +250,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 ASSERT_NO_THROW(messenger.update());
             }
@@ -261,7 +261,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -285,7 +285,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -309,7 +309,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -335,7 +335,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 buffer.addDeviceMessage({ 0x01 });
 
@@ -350,7 +350,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -374,7 +374,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 buffer.addDeviceMessage({ shared::DataType::kError, shared::DataError::kMessageIdReadError });
 
@@ -389,7 +389,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -413,7 +413,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -438,7 +438,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -462,7 +462,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -486,7 +486,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -510,7 +510,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -534,7 +534,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -558,7 +558,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -570,7 +570,7 @@ namespace emb
                     1000, [&](std::shared_ptr<ToggleLed>&& toggleLed) { ledState = toggleLed->ledState; });
 
                 ASSERT_TRUE(buffer.checkHostBuffer(
-                    { 0x01, shared::DataType::kUint8, 0xFE, 0x02, shared::DataType::kUint16, 0x03, 0xE8 }));
+                    { 0x01, shared::DataType::kUint16, 0xFF, 0xFE, 0x02, shared::DataType::kUint16, 0x03, 0xE8 }));
                 buffer.addDeviceMessage(
                     { 0x01, shared::DataType::kError, shared::DataError::kOutOfPeriodicCommandSlots });
 
@@ -585,7 +585,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<UserError>(0);
 
@@ -606,7 +606,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<UserError>(0);
 
@@ -627,7 +627,7 @@ namespace emb
 
                 buffer.addDeviceMessage({ 0x00 });
                 EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, 0xCC, 0xFF }));
+                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<UserError>(0);
 

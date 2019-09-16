@@ -169,7 +169,7 @@ namespace emb
                 messenger.registerCommand(0, toggleLed);
 
                 buffer.addHostMessage(
-                    { 0x01, shared::DataType::kUint8, 0xFE, 0x00, shared::DataType::kUint16, 0x03, 0xE8 });
+                    { 0x01, shared::DataType::kUint16, 0xFF, 0xFE, 0x00, shared::DataType::kUint16, 0x03, 0xE8 });
                 messenger.update();
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01 }));
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, shared::DataType::kBoolTrue }));
@@ -203,14 +203,14 @@ namespace emb
                 messenger.registerCommand(0, toggleLed);
 
                 buffer.addHostMessage(
-                    { 0x01, shared::DataType::kUint8, 0xFE, 0x00, shared::DataType::kUint16, 0x03, 0xE8 });
+                    { 0x01, shared::DataType::kUint16, 0xFF, 0xFE, 0x00, shared::DataType::kUint16, 0x03, 0xE8 });
                 messenger.update();
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01 }));
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, shared::DataType::kBoolTrue }));
                 ASSERT_TRUE(buffer.buffersEmpty());
 
                 millis_value += 600;
-                buffer.addHostMessage({ 0x02, shared::DataType::kUint8, 0xFD, 0x00 });
+                buffer.addHostMessage({ 0x02, shared::DataType::kUint16, 0xFF, 0xFD, 0x00 });
                 messenger.update();
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02, 0x01 }));
                 ASSERT_TRUE(buffer.buffersEmpty());
@@ -238,14 +238,14 @@ namespace emb
                 messenger.registerCommand(0, toggleLed);
 
                 buffer.addHostMessage(
-                    { 0x01, shared::DataType::kUint8, 0xFE, 0x00, shared::DataType::kUint16, 0x03, 0xE8 });
+                    { 0x01, shared::DataType::kUint16, 0xFF, 0xFE, 0x00, shared::DataType::kUint16, 0x03, 0xE8 });
                 messenger.update();
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01 }));
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x01, shared::DataType::kBoolTrue }));
                 ASSERT_TRUE(buffer.buffersEmpty());
 
                 millis_value += 600;
-                buffer.addHostMessage({ 0x02, shared::DataType::kUint8, 0xFF });
+                buffer.addHostMessage({ 0x02, shared::DataType::kUint16, 0xFF, 0xFF });
                 messenger.update();
                 ASSERT_TRUE(buffer.checkDeviceBuffer({ 0x02 }));
                 ASSERT_TRUE(buffer.buffersEmpty());
