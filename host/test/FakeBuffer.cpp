@@ -43,7 +43,14 @@ namespace emb
 
                 bool rv = host == message;
 
-                host.erase(std::begin(host), std::begin(host) + message.size());
+                if (host.size() >= message.size())
+                {
+                    host.erase(std::begin(host), std::begin(host) + message.size());
+                }
+                else
+                {
+                    host.erase(std::begin(host), std::begin(host) + host.size());
+                }
 
                 return rv;
             }

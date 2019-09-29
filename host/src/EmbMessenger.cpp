@@ -110,7 +110,7 @@ namespace emb
         std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command)
         {
             std::type_index type_index = command->getTypeIndex();
-            uint8_t command_id = 0;
+            uint16_t command_id = 0;
             try
             {
                 command_id = m_command_ids.at(type_index);
@@ -120,6 +120,11 @@ namespace emb
                 throw UnregisteredCommand("The command was not registered.");
             }
 
+            return send(command, command_id);
+        }
+
+        std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command, uint16_t command_id)
+        {
             command->m_message_id = m_message_id;
             {
 #ifndef EMB_SINGLE_THREADED
@@ -128,7 +133,7 @@ namespace emb
                 m_commands.emplace(m_message_id, command);
             }
 
-            write(m_message_id++, m_command_ids.at(command->getTypeIndex()));
+            write(m_message_id++, command_id);
             command->send(this);
             command->m_command_state = CommandState::Sent;
             m_writer.writeCrc();
@@ -319,7 +324,7 @@ namespace emb
             m_type_index = typeid(ResetCommand);
         }
 
-        EmbMessenger::RegisterPeriodicCommand::RegisterPeriodicCommand(uint8_t commandId, uint32_t period) :
+        EmbMessenger::RegisterPeriodicCommand::RegisterPeriodicCommand(uint16_t commandId, uint32_t period) :
             m_command_id(commandId),
             m_period(period)
         {
@@ -331,7 +336,7 @@ namespace emb
             messenger->write(m_command_id, m_period);
         }
 
-        EmbMessenger::UnregisterPeriodicCommand::UnregisterPeriodicCommand(uint8_t commandId) : m_command_id(commandId)
+        EmbMessenger::UnregisterPeriodicCommand::UnregisterPeriodicCommand(uint16_t commandId) : m_command_id(commandId)
         {
             m_type_index = typeid(UnregisterPeriodicCommand);
         }

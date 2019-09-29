@@ -142,6 +142,28 @@ namespace emb
             }
 
             /**
+             * @brief Send a command to the device.
+             *
+             * @param command Command to send
+             * @param commandId Id of the Command to send
+             * @return std::shared_ptr<Command> Command sent to the device
+             */
+            std::shared_ptr<Command> send(std::shared_ptr<Command> command, uint16_t commandId);
+
+            /**
+             * @brief Send a command to the device.
+             *
+             * @param command Command to send
+             * @param commandId Id of the Command to send
+             * @return std::shared_ptr<CommandType> Command sent to the device
+             */
+            template <typename CommandType>
+            std::shared_ptr<CommandType> send(std::shared_ptr<CommandType> command, uint16_t commandId)
+            {
+                return std::static_pointer_cast<CommandType>(send(std::static_pointer_cast<Command>(command), commandId));
+            }
+
+            /**
              * @brief Use in Command::send to write values to the device.
              * 
              * @tparam T Type of the first parameter
@@ -192,23 +214,23 @@ namespace emb
 
             class RegisterPeriodicCommand : public Command
             {
-                uint8_t m_command_id;
+                uint16_t m_command_id;
                 uint32_t m_period;
 
             public:
-                RegisterPeriodicCommand(uint8_t commandId, uint32_t period);
+                RegisterPeriodicCommand(uint16_t commandId, uint32_t period);
 
                 virtual void send(EmbMessenger* messenger);
             };
 
             class UnregisterPeriodicCommand : public Command
             {
-                uint8_t m_command_id;
+                uint16_t m_command_id;
 
             public:
                 uint16_t m_periodic_message_id;
 
-                UnregisterPeriodicCommand(uint8_t commandId);
+                UnregisterPeriodicCommand(uint16_t commandId);
 
                 virtual void send(EmbMessenger* messenger);
                 virtual void receive(EmbMessenger* messenger);
