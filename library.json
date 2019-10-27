@@ -13,8 +13,9 @@
             "shared"
         ],
         "exclude": [
-            "device/test",
-            "shared/test"
+            "device/test/*",
+            "shared/test/*",
+            "ext/*"
         ]
     }
 }
