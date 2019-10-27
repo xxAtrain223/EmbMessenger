@@ -14,12 +14,12 @@
             "shared/src/*.cpp"
         ]
     },
-    "build": [
+    "build": {
         "srcFilter": [
             "+<device/>",
             "-<device/test/>",
             "+<shared/>",
             "-<shared/test/>"
         ]
-    ]
+    }
 }
