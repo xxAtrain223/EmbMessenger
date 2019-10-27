@@ -9,13 +9,9 @@
     },
     "export": {
         "include": [
-            "device",
-            "shared"
-        ],
-        "exclude": [
-            "device/test/*",
-            "shared/test/*",
-            "ext/*"
+            "device/include/EmbMessenger/*.hpp",
+            "shared/include/EmbMessenger/*.hpp",
+            "shared/src/*.hpp"
         ]
     }
 }
