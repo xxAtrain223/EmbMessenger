@@ -15,6 +15,10 @@
         ]
     },
     "build": {
+        "flags": [
+            "-I device/include",
+            "-I shared/include"
+        ],
         "srcFilter": [
             "+<device/>",
             "-<device/test/>",
