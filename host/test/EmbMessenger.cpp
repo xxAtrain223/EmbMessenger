@@ -119,11 +119,11 @@ namespace emb
 
             TEST(host_command, command_state)
             {
-                FakeBuffer buffer;
+                std::shared_ptr<FakeBuffer> buffer = std::make_shared<FakeBuffer>();
 
-                buffer.addDeviceMessage({ 0x00 });
-                EmbMessenger messenger(&buffer, std::chrono::seconds(1));
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
+                buffer->addDeviceMessage({ 0x00 });
+                EmbMessenger messenger(buffer, std::chrono::seconds(1));
+                ASSERT_TRUE(buffer->checkHostBuffer({ 0x00, shared::DataType::kUint16, 0xFF, 0xFF }));
 
                 messenger.registerCommand<Ping>(0);
                 messenger.registerCommand<SetLed>(1);
@@ -135,13 +135,13 @@ namespace emb
                 messenger.send(addCommand);
                 ASSERT_EQ(addCommand->getCommandState(), CommandState::Sent);
 
-                ASSERT_TRUE(buffer.checkHostBuffer({ 0x01, 0x03, 0x07, 0x07 }));
-                buffer.addDeviceMessage({ 0x01, 0x0E });
+                ASSERT_TRUE(buffer->checkHostBuffer({ 0x01, 0x03, 0x07, 0x07 }));
+                buffer->addDeviceMessage({ 0x01, 0x0E });
 
                 messenger.update();
 
                 ASSERT_EQ(addCommand->getCommandState(), CommandState::Received);
-                ASSERT_TRUE(buffer.buffersEmpty());
+                ASSERT_TRUE(buffer->buffersEmpty());
                 ASSERT_EQ(addCommand->Result, 14);
             }
 
