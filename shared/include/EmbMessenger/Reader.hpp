@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include "EmbMessenger/Crc.hpp"
-#include "EmbMessenger/IBuffer.hpp"
+#include "Crc.hpp"
+#include "IBuffer.hpp"
 #include "Templates.hpp"
 
 namespace emb

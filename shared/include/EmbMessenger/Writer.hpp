@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "EmbMessenger/Templates.hpp"
+#include "Templates.hpp"
 
 namespace emb
 {

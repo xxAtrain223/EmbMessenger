@@ -9,12 +9,21 @@
     },
     "export": {
         "include": [
-            "device",
-            "shared"
+            "device/include/EmbMessenger/*.hpp",
+            "shared/include/EmbMessenger/*.hpp",
+            "shared/src/*.cpp"
+        ]
+    },
+    "build": {
+        "flags": [
+            "-I device/include",
+            "-I shared/include"
         ],
-        "exclude": [
-            "device/test",
-            "shared/test"
+        "srcFilter": [
+            "+<device/>",
+            "-<device/test/>",
+            "+<shared/>",
+            "-<shared/test/>"
         ]
     }
 }
