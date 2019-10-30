@@ -22,9 +22,9 @@ namespace emb
         {
             m_message_id = 0;
 
-            registerCommand<ResetCommand>(255);
-            registerCommand<RegisterPeriodicCommand>(254);
-            registerCommand<UnregisterPeriodicCommand>(253);
+            registerCommand<ResetCommand>(0xFFFF);
+            registerCommand<RegisterPeriodicCommand>(0xFFFE);
+            registerCommand<UnregisterPeriodicCommand>(0xFFFD);
 
             using clock_t = std::chrono::steady_clock;
             bool initializing = true;
@@ -110,7 +110,7 @@ namespace emb
         std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command)
         {
             std::type_index type_index = command->getTypeIndex();
-            uint8_t command_id = 0;
+            uint16_t command_id = 0;
             try
             {
                 command_id = m_command_ids.at(type_index);
@@ -120,6 +120,11 @@ namespace emb
                 throw UnregisteredCommand("The command was not registered.");
             }
 
+            return send(command, command_id);
+        }
+
+        std::shared_ptr<Command> EmbMessenger::send(std::shared_ptr<Command> command, uint16_t command_id)
+        {
             command->m_message_id = m_message_id;
             {
 #ifndef EMB_SINGLE_THREADED
@@ -128,8 +133,9 @@ namespace emb
                 m_commands.emplace(m_message_id, command);
             }
 
-            write(m_message_id++, m_command_ids.at(command->getTypeIndex()));
+            write(m_message_id++, command_id);
             command->send(this);
+            command->m_command_state = CommandState::Sent;
             m_writer.writeCrc();
 
             return command;
@@ -226,8 +232,8 @@ namespace emb
                 throw ExtraParameters(ExceptionSource::Host, "Message has extra parameters from the device", m_current_command);
             }
 
+            m_current_command->m_command_state = CommandState::Received;
 #ifndef EMB_SINGLE_THREADED
-            m_current_command->m_received = true;
             if (m_current_command->m_is_waiting)
             {
                 m_current_command->m_condition_variable.notify_all();
@@ -318,7 +324,7 @@ namespace emb
             m_type_index = typeid(ResetCommand);
         }
 
-        EmbMessenger::RegisterPeriodicCommand::RegisterPeriodicCommand(uint8_t commandId, uint32_t period) :
+        EmbMessenger::RegisterPeriodicCommand::RegisterPeriodicCommand(uint16_t commandId, uint32_t period) :
             m_command_id(commandId),
             m_period(period)
         {
@@ -330,7 +336,7 @@ namespace emb
             messenger->write(m_command_id, m_period);
         }
 
-        EmbMessenger::UnregisterPeriodicCommand::UnregisterPeriodicCommand(uint8_t commandId) : m_command_id(commandId)
+        EmbMessenger::UnregisterPeriodicCommand::UnregisterPeriodicCommand(uint16_t commandId) : m_command_id(commandId)
         {
             m_type_index = typeid(UnregisterPeriodicCommand);
         }
@@ -343,6 +349,22 @@ namespace emb
         void EmbMessenger::UnregisterPeriodicCommand::receive(EmbMessenger* messenger)
         {
             messenger->read(m_periodic_message_id);
+        }
+
+        bool EmbMessenger::commandsReceived()
+        {
+#ifndef EMB_SINGLE_THREADED
+            std::lock_guard<std::mutex> lock(m_commands_mutex);
+#endif
+            for (const auto& x : m_commands)
+            {
+                if (x.second->getCommandState() != CommandState::Received)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         void EmbMessenger::resetDevice()

@@ -11,7 +11,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14 CXX_STANDARD_RE
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} EmbMessengerShared)
 
-if(EMB_SINGLE_THREADED OR EMB_ENABLE_TESTING)
+if(EMB_SINGLE_THREADED OR EmbMessenger_ENABLE_TESTING)
 	target_compile_options(${PROJECT_NAME} PUBLIC -DEMB_SINGLE_THREADED)
 else()
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -20,7 +20,7 @@ else()
 	target_link_libraries(${PROJECT_NAME} Threads::Threads)
 endif()
 
-if(EMB_ENABLE_TESTING)
+if(EmbMessenger_ENABLE_TESTING)
 	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 --coverage -DEMB_TESTING)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "--coverage")
 

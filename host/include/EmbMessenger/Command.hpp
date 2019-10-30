@@ -17,6 +17,13 @@ namespace emb
     {
         class EmbMessenger;
 
+        enum class CommandState
+        {
+            NotSent,
+            Sent,
+            Received
+        };
+
         /**
          * @brief Base class for any commands to send to the device.
          * 
@@ -30,17 +37,17 @@ namespace emb
         {
             friend class EmbMessenger;
 
-        protected:
+        private:
             std::type_index m_type_index;
             uint16_t m_message_id;
             std::function<void(std::shared_ptr<Command>)> m_callback = nullptr;
             bool m_is_periodic = false;
+            CommandState m_command_state = CommandState::NotSent;
 
 #ifndef EMB_SINGLE_THREADED
             std::mutex m_mutex;
             std::condition_variable m_condition_variable;
             bool m_is_waiting = false;
-            bool m_received = false;
 #endif
 
         public:
@@ -101,6 +108,13 @@ namespace emb
                     callback(std::static_pointer_cast<CommandType>(ptr));
                 };
             }
+
+            /**
+             * @brief Gets the command's state.
+             *
+             * @return The current state of the command
+             */
+            CommandState getCommandState() const;
 
 #ifndef EMB_SINGLE_THREADED
             /**

@@ -22,12 +22,6 @@ namespace emb
                             throw UserErrorException("Something happened on the device", ptr);
                     }
                 }
-
-            public:
-                UserError()
-                {
-                    m_type_index = typeid(UserError);
-                }
             };
         }  // namespace test
     }  // namespace host

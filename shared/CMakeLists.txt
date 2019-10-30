@@ -7,7 +7,7 @@ file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "src/*.cpp")
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14 CXX_STANDARD_REQUIRED YES)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-if(EMB_ENABLE_TESTING)
+if(EmbMessenger_ENABLE_TESTING)
 	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 --coverage -DEMB_TESTING)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "--coverage")
 

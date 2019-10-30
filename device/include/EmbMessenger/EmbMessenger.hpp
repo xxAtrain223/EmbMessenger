@@ -27,8 +27,8 @@ namespace emb
          * 
          * EmbMessenger has reserved 16 command IDs for internal usage
          * 
-         * @tparam MaxCommands The maximum number of commands to store, must be less than `240`
-         * @tparam MaxPeriodicCommands The maximum number of periodic commands to store, must be less than `240`
+         * @tparam MaxCommands The maximum number of commands to store, must be less than `65520`
+         * @tparam MaxPeriodicCommands The maximum number of periodic commands to store, must be less than `65520`
          */
         template <uint8_t MaxCommands, uint8_t MaxPeriodicCommands>
         class EmbMessenger
@@ -44,7 +44,7 @@ namespace emb
 
             struct PeriodicCommand
             {
-                uint8_t command_id = 255;
+                uint16_t command_id = 65535;
                 uint16_t message_id = 0;
                 uint32_t time_interval = 0;
                 uint32_t next_time = 0;
@@ -55,7 +55,7 @@ namespace emb
             shared::Writer m_writer;
             jmp_buf m_jmp_buf;
 
-            uint8_t m_command_id;
+            uint16_t m_command_id;
             uint16_t m_message_id;
             bool m_is_periodic;
             uint8_t m_num_messages;
@@ -118,7 +118,7 @@ namespace emb
                 checkCrc();
                 for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
                 {
-                    m_periodic_commands[i].command_id = 255;
+                    m_periodic_commands[i].command_id = 65535;
                     m_periodic_commands[i].message_id = 0;
                     m_periodic_commands[i].time_interval = 0;
                     m_periodic_commands[i].next_time = 0;
@@ -140,7 +140,7 @@ namespace emb
                 bool registeredCommand = false;
                 for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
                 {
-                    if (m_periodic_commands[i].command_id >= 0xF0)
+                    if (m_periodic_commands[i].command_id >= 0xFFF0)
                     {
                         m_periodic_commands[i].command_id = periodic_command_id;
                         m_periodic_commands[i].message_id = m_message_id;
@@ -170,7 +170,7 @@ namespace emb
                     {
                         write(m_periodic_commands[i].message_id);
 
-                        m_periodic_commands[i].command_id = 255;
+                        m_periodic_commands[i].command_id = 65535;
                         m_periodic_commands[i].message_id = 0;
                         m_periodic_commands[i].time_interval = 0;
                         m_periodic_commands[i].next_time = 0;
@@ -194,7 +194,7 @@ namespace emb
                 m_reader(buffer),
                 m_writer(buffer)
             {
-                static_assert(MaxCommands < 0xF0, "MaxCommands must be less than 0xF0 (240)");
+                static_assert(MaxCommands < 0xFFF0, "MaxCommands must be less than 0xFFF0 (65520)");
                 static_assert(MaxPeriodicCommands == 0, "TimeFunction required for periodic commands");
 
                 for (uint8_t i = 0; i < MaxCommands; ++i)
@@ -215,8 +215,8 @@ namespace emb
                 m_writer(buffer),
                 m_time_func(timeFunc)
             {
-                static_assert(MaxCommands < 0xF0, "MaxCommands must be less than 0xF0 (240)");
-                static_assert(MaxPeriodicCommands < 0xF0, "MaxPeriodicCommands must be less than 0xF0 (240)");
+                static_assert(MaxCommands < 0xFFF0, "MaxCommands must be less than 0xFFF0 (65520)");
+                static_assert(MaxPeriodicCommands < 0xFFF0, "MaxPeriodicCommands must be less than 0xFFF0 (65520)");
 
                 for (uint8_t i = 0; i < MaxCommands; ++i)
                 {
@@ -227,7 +227,7 @@ namespace emb
             /**
              * @brief Registers a command
              * 
-             * Command must be less than `0xF0` (`240`).
+             * Command must be less than `0xFFF0` (`65520`).
              * Command must be less than MaxCommands.
              * Command IDs cannot be reused/overridden.
              * 
@@ -237,7 +237,7 @@ namespace emb
              */
             bool registerCommand(uint8_t id, CommandFunction command)
             {
-                if (id >= 0xF0)
+                if (id >= 0xFFF0)
                 {
                     return false;
                 }
@@ -315,7 +315,7 @@ namespace emb
                     if (!m_reader.read(m_message_id))
                     {
                         m_writer.writeError(shared::DataError::kMessageIdReadError);
-                        m_writer.write(0);
+                        m_writer.write((uint8_t)0);
                         consumeMessage();
                         m_writer.writeCrc();
                         return;
@@ -325,7 +325,7 @@ namespace emb
                     if (!m_reader.read(m_command_id))
                     {
                         m_writer.writeError(shared::DataError::kCommandIdReadError);
-                        m_writer.write(0);
+                        m_writer.write((uint8_t)0);
                         consumeMessage();
                         m_writer.writeCrc();
                         return;
@@ -335,13 +335,13 @@ namespace emb
                     {
                         switch (m_command_id)
                         {
-                            case 0xFF:
+                            case 0xFFFF:
                                 resetPeriodicCommands();
                                 break;
-                            case 0xFE:
+                            case 0xFFFE:
                                 registerPeriodicCommand();
                                 break;
-                            case 0xFD:
+                            case 0xFFFD:
                                 unregisterPeriodicCommand();
                                 break;
                             default:
@@ -370,14 +370,14 @@ namespace emb
                             {
                                 consumeMessage();
                                 m_writer.writeError(shared::DataError::kCrcInvalid);
-                                m_writer.write(0);
+                                m_writer.write((uint8_t)0);
                             }
                         }
                         else
                         {
                             consumeMessage();
                             m_writer.writeError(shared::DataError::kExtraParameters);
-                            m_writer.write(0);
+                            m_writer.write((uint8_t)0);
                         }
                     }
 
@@ -390,7 +390,7 @@ namespace emb
                     uint32_t current_time = m_time_func();
                     for (uint8_t i = 0; i < MaxPeriodicCommands; ++i)
                     {
-                        if (m_periodic_commands[i].command_id < 0xF0 && m_periodic_commands[i].next_time <= current_time)
+                        if (m_periodic_commands[i].command_id < 0xFFF0 && m_periodic_commands[i].next_time <= current_time)
                         {
                             m_command_id = m_periodic_commands[i].command_id;
                             m_message_id = m_periodic_commands[i].message_id;
