@@ -46,6 +46,8 @@ namespace emb
 
 #ifndef EMB_SINGLE_THREADED
             std::mutex m_mutex;
+
+        protected:
             std::condition_variable m_condition_variable;
             bool m_is_waiting = false;
 #endif
