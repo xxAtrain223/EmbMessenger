@@ -11,6 +11,8 @@
 
 #ifdef EMB_TESTING
 #include <functional>
+#elif __AVR__
+#include <avr/pgmspace.h>
 #endif
 
 #define ARRAY_SIZE(arr) sizeof(arr) / sizeof(*arr)
@@ -340,7 +342,21 @@ namespace emb
                                 unregisterPeriodicCommand();
                                 break;
                             default:
-                                if (m_command_id >= m_command_count || m_commands[m_command_id] == nullptr)
+                                if (m_command_id >= m_command_count)
+                                {
+                                    m_writer.writeError(shared::DataError::kCommandIdInvalid);
+                                    m_writer.write(m_command_id);
+                                    consumeMessage();
+                                    break;
+                                }
+
+                                #ifdef __AVR__
+                                CommandFunction command = (CommandFunction)pgm_read_ptr(m_commands + m_command_id * sizeof(CommandFunction));
+                                #else
+                                CommandFunction command = m_commands[m_command_id];
+                                #endif
+                                
+                                if (m_command_id >= m_command_count || command == nullptr)
                                 {
                                     m_writer.writeError(shared::DataError::kCommandIdInvalid);
                                     m_writer.write(m_command_id);
@@ -348,7 +364,7 @@ namespace emb
                                 }
                                 else
                                 {
-                                    m_commands[m_command_id]();
+                                    command();
                                 }
                         }
                     }
