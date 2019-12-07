@@ -1,5 +1,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "EmbMessenger/DataType.hpp"
 #include "EmbMessenger/EmbMessenger.hpp"
