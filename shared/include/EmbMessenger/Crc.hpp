@@ -4,6 +4,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __AVR__
+#include <avr/pgmspace.h>
+#else
+#define PROGMEM
+#endif
+
 #if !defined(CRC8) && !defined(CRC16) && !defined(CRC32)
 #define CRC8
 #define CRC16
@@ -65,17 +71,22 @@ namespace emb
                 T Calculate(const T table[], const T crc, const uint8_t data)
                 {
                     uint8_t pos = (uint8_t)((crc ^ ((uint32_t)data << nBits<T>())) >> nBits<T>());
-                    return ((sizeof(T) > 1) ? (crc << 8) : 0) ^ table[pos];
+#ifdef __AVR__
+                    T tableValue = pgm_read_byte_near(table + pos);
+#else
+                    T tableValue = table[pos];
+#endif
+                    return ((sizeof(T) > 1) ? (crc << 8) : 0) ^ tableValue;
                 }
 
 #ifdef CRC8
-                extern const CrcTable<uint8_t> CrcTable8;
+                extern const PROGMEM CrcTable<uint8_t> CrcTable8;
 #endif
 #ifdef CRC16
-                extern const CrcTable<uint16_t> CrcTable16;
+                extern const PROGMEM CrcTable<uint16_t> CrcTable16;
 #endif
 #ifdef CRC32
-                extern const CrcTable<uint32_t> CrcTable32;
+                extern const PROGMEM CrcTable<uint32_t> CrcTable32;
 #endif
             }  // namespace detail
 

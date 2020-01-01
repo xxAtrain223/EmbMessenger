@@ -222,38 +222,6 @@ namespace emb
             }
 
             /**
-             * @brief Registers a command
-             * 
-             * Command must be less than `0xFFF0` (`65520`).
-             * Command must be less than MaxCommands.
-             * Command IDs cannot be reused/overridden.
-             * 
-             * @param id Unique ID for the command
-             * @param command The command to be registered
-             * @return True if successful
-             */
-            /*bool registerCommand(uint8_t id, CommandFunction command)
-            {
-                if (id >= 0xFFF0)
-                {
-                    return false;
-                }
-
-                if (id >= m_command_count)
-                {
-                    return false;
-                }
-
-                if (m_commands[id] != nullptr)
-                {
-                    return false;
-                }
-
-                m_commands[id] = command;
-                return true;
-            }*/
-
-            /**
              * @brief Get the Command ID
              * 
              * For debugging, to be used within your command for sanity checks.
@@ -351,7 +319,7 @@ namespace emb
                                 }
 
                                 #ifdef __AVR__
-                                CommandFunction command = (CommandFunction)pgm_read_ptr(m_commands + m_command_id * sizeof(CommandFunction));
+                                CommandFunction command = (CommandFunction)pgm_read_ptr(m_commands + m_command_id);
                                 #else
                                 CommandFunction command = m_commands[m_command_id];
                                 #endif
