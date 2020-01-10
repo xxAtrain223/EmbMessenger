@@ -11,7 +11,11 @@
 
 #ifdef EMB_TESTING
 #include <functional>
+#elif __AVR__
+#include <avr/pgmspace.h>
 #endif
+
+#define ARRAY_SIZE(arr) sizeof(arr) / sizeof(*arr)
 
 namespace emb
 {
@@ -27,13 +31,12 @@ namespace emb
          * 
          * EmbMessenger has reserved 16 command IDs for internal usage
          * 
-         * @tparam MaxCommands The maximum number of commands to store, must be less than `65520`
          * @tparam MaxPeriodicCommands The maximum number of periodic commands to store, must be less than `65520`
          */
-        template <uint8_t MaxCommands, uint8_t MaxPeriodicCommands>
+        template <uint8_t MaxPeriodicCommands = 0>
         class EmbMessenger
         {
-        protected:
+        public:
 #ifndef EMB_TESTING
             using CommandFunction = void (*)(void);
             using TimeFunction = uint32_t (*)(void);
@@ -42,6 +45,7 @@ namespace emb
             using TimeFunction = std::function<uint32_t()>;
 #endif
 
+        protected:
             struct PeriodicCommand
             {
                 uint16_t command_id = 65535;
@@ -64,7 +68,8 @@ namespace emb
 
             TimeFunction m_time_func;
 
-            CommandFunction m_commands[MaxCommands];
+            const CommandFunction* m_commands;
+            const uint16_t m_command_count;
             PeriodicCommand m_periodic_commands[MaxPeriodicCommands];
 
             template <typename T, typename... Ts>
@@ -189,18 +194,14 @@ namespace emb
              * 
              * @param buffer Buffer for communication
              */
-            EmbMessenger(shared::IBuffer* buffer) :
+            EmbMessenger(shared::IBuffer* buffer, const CommandFunction commands[], uint16_t commandCount) :
                 m_buffer(buffer),
                 m_reader(buffer),
-                m_writer(buffer)
+                m_writer(buffer),
+                m_commands(commands),
+                m_command_count(commandCount)
             {
-                static_assert(MaxCommands < 0xFFF0, "MaxCommands must be less than 0xFFF0 (65520)");
                 static_assert(MaxPeriodicCommands == 0, "TimeFunction required for periodic commands");
-
-                for (uint8_t i = 0; i < MaxCommands; ++i)
-                {
-                    m_commands[i] = nullptr;
-                }
             }
 
             /**
@@ -209,51 +210,15 @@ namespace emb
              * @param buffer Buffer for communication
              * @param timeFunc A function that keeps track of the time. e.g. `millis()`
              */
-            EmbMessenger(shared::IBuffer* buffer, TimeFunction timeFunc) :
+            EmbMessenger(shared::IBuffer* buffer, const CommandFunction commands[], uint16_t commandCount, TimeFunction timeFunc) :
                 m_buffer(buffer),
                 m_reader(buffer),
                 m_writer(buffer),
+                m_commands(commands),
+                m_command_count(commandCount),
                 m_time_func(timeFunc)
             {
-                static_assert(MaxCommands < 0xFFF0, "MaxCommands must be less than 0xFFF0 (65520)");
                 static_assert(MaxPeriodicCommands < 0xFFF0, "MaxPeriodicCommands must be less than 0xFFF0 (65520)");
-
-                for (uint8_t i = 0; i < MaxCommands; ++i)
-                {
-                    m_commands[i] = nullptr;
-                }
-            }
-
-            /**
-             * @brief Registers a command
-             * 
-             * Command must be less than `0xFFF0` (`65520`).
-             * Command must be less than MaxCommands.
-             * Command IDs cannot be reused/overridden.
-             * 
-             * @param id Unique ID for the command
-             * @param command The command to be registered
-             * @return True if successful
-             */
-            bool registerCommand(uint8_t id, CommandFunction command)
-            {
-                if (id >= 0xFFF0)
-                {
-                    return false;
-                }
-
-                if (id >= MaxCommands)
-                {
-                    return false;
-                }
-
-                if (m_commands[id] != nullptr)
-                {
-                    return false;
-                }
-
-                m_commands[id] = command;
-                return true;
             }
 
             /**
@@ -345,7 +310,21 @@ namespace emb
                                 unregisterPeriodicCommand();
                                 break;
                             default:
-                                if (m_command_id >= MaxCommands || m_commands[m_command_id] == nullptr)
+                                if (m_command_id >= m_command_count)
+                                {
+                                    m_writer.writeError(shared::DataError::kCommandIdInvalid);
+                                    m_writer.write(m_command_id);
+                                    consumeMessage();
+                                    break;
+                                }
+
+                                #ifdef __AVR__
+                                CommandFunction command = (CommandFunction)pgm_read_ptr(m_commands + m_command_id);
+                                #else
+                                CommandFunction command = m_commands[m_command_id];
+                                #endif
+                                
+                                if (m_command_id >= m_command_count || command == nullptr)
                                 {
                                     m_writer.writeError(shared::DataError::kCommandIdInvalid);
                                     m_writer.write(m_command_id);
@@ -353,7 +332,7 @@ namespace emb
                                 }
                                 else
                                 {
-                                    m_commands[m_command_id]();
+                                    command();
                                 }
                         }
                     }

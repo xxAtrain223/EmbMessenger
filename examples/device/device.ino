@@ -2,9 +2,20 @@
 #include "ArduinoBuffer.hpp"
 
 ArduinoBuffer<64> buffer(&Serial);
-emb::EmbMessenger<5, 1> messenger(&buffer, millis);
+extern emb::device::EmbMessenger<1> messenger;
 bool ledState = false;
 const uint8_t ledPin = LED_BUILTIN;
+
+void setup()
+{
+    Serial.begin(9600);
+    pinMode(ledPin, OUTPUT);
+}
+
+void loop()
+{
+    messenger.update();
+}
 
 void ping()
 {
@@ -39,8 +50,8 @@ void addAdaptor()
 {
     int16_t a = 0, b = 0, rv = 0;
 
-    messenger.read_and_validate(a, [](int16_t val){ return val > -16 && val < 128; });
-    messenger.read_and_validate(b, [](int16_t val){ return val > -16 && val < 128; });
+    messenger.read(a, [](int16_t val){ return val > -16 && val < 128; });
+    messenger.read(b, [](int16_t val){ return val > -16 && val < 128; });
 
     add(a, b, rv);
 
@@ -60,19 +71,11 @@ void delayMs()
     delay(ms);
 }
 
-void setup()
-{
-    Serial.begin(9600);
-    pinMode(ledPin, OUTPUT);
-
-    messenger.attachCommand(0, ping);
-    messenger.attachCommand(1, setLedAdaptor);
-    messenger.attachCommand(2, toggleLedAdaptor);
-    messenger.attachCommand(3, addAdaptor);
-    messenger.attachCommand(4, delayMs);
-}
-
-void loop()
-{
-    messenger.update();
-}
+const emb::device::EmbMessenger<>::CommandFunction commands[] PROGMEM = {
+    ping,
+    setLedAdaptor,
+    toggleLedAdaptor,
+    addAdaptor,
+    delayMs
+};
+emb::device::EmbMessenger<1> messenger(&buffer, commands, 5, millis);
