@@ -319,7 +319,8 @@ namespace emb
                     default:
                         m_current_command->reportError(error, data, m_current_command);
                         std::stringstream stream;
-                        stream << std::hex << error;
+                        stream << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(error) <<
+                            " with data 0x" << std::setw(4) << static_cast<uint16_t>(data);
                         throw BaseException(ExceptionSource::Device,
                                             "The device reported a user defined error. 0x" + stream.str(),
                                             m_current_command);
