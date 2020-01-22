@@ -222,7 +222,7 @@ namespace emb
             m_message_count = 0;
         }
 
-        DebugBuffer::DebugBuffer(emb::shared::IBuffer* buffer, std::function<void(std::string)> print_func) :
+        DebugBuffer::DebugBuffer(std::shared_ptr<emb::shared::IBuffer> buffer, std::function<void(std::string)> print_func) :
             m_real_buffer(buffer),
             m_read_buffer(BufferType::Read, print_func),
             m_write_buffer(BufferType::Write, print_func)

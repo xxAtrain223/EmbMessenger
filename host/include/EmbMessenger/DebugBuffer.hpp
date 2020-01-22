@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "EmbMessenger/IBuffer.hpp"
 #include "EmbMessenger/Reader.hpp"
@@ -48,7 +49,7 @@ namespace emb
                 virtual void zero() override;
             };
 
-            emb::shared::IBuffer* m_real_buffer;
+            std::shared_ptr<emb::shared::IBuffer> m_real_buffer;
             DecodeBuffer m_read_buffer, m_write_buffer;
 
         public:
@@ -58,7 +59,7 @@ namespace emb
              * @param buffer The real buffer to use for communication.
              * @param print_func The function for printing the output. Defaults to stdout.
              */
-            DebugBuffer(emb::shared::IBuffer* buffer, std::function<void(std::string)> print_func = [](std::string str) { std::cout << str << std::endl; });
+            DebugBuffer(std::shared_ptr<emb::shared::IBuffer> buffer, std::function<void(std::string)> print_func = [](std::string str) { std::cout << str << std::endl; });
 
             virtual void writeByte(const uint8_t byte) override;
             virtual uint8_t peek() const override;
