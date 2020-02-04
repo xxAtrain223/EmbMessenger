@@ -89,6 +89,8 @@ namespace emb
                 default:
                     return 0;
             }
+
+            return 0;
         }
     }  // namespace shared
 }  // namespace emb
