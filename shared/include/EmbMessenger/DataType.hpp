@@ -43,54 +43,56 @@ namespace emb
          */
         constexpr uint8_t dataBytes(DataType type)
         {
+            uint8_t rv = 0;
+
             if ((uint8_t)type <= 0x7F)  // PosFixInt
             {
-                return 0;
+                rv = 0;
             }
             else if ((uint8_t)type >= 0xE0)  // NegFixInt
             {
-                return 0;
+                rv = 0;
             }
 
             switch (type)
             {
                 case emb::shared::kNull:
-                    return 0;
+                    rv = 0;
                 case emb::shared::kBoolFalse:
-                    return 0;
+                    rv = 0;
                 case emb::shared::kBoolTrue:
-                    return 0;
+                    rv = 0;
                 case emb::shared::kFloat:
-                    return 2;
+                    rv = 2;
                 case emb::shared::kUint8:
-                    return 1;
+                    rv = 1;
                 case emb::shared::kUint16:
-                    return 2;
+                    rv = 2;
                 case emb::shared::kUint32:
-                    return 4;
+                    rv = 4;
                 case emb::shared::kUint64:
-                    return 8;
+                    rv = 8;
                 case emb::shared::kInt8:
-                    return 1;
+                    rv = 1;
                 case emb::shared::kInt16:
-                    return 2;
+                    rv = 2;
                 case emb::shared::kInt32:
-                    return 4;
+                    rv = 4;
                 case emb::shared::kInt64:
-                    return 8;
+                    rv = 8;
                 case emb::shared::kPosFixInt:
-                    return 0;
+                    rv = 0;
                 case emb::shared::kNegFixInt:
-                    return 0;
+                    rv = 0;
                 case emb::shared::kEndOfMessage:
-                    return 1;
+                    rv = 1;
                 case emb::shared::kError:
-                    return 1;
+                    rv = 1;
                 default:
-                    return 0;
+                    rv = 0;
             }
 
-            return 0;
+            return rv;
         }
     }  // namespace shared
 }  // namespace emb
