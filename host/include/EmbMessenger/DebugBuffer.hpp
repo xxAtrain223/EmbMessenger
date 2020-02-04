@@ -29,10 +29,12 @@ namespace emb
             class DecodeBuffer : public emb::shared::IBuffer
             {
                 std::vector<uint8_t> m_buf;
-                bool m_receivedEOM = false, m_readEOM = false;
-                uint8_t m_message_count = 0;
+                uint8_t m_numberMessages = 0;
                 BufferType m_type;
                 std::function<void(std::string)> m_print_func;
+
+                emb::shared::DataType m_readType, m_writeType;
+                uint8_t m_readBytes, m_writeBytes;
 
                 void decode();
 

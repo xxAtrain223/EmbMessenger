@@ -28,9 +28,9 @@ namespace emb
         }
 
         DebugBuffer::DecodeBuffer::DecodeBuffer(BufferType type, std::function<void(std::string)> print_func) :
-            m_type(type),
-            m_print_func(print_func)
+            m_type(type), m_print_func(print_func)
         {
+            zero();
         }
 
         // Primary function decoding a message
@@ -106,7 +106,8 @@ namespace emb
                         uint64_t value;
                         reader.read(value);
                         // Print it with '0x' and leading 0's
-                        ss << value << " 0x" << std::setfill('0') << std::setw(getWidth(value)) << value << std::setfill(' ');
+                        ss << value << " 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(getWidth(value)) << value
+                           << std::setfill(' ') << std::dec;
                     } break;
 
                     case kNegFixInt:
@@ -146,7 +147,8 @@ namespace emb
                     case kEndOfMessage: {
                         // Read end of message and check the CRC
                         ss.str("");
-                        ss << (m_type == BufferType::Write ? "Write" : "Read ") << " Message " << message_id << " CRC " << (reader.readCrc() ? "Valid" : "Invalid");
+                        ss << (m_type == BufferType::Write ? "Write" : "Read ") << " Message " << message_id << " CRC "
+                           << (reader.readCrc() ? "Valid" : "Invalid");
                     } break;
 
                     default: {
@@ -162,15 +164,20 @@ namespace emb
         void DebugBuffer::DecodeBuffer::writeByte(const uint8_t byte)
         {
             m_buf.emplace_back(byte);
-            if (byte == emb::shared::DataType::kEndOfMessage)
+            if (m_writeBytes == 0)
             {
-                m_receivedEOM = true;
+                m_writeType = (emb::shared::DataType)byte;
+                m_writeBytes = emb::shared::dataBytes(m_writeType);
             }
-            else if (m_receivedEOM)
+            else
             {
-                ++m_message_count;
-                m_receivedEOM = false;
-                decode(); // Received full message, decode it.
+                --m_writeBytes;
+            }
+
+            if (m_writeBytes == 0 && m_writeType == emb::shared::DataType::kEndOfMessage)
+            {
+                ++m_numberMessages;
+                decode();
             }
         }
 
@@ -183,15 +190,22 @@ namespace emb
         {
             uint8_t byte = m_buf.at(0);
             m_buf.erase(m_buf.begin());
-            if (byte == emb::shared::DataType::kEndOfMessage)
+
+            if (m_readBytes == 0)
             {
-                m_readEOM = true;
+                m_readType = (emb::shared::DataType)byte;
+                m_readBytes = emb::shared::dataBytes(m_readType);
             }
-            else if (m_readEOM)
+            else
             {
-                --m_message_count;
-                m_readEOM = false;
+                --m_readBytes;
             }
+
+            if (m_readBytes == 0 && m_readType == emb::shared::DataType::kEndOfMessage)
+            {
+                --m_numberMessages;
+            }
+
             return byte;
         }
 
@@ -207,7 +221,7 @@ namespace emb
 
         uint8_t DebugBuffer::DecodeBuffer::messages() const
         {
-            return m_message_count;
+            return m_numberMessages;
         }
 
         void DebugBuffer::DecodeBuffer::update()
@@ -217,18 +231,21 @@ namespace emb
         void DebugBuffer::DecodeBuffer::zero()
         {
             m_buf.clear();
-            m_receivedEOM = false;
-            m_readEOM = false;
-            m_message_count = 0;
+            m_readType = emb::shared::DataType::kNull;
+            m_readBytes = 0;
+            m_writeType = emb::shared::DataType::kNull;
+            m_writeBytes = 0;
+            m_numberMessages = 0;
         }
 
-        DebugBuffer::DebugBuffer(std::shared_ptr<emb::shared::IBuffer> buffer, std::function<void(std::string)> print_func) :
+        DebugBuffer::DebugBuffer(std::shared_ptr<emb::shared::IBuffer> buffer,
+                                 std::function<void(std::string)> print_func) :
             m_real_buffer(buffer),
             m_read_buffer(BufferType::Read, print_func),
             m_write_buffer(BufferType::Write, print_func)
         {
         }
-        
+
         // Copy the byte into the write decode buffer, then forward it to the real buffer
         void DebugBuffer::writeByte(const uint8_t byte)
         {
