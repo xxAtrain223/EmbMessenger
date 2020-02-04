@@ -41,7 +41,7 @@ namespace emb
          *
          * @returns Number of data bytes
          */
-        constexpr uint8_t dataBytes(DataType type)
+        inline uint8_t dataBytes(DataType type)
         {
             uint8_t rv = 0;
 
