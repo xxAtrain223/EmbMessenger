@@ -58,38 +58,55 @@ namespace emb
             {
                 case emb::shared::kNull:
                     rv = 0;
+                    break;
                 case emb::shared::kBoolFalse:
                     rv = 0;
+                    break;
                 case emb::shared::kBoolTrue:
                     rv = 0;
+                    break;
                 case emb::shared::kFloat:
                     rv = 2;
+                    break;
                 case emb::shared::kUint8:
                     rv = 1;
+                    break;
                 case emb::shared::kUint16:
                     rv = 2;
+                    break;
                 case emb::shared::kUint32:
                     rv = 4;
+                    break;
                 case emb::shared::kUint64:
                     rv = 8;
+                    break;
                 case emb::shared::kInt8:
                     rv = 1;
+                    break;
                 case emb::shared::kInt16:
                     rv = 2;
+                    break;
                 case emb::shared::kInt32:
                     rv = 4;
+                    break;
                 case emb::shared::kInt64:
                     rv = 8;
+                    break;
                 case emb::shared::kPosFixInt:
                     rv = 0;
+                    break;
                 case emb::shared::kNegFixInt:
                     rv = 0;
+                    break;
                 case emb::shared::kEndOfMessage:
                     rv = 1;
+                    break;
                 case emb::shared::kError:
                     rv = 1;
+                    break;
                 default:
                     rv = 0;
+                    break;
             }
 
             return rv;
